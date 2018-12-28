@@ -1,0 +1,49 @@
+{% extends "account/dashboardlayout.html" %}
+
+{% block content1 %}
+
+<!-- <h1 class="h2">Visitors Address Book</h1> -->
+<div class="btn-toolbar mb-2 mb-md-0">
+  <form class="form-inline">
+        <input class="form-control mr-sm-2" placeholder="Search" type="search" name="q" id="query" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+  </form>
+
+  <div class="btn-group mr-2">
+    <a href="/addnewvisit" class="btn btn-dark">New Visit</a>
+  </div>
+</div>
+</div>
+
+
+<br>
+
+  <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Select</th>
+          <th scope="col">NANE</th>
+          <th scope="col">host</th>
+          <th scope="col">visitor</th>
+          <th scope="col">invite_reason</th>
+        </tr>
+      </thead>
+  {% for ip in objects_all %}
+  {% for m_obj in objects_all1 %}
+        {{m_obj.full_name}}
+    {% endfor %}
+      <tbody>
+        <tr>
+          <th scope="row">
+            <input type="checkbox" name="select" id="select">
+          </th>
+          <td>{{ip.visitor}}</td>
+          <td>{{ip.host}}</td>
+          <td>{{ip.visit}}</td>
+          <td>{{ip.invite_reason}}</td>
+        </tr>
+      </tbody>
+  {% endfor %}
+</table>
+
+{% endblock %}

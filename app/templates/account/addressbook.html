@@ -1,0 +1,74 @@
+{% extends "account/dashboardlayout.html" %}
+
+{% block content1 %}
+
+<h1 class="h2">Visitors Address Book</h1>
+<div class="btn-toolbar mb-2 mb-md-0">
+  <div class="btn-group mr-2">
+    <button class="btn btn-sm btn-outline-secondary">Share</button>
+  </div>
+</div>
+</div>
+
+<form class="form-inline">
+  <input class="form-control mr-sm-2" placeholder="Search" type="search" name="q" id="query" aria-label="Search">
+  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+</form>
+<br>
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">ALL</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">A</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">B</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">C</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">D</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">E</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">F</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">G</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">H</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">I</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">J</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">K</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">L</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">M</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">N</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">O</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">P</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">Q</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">R</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">S</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">T</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">U</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">V</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">W</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">X</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">Y</a></li>
+      <li class="page-item"><a class="page-link" href="#" type="search" name="q">Z</a></li>
+    </ul>
+  </nav>
+
+  <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Select</th>
+          <th scope="col">NANE</th>
+          <th scope="col">EMAIL</th>
+          <th scope="col">COMPANY</th>
+          <th scope="col">ADDRESS BOOK</th>
+        </tr>
+      </thead>
+  {% for ip in objects_all %}
+      <tbody>
+        <tr>
+          <th scope="row">
+            <input type="checkbox" name="select" id="select">
+          </th>
+          <td>{{ip.full_name}}</td>
+          <td>{{ip.email}}</td>
+          <td>{{ip.company_name}}</td>
+          <td>{{ip.address}}</td>
+        </tr>
+      </tbody>
+  {% endfor %}
+</table>
+{% endblock %}

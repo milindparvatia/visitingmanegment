@@ -1,0 +1,36 @@
+{% extends "app/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container body-content">
+    <div class="card mx-auto card-container w-50 p-5">
+            <p id="profile-name" class="profile-name-card">
+                    <br>
+                    {% if form.errors %}
+                    <p>Your account doesn't have access to this page. To proceed,
+                        please login with an account that has access.</p>
+                    {% endif %}
+                    <h1>Login Page</h1><br><br>
+                    {% if next%}
+                    <p>Please login to see this page.</p>
+                    {% endif %}
+            </p>
+            <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                    <div class="form-group">
+                        {{form.username|as_crispy_field}}
+                    </div>
+                    <div class="form-group">
+                        {{form.password|as_crispy_field}}
+                    </div>
+                    <button class="btn btn-primary" type="submit">Sign in</button>
+                    <input type="hidden" name="next" value="{{next}}">  
+                    <a href="..\..\register" class="btn btn-dark">register</a>
+            </form>
+            {# Assumes you setup the password_reset view in your URLconf #}
+            <br><p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+            
+        </div>
+    </form>
+</div>
+{% endblock %}
