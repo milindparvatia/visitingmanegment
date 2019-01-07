@@ -1,7 +1,5 @@
 from django.contrib import admin
-from app.models import Visit,Visitor,Host
+from app.models import Visitor,Host
 
-# Register your models here.
-admin.site.register(Visit)
 admin.site.register(Visitor)
 admin.site.register(Host)

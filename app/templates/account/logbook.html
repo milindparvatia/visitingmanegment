@@ -1,49 +1,85 @@
 {% extends "account/dashboardlayout.html" %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
 
 {% block content1 %}
 
-<!-- <h1 class="h2">Visitors Address Book</h1> -->
+<h1 class="h2">Log Book</h1>
 <div class="btn-toolbar mb-2 mb-md-0">
-  <form class="form-inline">
-        <input class="form-control mr-sm-2" placeholder="Search" type="search" name="q" id="query" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-  </form>
-
   <div class="btn-group mr-2">
-    <a href="/addnewvisit" class="btn btn-dark">New Visit</a>
+    <a href="/addnewvisit" class="btn btn-dark">Add New</a>
   </div>
 </div>
 </div>
 
+<form class="form-inline">
+  <input class="form-control mr-sm-2" placeholder="Search" type="search" name="q" id="query" aria-label="Search">
+  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+</form>
 
 <br>
-
-  <table class="table table-hover">
-      <thead>
-        <tr>
-          <th scope="col">Select</th>
-          <th scope="col">NANE</th>
-          <th scope="col">host</th>
-          <th scope="col">visitor</th>
-          <th scope="col">invite_reason</th>
-        </tr>
-      </thead>
-  {% for ip in objects_all %}
-  {% for m_obj in objects_all1 %}
-        {{m_obj.full_name}}
-    {% endfor %}
-      <tbody>
-        <tr>
-          <th scope="row">
-            <input type="checkbox" name="select" id="select">
-          </th>
-          <td>{{ip.visitor}}</td>
-          <td>{{ip.host}}</td>
-          <td>{{ip.visit}}</td>
-          <td>{{ip.invite_reason}}</td>
-        </tr>
-      </tbody>
-  {% endfor %}
+<table class="table table-bordered table-hover table-responsive">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">STATUSSSSSS</th>
+      <th scope="col">NANE</th>
+      <th scope="col">EMAIL</th>
+      <th scope="col">COMPANY</th>
+      <th scope="col">ADDRESS BOOK</th>
+      <th scope="col">COMPANY</th>
+      <th scope="col">COMPANY</th>
+      <th scope="col">COMPANY</th>
+      <th scope="col">COMPANY</th>
+      <th scope="col">COMPANY</th>
+      <th scope="col">COMPANY</th>
+      <th scope="col">COMPANY</th>
+    </tr>
+  </thead>
+{% for ip in objects_all %}
+  <tbody>
+    <tr>
+      <th scope="row">
+        <input type="checkbox" name="select" id="select">
+      </th>
+      <td>
+        <form action="/statusupdate/{{ip.id}}/" id="updateForm" method="POST">
+          {% csrf_token %}
+          {{ip.status}}
+            <div class="form-group">
+                {{ form1.status|as_crispy_field }}
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </form>
+        </td>
+      <td>{{ip.full_name}}</td>
+      <td>{{ip.email}}</td>
+      <td>{{ip.company_name}}</td>
+      <td>{% for data in ip.visiting.all %}{{ data }}{% endfor %}</td>
+      <td>{{ip.mobile}}</td>
+      <td>{{ip.licenseplate}}</td>
+      <td>{{ip.about}}</td>
+      <td>{{ip.comment}}</td>
+      <td>{{ip.date}}</td>
+      <td>{{ip.start_time}}</td>
+      <td>{{ip.end_time}}</td>
+    </tr>
+  </tbody>
+{% endfor %}
 </table>
+
+<p>Click on this paragraph.</p>
+
+<script>
+    {% block jquery %}
+  
+    // $(document).ready(function(){
+    //   $(".ssss").change(function(){
+    //       $('#updateForm').submit();
+    //     });
+    //   });
+  
+    {% endblock %}
+  </script>
 
 {% endblock %}

@@ -1,39 +1,37 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect, get_object_or_404
 
-from app.models import Host,Visit,Visitor
+from app.models import Host,Visitor
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
+from rest_framework import viewsets,status
 from rest_framework.generics import ListAPIView
-from app.serializers import HostSerializer,VisitorSerializer,VisitSerializer
+from app.serializers import HostSerializer,VisitorSerializer
 from app.forms import VisitorForm,HostForm
-from .forms import ToDoForm
+from .forms import ToDoForm, StatusForm
 
 from django.db.models import Q
-# class VisitorViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows users to be viewed or edited.
-#     """
-#     queryset = Group.objects.all()
-#     serializer_class = VisitorSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
+class VisitorViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Visitor.objects.all()
+    serializer_class = VisitorSerializer
 
-# class VisitViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows groups to be viewed or edited.
-#     """
-#     queryset = Group.objects.all()
-#     serializer_class = VisitSerializer
+class HostViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Host.objects.all()
+    serializer_class = HostSerializer
 
 class HostView(ListAPIView):
     queryset = Host.objects.all()
     serializer_class = HostSerializer
-
-class VisitView(ListAPIView):
-    queryset = Visit.objects.all()
-    serializer_class = VisitSerializer
 
 class VisitorView(ListAPIView):
     queryset = Visitor.objects.all()
@@ -45,6 +43,7 @@ def addnewvisit(request):
         instance = form.save(commit=False)
         print(form.cleaned_data.get("full_name"))
         instance.save()
+        form.save_m2m()
     else:
         form = VisitorForm()
             
@@ -88,48 +87,48 @@ def contact(request):
 def index(request):
     return render(request,'app/index.html')
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
+def statusupdate(request,id=None): 
+    instance = get_object_or_404(Visitor,id=id)
 
-# class CompanyListView(APIView):
-#     def get(self, request):
-#         query_list = VisitSerializer
-#         # one = Host.objects.prefetch_related('relateds')
-#         query = request.GET.get("q")
+    form = StatusForm(request.POST or None, instance=instance)
+    if form.is_valid():
+        instance = form.save(commit=False)
+        print(form.cleaned_data.get("status"))
+        instance.save(update_fields=["status"])
+    else:
+        form = StatusForm()
+            
+    instance = {'form':form}
+    return HttpResponseRedirect('../../logbook/')
 
-#         if query:
-#             query_list = query_list.filter(
-#                 Q(visit=query)|
-#                 Q(visitor=query)|
-#                 Q(host=query)|
-#                 Q(invite_reason=query)
-#                 )
 
-#         instance = {
-#             "objects_all":query_list,
-#             # "objects_all1":events
-#         }
-#         return Response(instance)
-
-from django.forms.models import model_to_dict
-
-def logbook(request):
-    query_list = Visit.objects.all()
+def logbook(request): 
+    query_list = Visitor.objects.all()
     one = Host.objects.prefetch_related('relateds')
-    # print(query_list[0].visiting.value)
+    
+    # instance = get_object_or_404(Visitor)
+    form = StatusForm(request.POST or None)
+    if form.is_valid():
+        instance = form.save(commit=False)
+        print(form.cleaned_data.get("status"))
+        instance.save(update_fields=["status"])
+    else:
+        form = StatusForm()
+    
     query = request.GET.get("q")
 
     if query:
         query_list = query_list.filter(
-            Q(visit=query)|
-            Q(visitor=query)|
-            Q(host=query)|
-            Q(invite_reason=query)
+            Q(full_name__icontains=query)|
+            Q(email__icontains=query)|
+            Q(company_name__icontains=query)
+            # Q(address__icontains=query)
             )
 
     instance = {
         "objects_all":query_list,
-        "objects_all1":one
+        "objects_all1":one,
+        'form1':form
     }
     return render(request, 'account/logbook.html', instance)
 
@@ -174,4 +173,3 @@ def colleagues(request):
         "objects_all":query_list
     }
     return render(request, 'account/colleagues.html', instance)
-    

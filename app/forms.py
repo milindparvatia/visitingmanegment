@@ -1,7 +1,6 @@
 from django import forms
-from .models import Visit,Visitor,Host
-from bootstrap_datepicker_plus import DatePickerInput
-from django import forms
+from .models import Visitor,Host
+from bootstrap_datepicker_plus import DatePickerInput,TimePickerInput
 
 class ToDoForm(forms.Form):
     date = forms.DateField(
@@ -12,7 +11,26 @@ class ToDoForm(forms.Form):
         label=''
     )
 
+class StatusForm(forms.ModelForm):
+    class Meta:
+        model = Visitor
+        fields = [
+            'status'
+        ]
+    
+    def __init__(self, *args, **kwargs):
+        super(StatusForm, self).__init__(*args, **kwargs)
+        self.fields['status'].label = False
+        self.fields['status'].widget.attrs.update({'class': "ssss"})
+
 class VisitorForm(forms.ModelForm):
+    date = forms.DateField(
+        widget=DatePickerInput(
+            format='%m/%d/%Y',
+            attrs={'id':'date','onchange':'myFunction()'}
+        ),
+        label='Date Visiting'
+    )
     class Meta:
         model = Visitor
         fields = [
@@ -23,8 +41,16 @@ class VisitorForm(forms.ModelForm):
             "licenseplate",
             "about",
             "comment",
-            "visiting"
+            "visiting",
+            'start_time', 
+            'end_time',
+            'status'
+            # "durations"
         ]
+        widgets = {
+            'start_time':TimePickerInput().start_of('party time'),
+            'end_time':TimePickerInput().end_of('party time'),
+        }
 
     def __init__(self, *args, **kwargs):
         def new_label_from_instance(self, obj):
@@ -52,17 +78,4 @@ class HostForm(forms.ModelForm):
             "email",
             "mobile",
             "comment"
-        ]
-
-class VisitForm(forms.ModelForm):
-    attrs={
-        'class': 'form-control'
-    }
-    class Meta:
-        model = Visit
-        fields = [
-            "visitor",
-            "host",
-            "visit",
-            "invite_reason"
         ]
