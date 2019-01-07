@@ -3,34 +3,34 @@
 {% block content %}
 <div class="container-fluid">
         <div class="row">
-            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav class="col-md-0 d-md-block bg-light sidebar">
             <div class="sidebar-sticky">
               <ul class="nav flex-column">
                 <li class="nav-item">
                   <a class="nav-link active" href="..\..\logbook">
-                    Dashboard <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Log Book">people</i>
+                     <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Log Book">people</i>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="..\..\addressbook">
-                    Address Book <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Visitors Address Book">contacts</i>
+                     <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Visitors Address Book">contacts</i>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="..\..\analytics">
-                      Analytics <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Analytics">show_chart</i>
+                       <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Analytics">show_chart</i>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="..\..\locations">
-                      Locations overview <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Locations overview">location_on</i>
+                       <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Locations overview">location_on</i>
                   </a>
                 </li>
               </ul>
             </div>
           </nav>
   
-          <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+          <main role="main" class="col">
               <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 {% block content1 %}{% endblock %}
               </div>

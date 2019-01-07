@@ -21,7 +21,8 @@ class StatusForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(StatusForm, self).__init__(*args, **kwargs)
         self.fields['status'].label = False
-        self.fields['status'].widget.attrs.update({'class': "ssss"})
+        # self.fields['status'].widget.attrs.update({'class': "ssss"})
+        # self.fields['status'].widget.attrs={ 'id': '{{ip.id}}', 'class': 'myCustomClass'}
 
 class VisitorForm(forms.ModelForm):
     date = forms.DateField(
