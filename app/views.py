@@ -65,7 +65,6 @@ def addnewhost(request):
 def register(request):
     if request.method == 'POST':    
         form = UserCreationForm(request.POST)
-    
         if form.is_valid():
             form.save()
             username = form.cleaned_data['username']
@@ -74,18 +73,9 @@ def register(request):
             login(request, user)
         return render(request,'account/logbook.html')
     else:
-                form=UserCreationForm()
+        form=UserCreationForm()
     context={'form' : form}
     return render(request,'registration/register.html',context)
-    
-def about(request):
-    return render(request,'app/about.html')
-
-def contact(request):
-    return render(request,'app/contact.html')
-
-def index(request):
-    return render(request,'app/index.html')
 
 def statusupdate(request,id=None): 
     instance = get_object_or_404(Visitor,id=id)
@@ -151,13 +141,6 @@ def addressbook(request):
 
     # return render(request,'account/addressbook.html')
 
-def locations(request):
-    user_form = ToDoForm()
-    return render(request, 'account/Locations.html', {'form': user_form})
-
-def analytics(request):
-    return render(request,'account/analytics.html')
-
 def colleagues(request):
     query_list = Host.objects.all()
     query = request.GET.get("q")
@@ -173,3 +156,19 @@ def colleagues(request):
         "objects_all":query_list
     }
     return render(request, 'account/colleagues.html', instance)
+
+def about(request):
+    return render(request,'app/about.html')
+
+def contact(request):
+    return render(request,'app/contact.html')
+
+def index(request):
+    return render(request,'app/index.html')
+
+def locations(request):
+    user_form = ToDoForm()
+    return render(request, 'account/Locations.html', {'form': user_form})
+
+def analytics(request):
+    return render(request,'account/analytics.html')
