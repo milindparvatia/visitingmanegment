@@ -5,7 +5,7 @@ from bootstrap_datepicker_plus import DatePickerInput,TimePickerInput
 class ToDoForm(forms.Form):
     date = forms.DateField(
         widget=DatePickerInput(
-            format='%m/%d/%Y',
+            format='%Y-%m-%d',
             attrs={'id':'date','onchange':'myFunction()'}
         ),
         label=''

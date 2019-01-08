@@ -29,11 +29,15 @@ class VisitorSerializer(ModelSerializer):
         model = Visitor
         fields = [
             "full_name",
+            'status',
             "company_name",
             "email",
             "mobile",
             "licenseplate",
             "about",
             "comment",
-            "visiting"
+            "visiting",
+            'date',
+            'start_time',
+            'end_time'
         ]

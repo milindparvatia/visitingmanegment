@@ -4,18 +4,23 @@
 
 {% block content1 %}
 
-<h1 class="h2">Log Book</h1>
+<form class="form-inline">
+    <input class="form-control mr-sm-2" placeholder="Search" type="search" name="q" id="query" aria-label="Search">
+</form>
+<form action="" method="GET" id="yourFormId" class="form">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_css %}         {# Embed Bootstrap CSS #}
+    {% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+    {{ form.media }}
+</form>
+<!-- <h1 class="h2">Log Book</h1> -->
 <div class="btn-toolbar mb-2 mb-md-0">
   <div class="btn-group mr-2">
     <a href="/addnewvisit" class="btn btn-dark">Add New</a>
   </div>
 </div>
 </div>
-
-<form class="form-inline">
-  <input class="form-control mr-sm-2" placeholder="Search" type="search" name="q" id="query" aria-label="Search">
-  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-</form>
 
 <br>
 <table class="table table-hover table-bordered table-responsive">
@@ -74,5 +79,15 @@
 </table>
 
 
-
+<script>
+    {% block jquery %}
+  
+    $(document).ready(function(){
+      $("#date").blur(function(){
+          $('#yourFormId').submit();
+        });
+      });
+  
+    {% endblock %}
+  </script>
 {% endblock %}

@@ -14,6 +14,9 @@ from .forms import ToDoForm, StatusForm
 from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.core.mail import send_mail
+
+from projectvisitor.settings import EMAIL_HOST_USER
 
 class VisitorViewSet(viewsets.ModelViewSet):
     """
@@ -41,9 +44,36 @@ def addnewvisit(request):
     form = VisitorForm(request.POST)
     if form.is_valid():
         instance = form.save(commit=False)
-        print(form.cleaned_data.get("full_name"))
+
+        name = form.cleaned_data.get("full_name")
+        email = form.cleaned_data.get("email")
+        hostname= form.cleaned_data.get("visiting")
+        fromtime = form.cleaned_data.get("start_time").strftime('%H:%M:%S')
+        totime = form.cleaned_data.get("end_time").strftime('%H:%M:%S')
+        ondate = form.cleaned_data.get("date").strftime('%m-%d-%Y')
+        hostval = hostname.values()
+        list_result = [entry for entry in hostval]
+        hname=list_result[0]['full_name']
+
+        hostsubject='New apointment is created with '+name
+        hostmessage='New visit is added with '+hname+' on '+ondate+ ' from '+fromtime+ ' to '+totime
+        hostsender_email=email
+        hostreceipient_email=EMAIL_HOST_USER
+
+        reciversubject='New apointment is created with '+hname
+        recivermessage='New visit is added with '+name+' on '+ondate+ ' from '+fromtime+ ' to '+totime
+        sender_email=EMAIL_HOST_USER
+        receipient_email=email
+        send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
+        send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
         instance.save()
         form.save_m2m()
+        # hostnamemain = [full_name for full_name in list_result]
+        # print(hostnamemain)
+        # print(list_result[1]['full_name'])
+        # print(ondate)
+        # print(form.cleaned_data.get("end_time"))
+        # print(form.cleaned_data.get("date"))
     else:
         form = VisitorForm()
             
@@ -93,10 +123,11 @@ def statusupdate(request,id=None):
 
 
 def logbook(request): 
-    query_list = Visitor.objects.all()
+    query_list = Visitor.objects.all().order_by('-date')
     one = Host.objects.prefetch_related('relateds')
     
-    # instance = get_object_or_404(Visitor)
+    user_form = ToDoForm()
+    
     form = StatusForm(request.POST or None)
     if form.is_valid():
         instance = form.save(commit=False)
@@ -105,6 +136,12 @@ def logbook(request):
     else:
         form = StatusForm()
     
+    datequery = request.GET.get("date")
+
+    if datequery:
+        query_list = query_list.filter(
+            Q(date__icontains=datequery)
+            )
     query = request.GET.get("q")
 
     if query:
@@ -118,12 +155,14 @@ def logbook(request):
     instance = {
         "objects_all":query_list,
         "objects_all1":one,
-        'form1':form
+        'form1':form,
+        'form':user_form
     }
     return render(request, 'account/logbook.html', instance)
 
 def addressbook(request):
     query_list = Visitor.objects.all()
+
     query = request.GET.get("q")
 
     if query:
@@ -138,8 +177,6 @@ def addressbook(request):
         "objects_all":query_list
     }
     return render(request, 'account/addressbook.html', instance)
-
-    # return render(request,'account/addressbook.html')
 
 def colleagues(request):
     query_list = Host.objects.all()
@@ -164,6 +201,8 @@ def contact(request):
     return render(request,'app/contact.html')
 
 def index(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect("account/logbook/")
     return render(request,'app/index.html')
 
 def locations(request):
