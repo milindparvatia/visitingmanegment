@@ -1,6 +1,10 @@
 {% extends "account/dashboardlayout.html" %}
-{% load bootstrap4 %}
 {% load crispy_forms_tags %}
+{% load bootstrap4 %}
+
+{% block extrahead %}
+{{ form.media }}
+{% endblock %}
 
 {% block content1 %}
 
@@ -9,10 +13,7 @@
 </form>
 <form action="" method="POST" id="yourFormId" class="form">
     {% csrf_token %}
-    {% bootstrap_form form %}
-    {% bootstrap_css %}         {# Embed Bootstrap CSS #}
-    {% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
-    {{ form.media }}
+    {{ form }}
 </form>
 <!-- <h1 class="h2">Log Book</h1> -->
 <div class="btn-toolbar mb-2 mb-md-0">

@@ -34,10 +34,10 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'bootstrap_datepicker_plus',
-    'bootstrap4',
     'crispy_forms',
     'app.apps.AppConfig',
     'rest_framework',
+    'bootstrap4',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -67,6 +67,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'demo.vethics@gmail.com'
 EMAIL_HOST_PASSWORD = '9116597096'
+DEFAULT_FROM_EMAIL = 'Vethic Team <noreply@example.com>'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 

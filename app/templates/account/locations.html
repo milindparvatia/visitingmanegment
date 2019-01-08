@@ -1,6 +1,10 @@
 {% extends "account/dashboardlayout.html" %}
 {% load bootstrap4 %}
 
+{% block extrahead %}
+{{ form.media }}
+{% endblock %}
+
 {% block content1 %}
 
 <h1 class="h2">LocationsOverview</h1>
@@ -8,10 +12,7 @@
 
 <form action="" method="GET" id="yourFormId" class="form">
     {% csrf_token %}
-    {% bootstrap_form form %}
-    {% bootstrap_css %}         {# Embed Bootstrap CSS #}
-    {% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
-    {{ form.media }}
+    {{ form }}
 </form>
 <div class="btn-toolbar mb-2 mb-md-0">
     <div class="btn-group mr-2">

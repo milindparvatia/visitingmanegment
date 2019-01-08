@@ -8,7 +8,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets,status
 from rest_framework.generics import ListAPIView
 from app.serializers import HostSerializer,VisitorSerializer
-from app.forms import VisitorForm,HostForm
+from app.forms import VisitorForm,HostForm,RegistraionForm
 from .forms import ToDoForm, StatusForm
 
 from django.db.models import Q
@@ -98,7 +98,7 @@ def addnewhost(request):
 
 def register(request):
     if request.method == 'POST':    
-        form = UserCreationForm(request.POST)
+        form = RegistraionForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data['username']
@@ -107,7 +107,7 @@ def register(request):
             login(request, user)
         return render(request,'account/logbook.html')
     else:
-        form=UserCreationForm()
+        form=RegistraionForm()
     context={'form' : form}
     return render(request,'registration/register.html',context)
 
