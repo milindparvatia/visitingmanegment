@@ -2,12 +2,26 @@
 {% load bootstrap4 %}
 {% load crispy_forms_tags %}
 
-
-
 {% block content %}
+<br>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            <ul{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <div class="container">
         <div class="card mx-auto card-container w-50 p-5">
-            <p id="profile-name" class="profile-name-card"></p>
+            <p id="profile-name" class="profile-name-card">
+                <h1 class="card-title">Add New Visitor</h1>
+            </p>
               <form action="/addnewvisit/" method="POST">
                 {% csrf_token %}
                     <div class="form-group">

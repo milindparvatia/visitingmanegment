@@ -7,7 +7,7 @@
 <form class="form-inline">
     <input class="form-control mr-sm-2" placeholder="Search" type="search" name="q" id="query" aria-label="Search">
 </form>
-<form action="" method="GET" id="yourFormId" class="form">
+<form action="" method="POST" id="yourFormId" class="form">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_css %}         {# Embed Bootstrap CSS #}

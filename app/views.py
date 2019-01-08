@@ -15,6 +15,7 @@ from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.mail import send_mail
+from django.contrib import messages
 
 from projectvisitor.settings import EMAIL_HOST_USER
 
@@ -64,6 +65,7 @@ def addnewvisit(request):
         recivermessage='New visit is added with '+name+' on '+ondate+ ' from '+fromtime+ ' to '+totime
         sender_email=EMAIL_HOST_USER
         receipient_email=email
+        messages.success(request, "Successfully Create New Entry for "+name)
         send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
         send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
         instance.save()
@@ -85,7 +87,9 @@ def addnewhost(request):
     if form.is_valid():
         instance = form.save(commit=False)
         print(form.cleaned_data.get("full_name"))
+        fname= form.cleaned_data.get("full_name")
         instance.save()
+        messages.success(request, "Successfully Create New Entry for "+fname)
     else:
         form = HostForm()
             
@@ -136,7 +140,7 @@ def logbook(request):
     else:
         form = StatusForm()
     
-    datequery = request.GET.get("date")
+    datequery = request.POST.get("date")
 
     if datequery:
         query_list = query_list.filter(
