@@ -206,8 +206,9 @@ def contact(request):
 
 def index(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect("account/logbook/")
-    return render(request,'app/index.html')
+        return HttpResponseRedirect("/logbook/")
+    else:
+        return render(request,'app/index.html')
 
 def locations(request):
     user_form = ToDoForm()
