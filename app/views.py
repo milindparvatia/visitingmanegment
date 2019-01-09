@@ -216,3 +216,13 @@ def locations(request):
 
 def analytics(request):
     return render(request,'account/analytics.html')
+
+def delselected(request,id):
+    query = request.GET.get("id")
+    print('hey')
+    print(query)
+    arg = Visitor.objects.get(id=query).delete()
+    data = {
+        "context" : arg
+    }
+    return render(request,'account/logbook.html',data)

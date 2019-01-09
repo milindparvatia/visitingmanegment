@@ -46,13 +46,13 @@
   <tbody>
     <tr>
       <th>
-        <input type="checkbox" name="select" id="select">
+        <input type="checkbox" name="fid[]" class="checkbox" id="{{ip.id}}">
       </th>
       <td>
         <form action="/statusupdate/{{ip.id}}/" class="form-inline" id="updateForm" method="POST">
           {% csrf_token %}
           <div class="form-group">
-              <select name="{{ form1.status.name }}" class="form-control" id="{{ip.isd}}">
+              <select name="{{ form1.status.name }}" class="form-control" id="{{ip.id}}">
                   <option value="{{ choice.0 }}">{{ ip.status }}</option>
                   {% for choice in form1.status.field.choices %}
                       <option value="{{ choice.0 }}">{{ choice.0 }}</option>
@@ -69,26 +69,55 @@
         <td>{{ip.full_name}}</td>
         <td>{{ip.company_name}}</td>
         <td>{% for data in ip.visiting.all %}{{ data }}{% endfor %}</td>
-      <td>{{ip.email}}</td>
-      <td>{{ip.mobile}}</td>
-      <td>{{ip.licenseplate}}</td>
-      <td>{{ip.about}}</td>
-      <td>{{ip.comment}}</td>
+        <td>{{ip.email}}</td>
+        <td>{{ip.mobile}}</td>
+        <td>{{ip.licenseplate}}</td>
+        <td>{{ip.about}}</td>
+        <td>{{ip.comment}}</td>
     </tr>
   </tbody>
 {% endfor %}
 </table>
 
+<button id="delt" class="btn btn-danger" onclick="Delselected()">Delete</button>
 
 <script>
     {% block jquery %}
   
-    $(document).ready(function(){
-      $("#date").blur(function(){
-          $('#yourFormId').submit();
-        });
-      });
-  
+    $("#date").blur(function(){
+      $('#yourFormId').submit();
+    });
+
+    var id = [];
+
+    $(".checkbox").click(function() {
+      id = $(this).attr('id');
+      $(this).parent().parent().addClass('checkedtd');
+    });
+    function Delselected(){
+        $.ajax({
+            method: 'GET',
+            url: 'delselected/',
+            data: { 
+              // 'csrfmiddlewaretoken':"{{ csrf_token }}",
+              'id' : id
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(
+                  "X-CSRFToken", 
+                  "{{ csrf_token }}"
+                  );
+                },
+            success: function(response){
+              console.log("succ");
+              $('.checkedtd').remove();
+            },
+            error: function(error_data){
+                    console.log("error");
+                    console.log(error_data);
+                }
+        }); 
+      };
     {% endblock %}
   </script>
 {% endblock %}

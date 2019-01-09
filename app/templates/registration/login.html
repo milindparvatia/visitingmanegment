@@ -29,7 +29,7 @@
                     <a href="..\..\register" class="btn btn-dark">register</a>
             </form>
             {# Assumes you setup the password_reset view in your URLconf #}
-            <br><p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+            <br><p><a href="{% url 'password_reset' %}" class="btn btn-warning" role="button">Lost password?</a></p>
             
         </div>
     </form>
