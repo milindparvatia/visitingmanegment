@@ -1,8 +1,22 @@
 from django import forms
-from .models import Visitor,Host
+from .models import Visitor,Host,Map
 from bootstrap_datepicker_plus import DatePickerInput,TimePickerInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+
+class MapForm(forms.ModelForm):
+    class Meta:
+        model = Map
+        fields = [
+            'loc',
+            'name'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(MapForm, self).__init__(*args, **kwargs)
+        self.fields['loc'].label = 'Location'
+        self.fields['loc'].widget.attrs={ 'id': 'pac-input', 'class': 'form-control'}
+        self.fields['name'].widget.attrs={ 'id': 'name'}
 
 class RegistraionForm(UserCreationForm):
     email = forms.EmailField(required=True)

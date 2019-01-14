@@ -3,12 +3,12 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect, get_object_or_404
 
-from app.models import Host,Visitor
+from app.models import Host,Visitor,Map
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets,status
 from rest_framework.generics import ListAPIView
-from app.serializers import HostSerializer,VisitorSerializer
-from app.forms import VisitorForm,HostForm,RegistraionForm
+from app.serializers import HostSerializer,VisitorSerializer, MAPSerializer
+from app.forms import VisitorForm,HostForm,RegistraionForm, MapForm
 from .forms import ToDoForm, StatusForm
 
 from django.db.models import Q
@@ -32,6 +32,13 @@ class HostViewSet(viewsets.ModelViewSet):
     """
     queryset = Host.objects.all()
     serializer_class = HostSerializer
+
+class MAPViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Map.objects.all()
+    serializer_class = MAPSerializer
 
 class HostView(ListAPIView):
     queryset = Host.objects.all()
@@ -66,8 +73,9 @@ def addnewvisit(request):
         sender_email=EMAIL_HOST_USER
         receipient_email=email
         messages.success(request, "Successfully Create New Entry for "+name)
-        send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
-        send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
+        # send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
+        # send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
+        #add karvanu che mailing
         instance.save()
         form.save_m2m()
         # hostnamemain = [full_name for full_name in list_result]
@@ -79,7 +87,12 @@ def addnewvisit(request):
     else:
         form = VisitorForm()
             
-    instance = {'form':form}
+    mapdata = Map.objects.all()
+
+    instance = {
+        "map":mapdata,
+        'form':form
+        }
     return render(request, 'account/addnewvisit.html', instance)
 
 def addnewhost(request):
@@ -93,7 +106,12 @@ def addnewhost(request):
     else:
         form = HostForm()
             
-    instance = {'form':form}
+    mapdata = Map.objects.all()
+
+    instance = {
+        "map":mapdata,
+        'form':form
+        }
     return render(request, 'account/addnewhost.html', instance)
 
 def register(request):
@@ -156,7 +174,10 @@ def logbook(request):
             # Q(address__icontains=query)
             )
 
+    mapdata = Map.objects.all()
+
     instance = {
+        "map":mapdata,
         "objects_all":query_list,
         "objects_all1":one,
         'form1':form,
@@ -177,7 +198,10 @@ def addressbook(request):
             # Q(address__icontains=query)
             )
 
+    mapdata = Map.objects.all()
+
     instance = {
+        "map":mapdata,
         "objects_all":query_list
     }
     return render(request, 'account/addressbook.html', instance)
@@ -192,8 +216,10 @@ def colleagues(request):
             Q(email__icontains=query)|
             Q(mobile__icontains=query)
             )
+    mapdata = Map.objects.all()
 
     instance = {
+        "map":mapdata,
         "objects_all":query_list
     }
     return render(request, 'account/colleagues.html', instance)
@@ -212,17 +238,70 @@ def index(request):
 
 def locations(request):
     user_form = ToDoForm()
-    return render(request, 'account/Locations.html', {'form': user_form})
+    mapdata = Map.objects.all()
+
+    instance = {
+        "map":mapdata,
+        'form': user_form
+    }
+    return render(request, 'account/Locations.html', instance)
 
 def analytics(request):
-    return render(request,'account/analytics.html')
+    mapdata = Map.objects.all()
+
+    instance = {
+        "map":mapdata
+    }
+    return render(request,'account/analytics.html', instance)
 
 def delselected(request,id):
-    query = request.GET.get("id")
-    print('hey')
-    print(query)
-    arg = Visitor.objects.get(id=query).delete()
+    query = request.GET.getlist("id[]")
+
+    for target_list in query:
+        arg = Visitor.objects.get(id=target_list).delete()
+
     data = {
         "context" : arg
     }
     return render(request,'account/logbook.html',data)
+
+def addnewlocations(request):
+    form = MapForm()
+
+    context = {
+        'form':form
+    }
+    return render(request,'account/addnewlocations.html',context)
+
+def newlocations(request):
+    if request.method == 'POST':
+        print(request.POST.get('loc'))
+        loc = request.POST.get('loc')
+        name = request.POST.get('name')
+        lon = request.POST.get('lon')
+        lat = request.POST.get('lat')
+        print(lon)
+        print(lat)
+        print(name)
+
+        savemap = Map(loc = loc, name = name, lon = lon, lat = lat)
+        savemap.save()
+
+        # response_data['result'] = 'Create post successful!'
+        # response_data['postpk'] = post.pk
+        # response_data['text'] = post.text
+        # response_data['created'] = post.created.strftime('%B %d, %Y %I:%M %p')
+        # response_data['author'] = post.author.username
+
+        return render(request,'account/logbook.html')
+    else:
+        return render(request,'account/logbook.html')
+
+    # instance = form.save(commit=False)
+    # print(form.cleaned_data.get("loc"))
+    # instance.save()
+
+    # context = {
+    #     'form':form
+    # }
+    # return HttpResponseRedirect(request,'account/addnewlocations.html')

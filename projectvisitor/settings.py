@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'geoposition',
     'bootstrap_datepicker_plus',
     'crispy_forms',
     'app.apps.AppConfig',
@@ -45,6 +46,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+GEOPOSITION_GOOGLE_MAPS_API_KEY = 'AIzaSyBMlG5eOnUMdABa9akVC9eU7UXZ6O9fCP8'
+
+EASY_MAPS_CENTER = (-41.3, 32)
+
 
 BOOTSTRAP4 = {'include_jquery': True,}
 

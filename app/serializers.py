@@ -1,4 +1,4 @@
-from app.models import Visitor,Host
+from app.models import Visitor,Host, Map
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
@@ -13,6 +13,12 @@ class HostSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Host
         fields = ('url', 'id', 'first_name', 'last_name', 'email', 'mobile', 'comment')
+
+class MAPSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = Map
+        fields = ('url', 'id', 'loc', 'lon', 'lat', 'name')
 
 class HostSerializer(ModelSerializer):
     class Meta:

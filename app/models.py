@@ -2,6 +2,12 @@ from django.db import models
 from django import forms
 import datetime
 
+class Map(models.Model):
+    loc = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    lon = models.FloatField()
+    lat = models.FloatField()
+
 class Host(models.Model):
     full_name = models.CharField(max_length=30)
     email = models.EmailField(max_length=20)

@@ -7,7 +7,7 @@
 
 {% block content1 %}
 
-<h1 class="h2">LocationsOverview</h1>
+<h1 class="h2">Locations Overview</h1>
 {# Display a form #}
 
 <form action="" method="GET" id="yourFormId" class="form">
@@ -16,10 +16,32 @@
 </form>
 <div class="btn-toolbar mb-2 mb-md-0">
     <div class="btn-group mr-2">
-      <a href="##" class="btn btn-dark">Add New</a>
+      <a href="/addnewlocations/" class="btn btn-dark">Add New</a>
     </div>
   </div>
-  </div>
+</div>
+
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">LOCATION</th>
+        <th scope="col">BUILDING NANE</th>
+      </tr>
+    </thead>
+{% for ip in map %}
+    <tbody>
+      <tr>
+        <th scope="row">
+          <input type="checkbox" name="select" id="select">
+        </th>
+        <td>{{ip.loc}}</td>
+        <td>{{ip.name}}</td>
+      </tr>
+    </tbody>
+{% endfor %}
+</table>
+
 
 <script>
   {% block jquery %}

@@ -7,6 +7,7 @@ from django.conf.urls import url, include
 router = routers.DefaultRouter()
 router.register(r'Visitor', views.VisitorViewSet)
 router.register(r'Host', views.HostViewSet)
+router.register(r'Map', views.MAPViewSet)
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),
@@ -23,6 +24,8 @@ urlpatterns = [
     path('colleagues/', views.colleagues, name='colleagues'),
     path('addnewvisit/', views.addnewvisit, name='addnewvisit'),
     path('addnewhost/', views.addnewhost, name='addnewhost'),
+    path('addnewlocations/', views.addnewlocations, name='addnewlocations'),
+    path('newlocations/', views.newlocations, name='newlocations'),
     path('api/data/HostView/', views.HostView.as_view()),
     path('api/data/VisitorView/', views.VisitorView.as_view()),
     url(r'^logbook/delselected/(?:id=(?P<id>\d+)/)?$', views.delselected, name='delselected'),

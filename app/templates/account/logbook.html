@@ -24,7 +24,7 @@
 </div>
 
 <br>
-<table class="table table-hover table-bordered table-responsive">
+<table class="table table-hover table-responsive">
   <thead>
     <tr>
       <th scope="col">#</th>
@@ -42,8 +42,9 @@
       <th scope="col">COMMENT</th>
     </tr>
   </thead>
-{% for ip in objects_all %}
+
   <tbody>
+    {% for ip in objects_all %}
     <tr>
       <th>
         <input type="checkbox" name="fid[]" class="checkbox" id="{{ip.id}}">
@@ -75,8 +76,9 @@
         <td>{{ip.about}}</td>
         <td>{{ip.comment}}</td>
     </tr>
+    {% endfor %}
   </tbody>
-{% endfor %}
+
 </table>
 
 <button id="delt" class="btn btn-danger" onclick="Delselected()">Delete</button>
@@ -88,19 +90,32 @@
       $('#yourFormId').submit();
     });
 
+    var value = 0;
     var id = [];
 
     $(".checkbox").click(function() {
-      id = $(this).attr('id');
-      $(this).parent().parent().addClass('checkedtd');
+      if(!$(this).is(':checked')){
+        console.log('uncheck');
+        value = $(this).attr('id');
+        id.splice($.inArray(value, id),1);
+        console.log(id);
+        $(this).parent().parent().removeClass('checkedtd');
+      }
+      else{
+        console.log('check');
+        value = $(this).attr('id');
+        id.push(value);
+        console.log(id);
+        $(this).parent().parent().addClass('checkedtd');
+      }
+
     });
     function Delselected(){
         $.ajax({
             method: 'GET',
             url: 'delselected/',
-            data: { 
-              // 'csrfmiddlewaretoken':"{{ csrf_token }}",
-              'id' : id
+            data: {
+              'id[]' : id
             },
             beforeSend: function(xhr) {
                 xhr.setRequestHeader(
