@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '#k#8#t7zz-iqji_2dfoa^rca1_#8+xi7z2^tdvbgzz(_3xw&4s'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-GEOPOSITION_GOOGLE_MAPS_API_KEY = 'AIzaSyBMlG5eOnUMdABa9akVC9eU7UXZ6O9fCP8'
+GEOPOSITION_GOOGLE_MAPS_API_KEY = ''
 
 EASY_MAPS_CENTER = (-41.3, 32)
 
