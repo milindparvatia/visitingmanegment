@@ -244,7 +244,7 @@ def locations(request):
         "map":mapdata,
         'form': user_form
     }
-    return render(request, 'account/Locations.html', instance)
+    return render(request, 'account/locations.html', instance)
 
 def analytics(request):
     mapdata = Map.objects.all()
