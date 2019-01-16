@@ -52,55 +52,72 @@
 </div>
 
 <script>
-    {% block jquery %}
-    
-    var xValue = ['Product A', 'Product B', 'Product C'];
+  {% block jquery %}
+  var endpoint1 = '/api/data/VisitorView/'
+  var defaultData = [];
 
-    var yValue = [20, 14, 23];
-    var yValue2 = [24, 16, 20];
+$.ajax({
+      method: "GET",
+      url: endpoint1,
+    success: function(datalist){
+        defaultData = datalist       
+        setCharts()
+        // $("#progress").hide()
+    },
+    error: function(error_data){
+        console.log("error")
+        console.log(error_data)
+    }
+});
 
-    var trace1 = {
-      x: xValue,
-      y: yValue,
-      type: 'bar',
-      text: yValue,
-      textposition: 'auto',
-      hoverinfo: 'none',
-      opacity: 0.5,
-      marker: {
-        color: 'rgb(158,202,225)',
-        line: {
-          color: 'rbg(8,48,107)',
-          width: 1.5
-        }
+function setCharts() {
+  var xValue = [defaultData.start_time];
+
+  var yValue = [20, 14, 23];
+  var yValue2 = [24, 16, 20];
+
+  var trace1 = {
+    x: xValue,
+    y: yValue,
+    type: 'bar',
+    text: yValue.map(String),
+    textposition: 'auto',
+    hoverinfo: 'none',
+    opacity: 0.5,
+    marker: {
+      color: 'rgb(158,202,225)',
+      line: {
+        color: 'rgb(8,48,107)',
+        width: 1.5
       }
-    };
+    }
+  };
 
-    var trace2 = {
-      x: xValue,
-      y: yValue2,
-      type: 'bar',
-      text: yValue2,
-      textposition: 'auto',
-      hoverinfo: 'none',
-      marker: {
-        color: 'rgba(58,200,225,.5)',
-        line: {
-          color: 'rbg(8,48,107)',
-          width: 1.5
-        }
+  var trace2 = {
+    x: xValue,
+    y: yValue2,
+    type: 'bar',
+    text: yValue2.map(String),
+    textposition: 'auto',
+    hoverinfo: 'none',
+    marker: {
+      color: 'rgba(58,200,225,.5)',
+      line: {
+        color: 'rgb(8,48,107)',
+        width: 1.5
       }
-    };
+    }
+  };
 
-    var data = [trace1,trace2];
+  var data = [trace1,trace2];
 
-    var layout = {
-      title: 'January 2013 Sales Report',
-      barmode: 'stack'
-    };
+  var layout = {
+    title: 'January 2013 Sales Report'
+  };
 
-    Plotly.newPlot('myDiv', data, layout, {showSendToCloud:true});
-
-    {% endblock %}
-  </script>
+  Plotly.newPlot('myDiv', data, layout);
+}
+  {% endblock %}          
+</script>
+  
 {% endblock %}

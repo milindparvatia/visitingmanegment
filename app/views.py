@@ -17,6 +17,7 @@ from rest_framework.response import Response
 from django.core.mail import send_mail
 from django.contrib import messages
 
+import pandas as pd
 from projectvisitor.settings import EMAIL_HOST_USER
 
 class VisitorViewSet(viewsets.ModelViewSet):
@@ -39,19 +40,12 @@ class MAPViewSet(viewsets.ModelViewSet):
     """
     queryset = Map.objects.all()
     serializer_class = MAPSerializer
-
-class HostView(ListAPIView):
-    queryset = Host.objects.all()
-    serializer_class = HostSerializer
-
-class VisitorView(ListAPIView):
-    queryset = Visitor.objects.all()
-    serializer_class = VisitorSerializer
     
 def addnewvisit(request):
     form = VisitorForm(request.POST)
     if form.is_valid():
         instance = form.save(commit=False)
+        instance.user = request.user
 
         name = form.cleaned_data.get("full_name")
         email = form.cleaned_data.get("email")
@@ -99,6 +93,7 @@ def addnewhost(request):
     form = HostForm(request.POST)
     if form.is_valid():
         instance = form.save(commit=False)
+        # instance.user = request.user
         print(form.cleaned_data.get("full_name"))
         fname= form.cleaned_data.get("full_name")
         instance.save()
@@ -123,7 +118,7 @@ def register(request):
             password = form.cleaned_data['password1']
             user = authenticate(username = username, password = password)
             login(request, user)
-        return render(request,'account/logbook.html')
+            return HttpResponseRedirect('../addnewlocations/')
     else:
         form=RegistraionForm()
     context={'form' : form}
@@ -144,8 +139,8 @@ def statusupdate(request,id=None):
     return HttpResponseRedirect('../../logbook/')
 
 
-def logbook(request): 
-    query_list = Visitor.objects.all().order_by('-date')
+def logbook(request):
+    query_list = Visitor.objects.all().order_by('-date').filter(user=request.user)
     one = Host.objects.prefetch_related('relateds')
     
     user_form = ToDoForm()
@@ -176,14 +171,20 @@ def logbook(request):
 
     mapdata = Map.objects.all()
 
-    instance = {
+    if mapdata.exists():
+        instance = {
         "map":mapdata,
         "objects_all":query_list,
         "objects_all1":one,
         'form1':form,
         'form':user_form
-    }
-    return render(request, 'account/logbook.html', instance)
+        }
+        return render(request, 'account/logbook.html', instance)
+    else:
+        instance = {
+        "map":mapdata,
+        }
+        return redirect('../addnewlocations/')
 
 def addressbook(request):
     query_list = Visitor.objects.all()
@@ -248,9 +249,11 @@ def locations(request):
 
 def analytics(request):
     mapdata = Map.objects.all()
+    datalist = Visitor.objects.all().order_by('-date')
 
     instance = {
-        "map":mapdata
+        "map":mapdata,
+        "datalist":datalist
     }
     return render(request,'account/analytics.html', instance)
 
@@ -283,19 +286,11 @@ def newlocations(request):
         print(lon)
         print(lat)
         print(name)
-
         savemap = Map(loc = loc, name = name, lon = lon, lat = lat)
         savemap.save()
-
-        # response_data['result'] = 'Create post successful!'
-        # response_data['postpk'] = post.pk
-        # response_data['text'] = post.text
-        # response_data['created'] = post.created.strftime('%B %d, %Y %I:%M %p')
-        # response_data['author'] = post.author.username
-
-        return render(request,'account/logbook.html')
+        return redirect('../logbook/')
     else:
-        return render(request,'account/logbook.html')
+        return redirect('../logbook/')
 
     # instance = form.save(commit=False)
     # print(form.cleaned_data.get("loc"))

@@ -15,7 +15,7 @@ class HostSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'id', 'first_name', 'last_name', 'email', 'mobile', 'comment')
 
 class MAPSerializer(serializers.HyperlinkedModelSerializer):
-
+    url = serializers.HyperlinkedIdentityField(view_name="map-detail")
     class Meta:
         model = Map
         fields = ('url', 'id', 'loc', 'lon', 'lat', 'name')
@@ -35,6 +35,7 @@ class VisitorSerializer(ModelSerializer):
     class Meta:
         model = Visitor
         fields = [
+            "user",
             "id",
             "full_name",
             'status',

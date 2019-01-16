@@ -26,7 +26,5 @@ urlpatterns = [
     path('addnewhost/', views.addnewhost, name='addnewhost'),
     path('addnewlocations/', views.addnewlocations, name='addnewlocations'),
     path('newlocations/', views.newlocations, name='newlocations'),
-    path('api/data/HostView/', views.HostView.as_view()),
-    path('api/data/VisitorView/', views.VisitorView.as_view()),
     url(r'^logbook/delselected/(?:id=(?P<id>\d+)/)?$', views.delselected, name='delselected'),
 ]

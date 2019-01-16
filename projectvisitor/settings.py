@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = '#k#8#t7zz-iqji_2dfoa^rca1_#8+xi7z2^tdvbgzz(_3xw&4s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -46,8 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-GOOGLE_MAPS_API_KEY = ''
-
 BOOTSTRAP4 = {'include_jquery': True,}
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -67,9 +65,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = ''
+EMAIL_HOST_USER = 'demo.vethics@gmail.com'
+EMAIL_HOST_PASSWORD = '9116597096'
+DEFAULT_FROM_EMAIL = 'Vethic Team <noreply@example.com>'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 

@@ -23,7 +23,7 @@
   <br>
   <div class="row">
     <div class="col">
-        <form action="/newlocations/" method="POST">
+        <form action="/logbook/" method="POST">
             {% csrf_token %}
             <div class="form-group">
                     {{ form.loc|as_crispy_field }}
@@ -115,9 +115,9 @@
           var savedata = bounds;
           console.log(savedata);
           lonmap = savedata.ma.l
-          latmap = savedata.fa.l
+          latmap = savedata.ga.l
           console.log(savedata.ma.l);
-          console.log(savedata.fa.l);
+          console.log(savedata.ga.l);
           map.fitBounds(bounds);
         });
       }
@@ -148,6 +148,7 @@
                 },
             success: function(response){
               console.log("succ");
+              window.location.replace("../logbook/");
             },
             error: function(error_data){
                     console.log("error");
