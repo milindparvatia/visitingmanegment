@@ -67,14 +67,15 @@
         <td>{{ip.start_time}}</td>
         <td>{{ip.end_time}}</td>
         <td>{{ip.date}}</td>
-        <td>{{ip.full_name}}</td>
-        <td>{{ip.company_name}}</td>
-        <td>{% for data in ip.visiting.all %}{{ data }}{% endfor %}</td>
-        <td>{{ip.email}}</td>
-        <td>{{ip.mobile}}</td>
-        <td>{{ip.licenseplate}}</td>
-        <td>{{ip.about}}</td>
-        <td>{{ip.comment}}</td>
+
+        <td>{% for data in ip.visitor.full_name %}{{ data }}{% endfor %}</td>
+        <td>{% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
+        <td>{% for data in ip.host.all %}{{ data }}{% endfor %}</td>
+        <td>{% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
+        <td>{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</td>
+        <td>{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</td>
+        <td>{% for data in ip.visitor.about %}{{ data }}{% endfor %}</td>
+        <td>{% for data in ip.visitor.comment %}{{ data }}{% endfor %}</td>
     </tr>
     {% endfor %}
   </tbody>

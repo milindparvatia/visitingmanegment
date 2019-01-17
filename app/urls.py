@@ -8,6 +8,7 @@ router = routers.DefaultRouter()
 router.register(r'Visitor', views.VisitorViewSet)
 router.register(r'Host', views.HostViewSet)
 router.register(r'Map', views.MAPViewSet)
+router.register(r'Meeting', views.MeetingViewSet)
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),

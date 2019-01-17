@@ -8,6 +8,9 @@ class Map(models.Model):
     lon = models.FloatField()
     lat = models.FloatField()
 
+    def __str__(self):
+        return self.name
+
 class Host(models.Model):
     full_name = models.CharField(max_length=30)
     email = models.EmailField(max_length=20)
@@ -25,17 +28,21 @@ STATUS_CHOICES = (
 
 class Visitor(models.Model):
     full_name = models.CharField(max_length=30)
-    status = models.CharField(choices=STATUS_CHOICES, blank=False, max_length=128)
     company_name = models.CharField(max_length=20)
     email = models.EmailField(max_length=20)
-    mobile = models.IntegerField()
-    licenseplate = models.IntegerField(null=True)
+    mobile = models.CharField(max_length=20)
+    licenseplate = models.CharField(max_length=20)
     about = models.CharField(max_length=50, null=True)
     comment = models.CharField(max_length=100, null=True)
-    visiting = models.ManyToManyField(Host,related_name='relateds')
-    date = models.DateField(default=datetime.date.today)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
     
     def __str__(self):
         return self.full_name
+
+class Meeting(models.Model):
+    visitor = models.ForeignKey(Visitor, on_delete=models.CASCADE,related_name='relateds')
+    host = models.ManyToManyField(Host,related_name='relateds')
+    status = models.CharField(choices=STATUS_CHOICES, blank=False, max_length=128)
+    location = models.ForeignKey(Map, on_delete=models.CASCADE)
+    date = models.DateField(default=datetime.date.today)
+    start_time = models.TimeField()
+    end_time = models.TimeField()

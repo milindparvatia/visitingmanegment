@@ -1,5 +1,5 @@
 from django import forms
-from .models import Visitor,Host,Map
+from .models import Visitor,Host,Map,Meeting
 from bootstrap_datepicker_plus import DatePickerInput,TimePickerInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -53,7 +53,7 @@ class ToDoForm(forms.Form):
 
 class StatusForm(forms.ModelForm):
     class Meta:
-        model = Visitor
+        model = Meeting
         fields = [
             'status'
         ]
@@ -65,13 +65,6 @@ class StatusForm(forms.ModelForm):
         # self.fields['status'].widget.attrs={ 'id': '{{ip.id}}', 'class': 'myCustomClass'}
 
 class VisitorForm(forms.ModelForm):
-    date = forms.DateField(
-        widget=DatePickerInput(
-            format='%m/%d/%Y',
-            attrs={'id':'date','onchange':'myFunction()'}
-        ),
-        label='Date Visiting'
-    )
     class Meta:
         model = Visitor
         fields = [
@@ -81,32 +74,8 @@ class VisitorForm(forms.ModelForm):
             "mobile",
             "licenseplate",
             "about",
-            "comment",
-            "visiting",
-            'start_time', 
-            'end_time',
-            'status'
-            # "durations"
+            "comment"
         ]
-        widgets = {
-            'start_time':TimePickerInput().start_of('party time'),
-            'end_time':TimePickerInput().end_of('party time'),
-        }
-
-    def __init__(self, *args, **kwargs):
-        def new_label_from_instance(self, obj):
-            return obj.full_name
-
-        super(VisitorForm, self).__init__(*args, **kwargs)
-        funcType = type(self.fields['visiting'].label_from_instance)
-        self.fields['visiting'].label_from_instance = funcType(new_label_from_instance, self.fields['visiting'])
-
-    # def __init__ (self, *args, **kwargs):
-    #     # # Visitor = kwargs.pop("Visitor")
-    #     # super(Visitor, self).__init__(*args, **kwargs)
-    #     self.fields["visiting"].widget = forms.widgets.CheckboxSelectMultiple()
-    #     # self.fields["visiting"].help_text = ""
-    #     # self.fields["visiting"].queryset = FoodPreference.objects.filter(franchise=brand)
 
 class HostForm(forms.ModelForm):
     attrs={
@@ -120,3 +89,26 @@ class HostForm(forms.ModelForm):
             "mobile",
             "comment"
         ]
+
+class MeetingForm(forms.ModelForm):
+    date = forms.DateField(
+        widget=DatePickerInput(
+            format='%m/%d/%Y',
+            attrs={'id':'date','onchange':'myFunction()'}
+        ),
+        label='Date Visiting'
+    )
+    class Meta:
+        model = Meeting
+        fields = [
+            "status",
+            "location",
+            "host",
+            'start_time', 
+            'end_time',
+            'status'
+        ]
+        widgets = {
+            'start_time':TimePickerInput().start_of('party time'),
+            'end_time':TimePickerInput().end_of('party time'),
+        }

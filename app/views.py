@@ -3,111 +3,37 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect, get_object_or_404
 
-from app.models import Host,Visitor,Map
 from django.contrib.auth.models import User, Group
+from app.models import Host,Visitor,Map, Meeting
+from app.serializers import HostSerializer,MeetingSerializer,VisitorSerializer, MAPSerializer
+from .forms import VisitorForm,HostForm,RegistraionForm, MeetingForm, MapForm, ToDoForm, StatusForm
+
 from rest_framework import viewsets,status
 from rest_framework.generics import ListAPIView
-from app.serializers import HostSerializer,VisitorSerializer, MAPSerializer
-from app.forms import VisitorForm,HostForm,RegistraionForm, MapForm
-from .forms import ToDoForm, StatusForm
-
-from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from django.db.models import Q
+import operator
+from functools import reduce
+
 from django.core.mail import send_mail
 from django.contrib import messages
-
-import pandas as pd
 from projectvisitor.settings import EMAIL_HOST_USER
 
-class VisitorViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = Visitor.objects.all()
-    serializer_class = VisitorSerializer
+import pandas as pd
 
-class HostViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Host.objects.all()
-    serializer_class = HostSerializer
-
-class MAPViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Map.objects.all()
-    serializer_class = MAPSerializer
-    
-def addnewvisit(request):
-    form = VisitorForm(request.POST)
-    if form.is_valid():
-        instance = form.save(commit=False)
-        instance.user = request.user
-
-        name = form.cleaned_data.get("full_name")
-        email = form.cleaned_data.get("email")
-        hostname= form.cleaned_data.get("visiting")
-        fromtime = form.cleaned_data.get("start_time").strftime('%H:%M:%S')
-        totime = form.cleaned_data.get("end_time").strftime('%H:%M:%S')
-        ondate = form.cleaned_data.get("date").strftime('%m-%d-%Y')
-        hostval = hostname.values()
-        list_result = [entry for entry in hostval]
-        hname=list_result[0]['full_name']
-
-        hostsubject='New apointment is created with '+name
-        hostmessage='New visit is added with '+hname+' on '+ondate+ ' from '+fromtime+ ' to '+totime
-        hostsender_email=email
-        hostreceipient_email=EMAIL_HOST_USER
-
-        reciversubject='New apointment is created with '+hname
-        recivermessage='New visit is added with '+name+' on '+ondate+ ' from '+fromtime+ ' to '+totime
-        sender_email=EMAIL_HOST_USER
-        receipient_email=email
-        messages.success(request, "Successfully Create New Entry for "+name)
-        # send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
-        # send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
-        #add karvanu che mailing
-        instance.save()
-        form.save_m2m()
-        # hostnamemain = [full_name for full_name in list_result]
-        # print(hostnamemain)
-        # print(list_result[1]['full_name'])
-        # print(ondate)
-        # print(form.cleaned_data.get("end_time"))
-        # print(form.cleaned_data.get("date"))
+def index(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect("/logbook/")
     else:
-        form = VisitorForm()
-            
-    mapdata = Map.objects.all()
+        return render(request,'app/index.html')
 
-    instance = {
-        "map":mapdata,
-        'form':form
-        }
-    return render(request, 'account/addnewvisit.html', instance)
+def about(request):
+    return render(request,'app/about.html')
 
-def addnewhost(request):
-    form = HostForm(request.POST)
-    if form.is_valid():
-        instance = form.save(commit=False)
-        # instance.user = request.user
-        print(form.cleaned_data.get("full_name"))
-        fname= form.cleaned_data.get("full_name")
-        instance.save()
-        messages.success(request, "Successfully Create New Entry for "+fname)
-    else:
-        form = HostForm()
-            
-    mapdata = Map.objects.all()
-
-    instance = {
-        "map":mapdata,
-        'form':form
-        }
-    return render(request, 'account/addnewhost.html', instance)
+def contact(request):
+    return render(request,'app/contact.html')
 
 def register(request):
     if request.method == 'POST':    
@@ -124,8 +50,71 @@ def register(request):
     context={'form' : form}
     return render(request,'registration/register.html',context)
 
+class VisitorViewSet(viewsets.ModelViewSet):
+    queryset = Visitor.objects.all()
+    serializer_class = VisitorSerializer
+
+class HostViewSet(viewsets.ModelViewSet):
+    queryset = Host.objects.all()
+    serializer_class = HostSerializer
+
+class MAPViewSet(viewsets.ModelViewSet):
+    queryset = Map.objects.all()
+    serializer_class = MAPSerializer
+
+class MeetingViewSet(viewsets.ModelViewSet):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+
+def logbook(request):
+    query_list = Meeting.objects.all()
+    query_list_host = Host.objects.prefetch_related('relateds')
+    query_list_visitor = Visitor.objects.prefetch_related('relateds')
+    
+    user_form = ToDoForm()
+    
+    form = StatusForm()
+    
+    datequery = request.POST.get("date")
+
+    if datequery:
+        query_list = query_list.filter(
+            Q(date__icontains=datequery)
+            )
+    query = request.GET.get("q")
+
+    # if query:
+    #     q_list_visitor = [Q(full_name__icontains=query),Q(email__icontains=query),Q(company_name__icontains=query)]
+    #     object_list_visitor = Visitor.objects.filter(reduce(operator.or_, q_list_visitor))#.values('id') #.values_list('id', flat=True).values()
+
+    #     # list_result = [entry for id in object_list_visitor]
+    #     # ids=list_result[0]['id']
+    #     # ek_list=[Q(visitor__icontains=object_list_visitor)]
+    #     # object_list_meeting = Meeting.objects.filter(reduce(operator.or_, ek_list)) #.all().remove(object_list_visitor)
+
+    #     print(object_list_visitor)
+    #     print(object_list_meeting)
+
+    mapdata = Map.objects.all()
+
+    if mapdata.exists():
+        instance = {
+        "map":mapdata,
+        "query_list_visitor":query_list_visitor,
+        "objects_all":query_list,
+        "objects_all1":query_list_host,
+        'form1':form,
+        'form':user_form
+        }
+        return render(request, 'account/logbook.html', instance)
+    else:
+        instance = {
+        "map":mapdata,
+        }
+        return redirect('../addnewlocations/')
+
 def statusupdate(request,id=None): 
-    instance = get_object_or_404(Visitor,id=id)
+    instance = get_object_or_404(Meeting,id=id)
 
     form = StatusForm(request.POST or None, instance=instance)
     if form.is_valid():
@@ -138,53 +127,71 @@ def statusupdate(request,id=None):
     instance = {'form':form}
     return HttpResponseRedirect('../../logbook/')
 
+def delselected(request,id):
+    query = request.GET.getlist("id[]")
 
-def logbook(request):
-    query_list = Visitor.objects.all().order_by('-date').filter(user=request.user)
-    one = Host.objects.prefetch_related('relateds')
+    for target_list in query:
+        arg = Meeting.objects.get(id=target_list).delete()
+
+    data = {
+        "context" : arg
+    }
+    return render(request,'account/logbook.html',data)
+
+def addnewvisit(request):
+    form2 = MeetingForm(request.POST)
+    form1 = VisitorForm(request.POST)
+
+    a = form1.is_valid()
+    b = form2.is_valid()
+
+    if a and b:
+        instance1 = form1.save()
+        
+        name = form1.cleaned_data.get("full_name")
+        email = form1.cleaned_data.get("email")
+        hostname= form2.cleaned_data.get("host")
+        fromtime = form2.cleaned_data.get("start_time").strftime('%H:%M:%S')
+        totime = form2.cleaned_data.get("end_time").strftime('%H:%M:%S')
+        ondate = form2.cleaned_data.get("date").strftime('%m-%d-%Y')
+        hostval = hostname.values()
+        list_result = [entry for entry in hostval]
+        hname=list_result[0]['full_name']
     
-    user_form = ToDoForm()
+        hostsubject='New apointment is created with '+name
+        hostmessage='New visit is added with '+hname+' on '+ondate+ ' from '+fromtime+ ' to '+totime
+        hostsender_email=email
+        hostreceipient_email=EMAIL_HOST_USER
+
+        reciversubject='New apointment is created with '+hname
+        recivermessage='New visit is added with '+name+' on '+ondate+ ' from '+fromtime+ ' to '+totime
+        sender_email=EMAIL_HOST_USER
+        receipient_email=email
+        messages.success(request, "Successfully Create New Entry for "+name)
+        
+        # send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
+        # send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
     
-    form = StatusForm(request.POST or None)
-    if form.is_valid():
-        instance = form.save(commit=False)
-        print(form.cleaned_data.get("status"))
-        instance.save(update_fields=["status"])
+        ####add karvanu che mailing
+
+        instance1.save()
+        instance2 = form2.save(commit=False)
+        instance2.visitor_id = instance1.pk
+        instance2.save()
+        form2.save_m2m()
     else:
-        form = StatusForm()
-    
-    datequery = request.POST.get("date")
-
-    if datequery:
-        query_list = query_list.filter(
-            Q(date__icontains=datequery)
-            )
-    query = request.GET.get("q")
-
-    if query:
-        query_list = query_list.filter(
-            Q(full_name__icontains=query)|
-            Q(email__icontains=query)|
-            Q(company_name__icontains=query)
-            # Q(address__icontains=query)
-            )
+        print("error")
+        form1 = VisitorForm()
+        form2 = MeetingForm()
 
     mapdata = Map.objects.all()
 
-    if mapdata.exists():
-        instance = {
+    instance = {
         "map":mapdata,
-        "objects_all":query_list,
-        "objects_all1":one,
-        'form1':form,
-        'form':user_form
+        'form1':form1,
+        'form2':form2
         }
-        return render(request, 'account/logbook.html', instance)
-    else:
-        instance = {
-        "map":mapdata,
-        }
-        return redirect('../addnewlocations/')
+    return render(request, 'account/addnewvisit.html', instance)
 
 def addressbook(request):
     query_list = Visitor.objects.all()
@@ -225,17 +232,25 @@ def colleagues(request):
     }
     return render(request, 'account/colleagues.html', instance)
 
-def about(request):
-    return render(request,'app/about.html')
-
-def contact(request):
-    return render(request,'app/contact.html')
-
-def index(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect("/logbook/")
+def addnewhost(request):
+    form = HostForm(request.POST)
+    if form.is_valid():
+        instance = form.save(commit=False)
+        # instance.user = request.user
+        print(form.cleaned_data.get("full_name"))
+        fname= form.cleaned_data.get("full_name")
+        instance.save()
+        messages.success(request, "Successfully Create New Entry for "+fname)
     else:
-        return render(request,'app/index.html')
+        form = HostForm()
+            
+    mapdata = Map.objects.all()
+
+    instance = {
+        "map":mapdata,
+        'form':form
+        }
+    return render(request, 'account/addnewhost.html', instance)
 
 def locations(request):
     user_form = ToDoForm()
@@ -246,27 +261,6 @@ def locations(request):
         'form': user_form
     }
     return render(request, 'account/locations.html', instance)
-
-def analytics(request):
-    mapdata = Map.objects.all()
-    datalist = Visitor.objects.all().order_by('-date')
-
-    instance = {
-        "map":mapdata,
-        "datalist":datalist
-    }
-    return render(request,'account/analytics.html', instance)
-
-def delselected(request,id):
-    query = request.GET.getlist("id[]")
-
-    for target_list in query:
-        arg = Visitor.objects.get(id=target_list).delete()
-
-    data = {
-        "context" : arg
-    }
-    return render(request,'account/logbook.html',data)
 
 def addnewlocations(request):
     form = MapForm()
@@ -292,11 +286,12 @@ def newlocations(request):
     else:
         return redirect('../logbook/')
 
-    # instance = form.save(commit=False)
-    # print(form.cleaned_data.get("loc"))
-    # instance.save()
+def analytics(request):
+    mapdata = Map.objects.all()
+    datalist = Visitor.objects.all().order_by('-date')
 
-    # context = {
-    #     'form':form
-    # }
-    # return HttpResponseRedirect(request,'account/addnewlocations.html')
+    instance = {
+        "map":mapdata,
+        "datalist":datalist
+    }
+    return render(request,'account/analytics.html', instance)

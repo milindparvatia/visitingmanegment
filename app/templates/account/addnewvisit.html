@@ -29,45 +29,45 @@
               <form action="/addnewvisit/" method="POST">
                 {% csrf_token %}
                     <div class="form-group">
-                        {{ form.full_name|as_crispy_field }}
+                        {{ form1.full_name|as_crispy_field }}
                     </div>
                   <div class="form-group">
-                      {{ form.company_name|as_crispy_field }}
+                      {{ form1.company_name|as_crispy_field }}
                   </div>
                   <div class="form-group">
-                      {{ form.email|as_crispy_field }}
+                      {{ form1.email|as_crispy_field }}
                   </div>
                   <div class="form-group">
-                      {{ form.mobile|as_crispy_field }}
+                      {{ form1.mobile|as_crispy_field }}
                   </div>
                   <div class="form-group">
-                      {{ form.licenseplate|as_crispy_field }}
+                      {{ form1.licenseplate|as_crispy_field }}
                   </div>
                   
                   <div class="form-group">
-                      {{ form.about|as_crispy_field }}
+                      {{ form1.about|as_crispy_field }}
                   </div>
                   <div class="form-group">
-                      {{ form.comment|as_crispy_field }}
-                  </div>
+                      {{ form1.comment|as_crispy_field }}
+                  </div>  
                   <div class="form-group">
-                      {{ form.visiting|as_crispy_field }}
-                  </div>
-                  <div class="form-group">
-                    {{ form.date|as_crispy_field }}
+                    {{ form2.host|as_crispy_field }}
                 </div>
                 <div class="form-group">
-                    {{ form.start_time|as_crispy_field }}
+                    {{ form2.location|as_crispy_field }}
                 </div>
                 <div class="form-group">
-                    {{ form.end_time|as_crispy_field }}
-                </div>
-                <div class="form-group">
-                    {{ form.status|as_crispy_field }}
-                </div>
-                <div class="form-group">
-                    
-                </div>
+                  {{ form2.date|as_crispy_field }}
+              </div>
+              <div class="form-group">
+                  {{ form2.start_time|as_crispy_field }}
+              </div>
+              <div class="form-group">
+                  {{ form2.end_time|as_crispy_field }}
+              </div>
+              <div class="form-group">
+                  {{ form2.status|as_crispy_field }}
+              </div>
                   <div class="form-group mx-auto">
                         <button type="submit" class="btn btn-primary">Save Visit</button>
                         <button type="submit" class="btn btn-secondary">Save And Create New One</button>
