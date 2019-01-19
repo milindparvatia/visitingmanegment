@@ -13,7 +13,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from django.db.models import Q
+from django.db.models import Q, FilteredRelation
+from itertools import chain
 import operator
 from functools import reduce
 
@@ -71,40 +72,60 @@ def logbook(request):
     query_list_host = Host.objects.prefetch_related('relateds')
     query_list_visitor = Visitor.objects.prefetch_related('relateds')
     
-    user_form = ToDoForm()
-    
+    user_form = ToDoForm()    
     form = StatusForm()
     
     datequery = request.POST.get("date")
-
+    query = request.GET.get("q")
+    
     if datequery:
         query_list = query_list.filter(
             Q(date__icontains=datequery)
             )
-    query = request.GET.get("q")
-
-    # if query:
-    #     q_list_visitor = [Q(full_name__icontains=query),Q(email__icontains=query),Q(company_name__icontains=query)]
-    #     object_list_visitor = Visitor.objects.filter(reduce(operator.or_, q_list_visitor))#.values('id') #.values_list('id', flat=True).values()
-
-    #     # list_result = [entry for id in object_list_visitor]
-    #     # ids=list_result[0]['id']
-    #     # ek_list=[Q(visitor__icontains=object_list_visitor)]
-    #     # object_list_meeting = Meeting.objects.filter(reduce(operator.or_, ek_list)) #.all().remove(object_list_visitor)
-
-    #     print(object_list_visitor)
-    #     print(object_list_meeting)
+    
+    if query:
+        print(query_list)
+        query_list_visitor_list = query_list_visitor.filter(
+            Q(full_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(company_name__icontains=query)
+        )
+        
+        query_list_v = query_list_visitor.filter(Q(full_name__icontains=query)&
+                                                        Q(email__icontains=query))
+        y = 0
+        for x in query_list_visitor_list:
+            if y==0:
+                query_list_vi = query_list.filter(
+                    visitor=query_list_visitor_list[y])
+                report = chain(query_list_v, query_list_vi)
+                y = y+1
+            else:
+                query_list_vi = query_list.filter(
+                    visitor=query_list_visitor_list[y])
+                report = chain(report,query_list_vi)
+                y = y+1
 
     mapdata = Map.objects.all()
 
-    if mapdata.exists():
+    if mapdata.exists() and query:
         instance = {
         "map":mapdata,
-        "query_list_visitor":query_list_visitor,
-        "objects_all":query_list,
+        "query_list_visitor": query_list_visitor_list,
+        "objects_all": report,
         "objects_all1":query_list_host,
         'form1':form,
         'form':user_form
+        }
+        return render(request, 'account/logbook.html', instance)
+    elif mapdata.exists():
+        instance = {
+            "map": mapdata,
+            "query_list_visitor": query_list_visitor,
+            "objects_all": query_list,
+            "objects_all1": query_list_host,
+            'form1': form,
+            'form': user_form
         }
         return render(request, 'account/logbook.html', instance)
     else:
