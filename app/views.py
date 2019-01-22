@@ -1,17 +1,17 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
-from django.shortcuts import render, redirect, get_object_or_404
-
 from django.contrib.auth.models import User, Group
-from app.models import Host,Visitor,Map, Meeting
-from app.serializers import HostSerializer,MeetingSerializer,VisitorSerializer, MAPSerializer
-from .forms import VisitorForm,HostForm,RegistraionForm, MeetingForm, MapForm, ToDoForm, StatusForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Host, Visitor, Map, Meeting
+from .serializers import HostSerializer, MeetingSerializer, VisitorSerializer, MAPSerializer
+from .forms import VisitorForm, HostForm, RegistraionForm, MeetingForm, MapForm, ToDoForm, StatusForm
 
-from rest_framework import viewsets,status
+from rest_framework import viewsets, status
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from django.db.models import Q, FilteredRelation
 from itertools import chain
@@ -22,67 +22,79 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from projectvisitor.settings import EMAIL_HOST_USER
 
+import datetime
 import pandas as pd
+
+class VisitorViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    queryset = Visitor.objects.all()
+    serializer_class = VisitorSerializer
+
+class HostViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    queryset = Host.objects.all()
+    serializer_class = HostSerializer
+
+class MAPViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    queryset = Map.objects.all()
+    serializer_class = MAPSerializer
+
+class MeetingViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
 
 def index(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect("/logbook/")
     else:
-        return render(request,'app/index.html')
+        return render(request, 'app/index.html')
 
 def about(request):
-    return render(request,'app/about.html')
+    return render(request, 'app/about.html')
 
 def contact(request):
-    return render(request,'app/contact.html')
+    return render(request, 'app/contact.html')
 
 def register(request):
-    if request.method == 'POST':    
+    if request.method == 'POST':
         form = RegistraionForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
-            user = authenticate(username = username, password = password)
+            user = authenticate(username=username, password=password)
             login(request, user)
             return HttpResponseRedirect('../addnewlocations/')
     else:
-        form=RegistraionForm()
-    context={'form' : form}
-    return render(request,'registration/register.html',context)
-
-class VisitorViewSet(viewsets.ModelViewSet):
-    queryset = Visitor.objects.all()
-    serializer_class = VisitorSerializer
-
-class HostViewSet(viewsets.ModelViewSet):
-    queryset = Host.objects.all()
-    serializer_class = HostSerializer
-
-class MAPViewSet(viewsets.ModelViewSet):
-    queryset = Map.objects.all()
-    serializer_class = MAPSerializer
-
-class MeetingViewSet(viewsets.ModelViewSet):
-    queryset = Meeting.objects.all()
-    serializer_class = MeetingSerializer
+        form = RegistraionForm()
+    context = {'form': form}
+    return render(request, 'registration/register.html', context)
 
 def logbook(request):
-    query_list = Meeting.objects.all()
+    query_list = Meeting.objects.all().order_by('-date')
     query_list_host = Host.objects.prefetch_related('relateds')
     query_list_visitor = Visitor.objects.prefetch_related('relateds')
-    
-    user_form = ToDoForm()    
+
+    user_form = ToDoForm(request.POST or None)
     form = StatusForm()
     
     datequery = request.POST.get("date")
+    if not datequery:
+        print('1')
+        today = datetime.date.today()
+        datequery = today
+    
+    query_list = query_list.filter(
+        Q(date__icontains=datequery)
+    )
     query = request.GET.get("q")
-    
-    if datequery:
-        query_list = query_list.filter(
-            Q(date__icontains=datequery)
-            )
-    
+
     if query:
         print(query_list)
         query_list_visitor_list = query_list_visitor.filter(
@@ -134,7 +146,7 @@ def logbook(request):
         }
         return redirect('../addnewlocations/')
 
-def statusupdate(request,id=None): 
+def statusupdate(request,id=None):
     instance = get_object_or_404(Meeting,id=id)
 
     form = StatusForm(request.POST or None, instance=instance)
@@ -144,8 +156,8 @@ def statusupdate(request,id=None):
         instance.save(update_fields=["status"])
     else:
         form = StatusForm()
-            
-    instance = {'form':form}
+
+    instance = {'form': form}
     return HttpResponseRedirect('../../logbook/')
 
 def delselected(request,id):
@@ -162,6 +174,7 @@ def delselected(request,id):
 def addnewvisit(request):
     form2 = MeetingForm(request.POST)
     form1 = VisitorForm(request.POST)
+    form = ToDoForm()
 
     a = form1.is_valid()
     b = form2.is_valid()
@@ -193,7 +206,7 @@ def addnewvisit(request):
         # send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
         # send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
     
-        ####add karvanu che mailing
+        # add karvanu che mailing
 
         instance1.save()
         instance2 = form2.save(commit=False)
@@ -201,14 +214,15 @@ def addnewvisit(request):
         instance2.save()
         form2.save_m2m()
     else:
-        print("error")
+        form = ToDoForm()
         form1 = VisitorForm()
         form2 = MeetingForm()
 
     mapdata = Map.objects.all()
 
     instance = {
-        "map":mapdata,
+        "map": mapdata,
+        'form': form,
         'form1':form1,
         'form2':form2
         }

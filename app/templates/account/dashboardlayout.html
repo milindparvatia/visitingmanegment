@@ -2,38 +2,38 @@
 
 {% block content %}
 <div class="container-fluid">
-        <div class="row">
-            <nav class="col-md-0 d-md-block bg-light sidebar">
-            <div class="sidebar-sticky">
-              <ul class="nav flex-column">
-                <li class="nav-item">
-                  <a class="nav-link active" href="..\..\logbook">
-                     <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Log Book">people</i>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="..\..\addressbook">
-                     <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Visitors Address Book">contacts</i>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="..\..\analytics">
-                       <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Analytics">show_chart</i>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="..\..\locations">
-                       <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Locations overview">location_on</i>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </nav>
-  
-          <main role="main" class="col">
-              <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                {% block content1 %}{% endblock %}
-              </div>
-          </main>
+  <div class="row">
+    <nav class="col-md-0 d-xl-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'logbook' %}">
+              <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Log Book">people</i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'addressbook' %}">
+              <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Visitors Address Book">contacts</i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'analytics' %}">
+              <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Analytics">show_chart</i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'locations' %}">
+              <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Locations overview">location_on</i>
+            </a>
+          </li>
+        </ul>
       </div>
-{% endblock %}
+    </nav>
+
+    <main role="main" class="col">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        {% block content1 %}{% endblock %}
+      </div>
+    </main>
+  </div>
+  {% endblock %}

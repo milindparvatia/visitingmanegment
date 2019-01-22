@@ -1,6 +1,6 @@
 {% extends "app/layout.html" %}
-{% load crispy_forms_tags %}
 {% load bootstrap4 %}
+{% load crispy_forms_tags %}
 
 {% block extrahead %}
 {{ form.media }}
@@ -12,70 +12,70 @@
 <ul class="messages">
     {% for message in messages %}
     <div class="alert alert-primary alert-dismissible fade show" role="alert">
-            <ul{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</ul>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
+        <ul {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</ul>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     {% endfor %}
 </ul>
 {% endif %}
 
 <div class="container">
-        <div class="card mx-auto card-container w-50 p-5">
-            <p id="profile-name" class="profile-name-card">
-                <h1 class="card-title">Add New Visitor</h1>
-            </p>
-              <form action="/addnewvisit/" method="POST">
-                {% csrf_token %}
-                    <div class="form-group">
-                        {{ form1.full_name|as_crispy_field }}
-                    </div>
-                  <div class="form-group">
-                      {{ form1.company_name|as_crispy_field }}
-                  </div>
-                  <div class="form-group">
-                      {{ form1.email|as_crispy_field }}
-                  </div>
-                  <div class="form-group">
-                      {{ form1.mobile|as_crispy_field }}
-                  </div>
-                  <div class="form-group">
-                      {{ form1.licenseplate|as_crispy_field }}
-                  </div>
-                  
-                  <div class="form-group">
-                      {{ form1.about|as_crispy_field }}
-                  </div>
-                  <div class="form-group">
-                      {{ form1.comment|as_crispy_field }}
-                  </div>  
-                  <div class="form-group">
-                    {{ form2.host|as_crispy_field }}
-                </div>
-                <div class="form-group">
-                    {{ form2.location|as_crispy_field }}
-                </div>
-                <div class="form-group">
-                  {{ form2.date|as_crispy_field }}
-              </div>
-              <div class="form-group">
-                  {{ form2.start_time|as_crispy_field }}
-              </div>
-              <div class="form-group">
-                  {{ form2.end_time|as_crispy_field }}
-              </div>
-              <div class="form-group">
-                  {{ form2.status|as_crispy_field }}
-              </div>
-                  <div class="form-group mx-auto">
-                        <button type="submit" class="btn btn-primary">Save Visit</button>
-                        <button type="submit" class="btn btn-secondary">Save And Create New One</button>
-                        <a href="/logbook" class="btn btn-success">Cancel</a>
-                        <input type="hidden" name="next" value="{{next}}">
-                  </div>        
-              </form>
-        </div>
+    <div class="card mx-auto card-container w-50 p-5">
+        <p id="profile-name" class="profile-name-card">
+            <h1 class="card-title">Add New Visitor</h1>
+        </p>
+        <form action="/addnewvisit/" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form1.full_name|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form1.company_name|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form1.email|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form1.mobile|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form1.licenseplate|as_crispy_field }}
+            </div>
+
+            <div class="form-group">
+                {{ form1.about|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form1.comment|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.host|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.location|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.date|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.start_time|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.end_time|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.status|as_crispy_field }}
+            </div>
+            <div class="form-group mx-auto">
+                <button type="submit" class="btn btn-primary">Save Visit</button>
+                <button type="submit" class="btn btn-secondary">Save And Create New One</button>
+                <a href="{% url 'logbook' %}" class="btn btn-success">Cancel</a>
+                <input type="hidden" name="next" value="{{next}}">
+            </div>
+        </form>
     </div>
-    
+</div>
+
 {% endblock %}

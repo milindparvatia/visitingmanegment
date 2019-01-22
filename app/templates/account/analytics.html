@@ -12,43 +12,42 @@
     <span data-feather="calendar"></span>
     This week
   </button>
-  
 </div>
 </div>
 
 <div class="col-11 mx-auto">
-  <div class="row">   
+  <div class="row">
     <div class="jumbotron">
       <div class="row">
-      <h5 class="card-title mx-auto">How busy is your reception?</h5>
-    </div>
+        <h5 class="card-title mx-auto">How busy is your reception?</h5>
+      </div>
       <div id="tester" style="width:1100px;height:500px;"></div>
     </div>
   </div>
-  <div class="row">   
-      <div class="jumbotron">
-        <div class="row">
+  <div class="row">
+    <div class="jumbotron">
+      <div class="row">
         <h5 class="card-title mx-auto">How busy is your reception?</h5>
       </div>
-        <div id="myDiv" style="width:1100px;height:500px;"></div>
-      </div>
+      <div id="myDiv" style="width:1100px;height:500px;"></div>
     </div>
-    <div class="row">   
-        <div class="jumbotron">
-          <div class="row">
-          <h5 class="card-title mx-auto">How busy is your reception?</h5>
-        </div>
-          <div id="tester" style="width:1100px;height:500px;"></div>
-        </div>
+  </div>
+  <div class="row">
+    <div class="jumbotron">
+      <div class="row">
+        <h5 class="card-title mx-auto">How busy is your reception?</h5>
       </div>
-      <div class="row">   
-          <div class="jumbotron">
-            <div class="row">
-            <h5 class="card-title mx-auto">How busy is your reception?</h5>
-          </div>
-            <div id="tester" style="width:1100px;height:500px;"></div>
-          </div>
-        </div>
+      <div id="tester" style="width:1100px;height:500px;"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="jumbotron">
+      <div class="row">
+        <h5 class="card-title mx-auto">How busy is your reception?</h5>
+      </div>
+      <div id="tester" style="width:1100px;height:500px;"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -56,68 +55,68 @@
   var endpoint1 = '/api/data/VisitorView/'
   var defaultData = [];
 
-$.ajax({
-      method: "GET",
-      url: endpoint1,
-    success: function(datalist){
-        defaultData = datalist       
-        setCharts()
-        // $("#progress").hide()
+  $.ajax({
+    method: "GET",
+    url: endpoint1,
+    success: function (datalist) {
+      defaultData = datalist
+      setCharts()
+      // $("#progress").hide()
     },
-    error: function(error_data){
-        console.log("error")
-        console.log(error_data)
+    error: function (error_data) {
+      console.log("error")
+      console.log(error_data)
     }
-});
+  });
 
-function setCharts() {
-  var xValue = [defaultData.start_time];
+  function setCharts() {
+    var xValue = [defaultData.start_time];
 
-  var yValue = [20, 14, 23];
-  var yValue2 = [24, 16, 20];
+    var yValue = [20, 14, 23];
+    var yValue2 = [24, 16, 20];
 
-  var trace1 = {
-    x: xValue,
-    y: yValue,
-    type: 'bar',
-    text: yValue.map(String),
-    textposition: 'auto',
-    hoverinfo: 'none',
-    opacity: 0.5,
-    marker: {
-      color: 'rgb(158,202,225)',
-      line: {
-        color: 'rgb(8,48,107)',
-        width: 1.5
+    var trace1 = {
+      x: xValue,
+      y: yValue,
+      type: 'bar',
+      text: yValue.map(String),
+      textposition: 'auto',
+      hoverinfo: 'none',
+      opacity: 0.5,
+      marker: {
+        color: 'rgb(158,202,225)',
+        line: {
+          color: 'rgb(8,48,107)',
+          width: 1.5
+        }
       }
-    }
-  };
+    };
 
-  var trace2 = {
-    x: xValue,
-    y: yValue2,
-    type: 'bar',
-    text: yValue2.map(String),
-    textposition: 'auto',
-    hoverinfo: 'none',
-    marker: {
-      color: 'rgba(58,200,225,.5)',
-      line: {
-        color: 'rgb(8,48,107)',
-        width: 1.5
+    var trace2 = {
+      x: xValue,
+      y: yValue2,
+      type: 'bar',
+      text: yValue2.map(String),
+      textposition: 'auto',
+      hoverinfo: 'none',
+      marker: {
+        color: 'rgba(58,200,225,.5)',
+        line: {
+          color: 'rgb(8,48,107)',
+          width: 1.5
+        }
       }
-    }
-  };
+    };
 
-  var data = [trace1,trace2];
+    var data = [trace1, trace2];
 
-  var layout = {
-    title: 'January 2013 Sales Report'
-  };
+    var layout = {
+      title: 'January 2013 Sales Report'
+    };
 
-  Plotly.newPlot('myDiv', data, layout);
-}
+    Plotly.newPlot('myDiv', data, layout);
+  }
   {% endblock %}          
 </script>
-  
+
 {% endblock %}

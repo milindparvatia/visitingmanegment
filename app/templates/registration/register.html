@@ -4,30 +4,31 @@
 {% block content %}
 <br>
 <div class="container body-content">
-<body>
-        <div class="container body-content">
-                <div class="card mx-auto card-container w-50 p-5">
-                        <p id="profile-name" class="profile-name-card">
-                                <br>
-                                {% if next%}    
-                                <p>Hey,you can't access.</p>
-                                {% endif %}
-                                <h1>Registration Page!</h1><br>  
-                        </p>
-                        <form action="{% url 'register' %}" method="post">
-                                {% csrf_token %}
-                                {% if form.errors %}
-                                <p>There's something wrong with what you entered!</p>
-                                {% endif %}
-                                <div class="form-group">
-                                    {{form|crispy}}
-                                </div>
-                                <button class="btn btn-primary" type="submit">Sign Up</button>
-                                <input type="hidden" name="next" value="{{next}}">  
-                                <a href="..\accounts\login\" class="btn btn-dark">Back</a>
-                        </form>        
-                    </div>
-                </form>
-            </div>
-    
-{% endblock %}
+
+        <body>
+                <div class="container body-content">
+                        <div class="card mx-auto card-container w-50 p-5">
+                                <p id="profile-name" class="profile-name-card">
+                                        <br>
+                                        {% if next%}
+                                        <p>Hey,you can't access.</p>
+                                        {% endif %}
+                                        <h1>Registration Page!</h1><br>
+                                </p>
+                                <form action="{% url 'register' %}" method="post">
+                                        {% csrf_token %}
+                                        {% if form.errors %}
+                                        <p>There's something wrong with what you entered!</p>
+                                        {% endif %}
+                                        <div class="form-group">
+                                                {{form|crispy}}
+                                        </div>
+                                        <button class="btn btn-primary" type="submit">Sign Up</button>
+                                        <input type="hidden" name="next" value="{{next}}">
+                                        <a href="{% url 'login' %}" class="btn btn-dark">Back</a>
+                                </form>
+                        </div>
+                        </form>
+                </div>
+
+                {% endblock %}

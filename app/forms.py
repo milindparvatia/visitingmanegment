@@ -1,8 +1,10 @@
 from django import forms
-from .models import Visitor,Host,Map,Meeting
-from bootstrap_datepicker_plus import DatePickerInput,TimePickerInput
+import datetime
+from .models import Visitor, Host, Map, Meeting
+from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+
 
 class MapForm(forms.ModelForm):
     class Meta:
@@ -15,23 +17,26 @@ class MapForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(MapForm, self).__init__(*args, **kwargs)
         self.fields['loc'].label = 'Location'
-        self.fields['loc'].widget.attrs={ 'id': 'pac-input', 'class': 'form-control'}
-        self.fields['name'].widget.attrs={ 'id': 'name'}
+        self.fields['loc'].widget.attrs = {
+            'id': 'pac-input', 'class': 'form-control'}
+        self.fields['name'].widget.attrs = {'id': 'name'}
+
 
 class RegistraionForm(UserCreationForm):
     email = forms.EmailField(required=True)
+
     class Meta:
-        model=User
+        model = User
         fields = [
-                "first_name",
-                "last_name",
-                "username",
-                "email",
-                "password1",
-                "password2"
-            ]
-    
-    def save(self,commit=True):
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "password1",
+            "password2"
+        ]
+
+    def save(self, commit=True):
         user = super(RegistraionForm, self).save(commit=False)
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
@@ -42,14 +47,17 @@ class RegistraionForm(UserCreationForm):
 
         return user
 
+
 class ToDoForm(forms.Form):
     date = forms.DateField(
         widget=DatePickerInput(
             format='%Y-%m-%d',
-            attrs={'id':'date','onchange':'myFunction()'}
+            attrs={'id': 'date', 'onchange': 'myFunction()'}
         ),
-        label=''
+        label='',
+        initial=datetime.date.today()
     )
+
 
 class StatusForm(forms.ModelForm):
     class Meta:
@@ -57,12 +65,13 @@ class StatusForm(forms.ModelForm):
         fields = [
             'status'
         ]
-    
+
     def __init__(self, *args, **kwargs):
         super(StatusForm, self).__init__(*args, **kwargs)
         self.fields['status'].label = False
         # self.fields['status'].widget.attrs.update({'class': "ssss"})
         # self.fields['status'].widget.attrs={ 'id': '{{ip.id}}', 'class': 'myCustomClass'}
+
 
 class VisitorForm(forms.ModelForm):
     class Meta:
@@ -77,10 +86,12 @@ class VisitorForm(forms.ModelForm):
             "comment"
         ]
 
+
 class HostForm(forms.ModelForm):
-    attrs={
+    attrs = {
         'class': 'form-control'
     }
+
     class Meta:
         model = Host
         fields = [
@@ -90,25 +101,27 @@ class HostForm(forms.ModelForm):
             "comment"
         ]
 
+
 class MeetingForm(forms.ModelForm):
     date = forms.DateField(
         widget=DatePickerInput(
             format='%m/%d/%Y',
-            attrs={'id':'date','onchange':'myFunction()'}
+            attrs={'id': 'date', 'onchange': 'myFunction()'}
         ),
         label='Date Visiting'
     )
+
     class Meta:
         model = Meeting
         fields = [
             "status",
             "location",
             "host",
-            'start_time', 
+            'start_time',
             'end_time',
             'status'
         ]
         widgets = {
-            'start_time':TimePickerInput().start_of('party time'),
-            'end_time':TimePickerInput().end_of('party time'),
+            'start_time': TimePickerInput().start_of('party time'),
+            'end_time': TimePickerInput().end_of('party time'),
         }

@@ -11,46 +11,46 @@
 {# Display a form #}
 
 <form action="" method="GET" id="yourFormId" class="form">
-    {% csrf_token %}
-    {{ form }}
+  {% csrf_token %}
+  {{ form }}
 </form>
 <div class="btn-toolbar mb-2 mb-md-0">
-    <div class="btn-group mr-2">
-      <a href="/addnewlocations/" class="btn btn-dark">Add New</a>
-    </div>
+  <div class="btn-group mr-2">
+    <a href="{% url 'addnewlocations' %}" class="btn btn-dark">Add New</a>
   </div>
+</div>
 </div>
 
 <table class="table table-hover">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">LOCATION</th>
-        <th scope="col">BUILDING NANE</th>
-      </tr>
-    </thead>
-{% for ip in map %}
-    <tbody>
-      <tr>
-        <th scope="row">
-          <input type="checkbox" name="select" id="select">
-        </th>
-        <td>{{ip.loc}}</td>
-        <td>{{ip.name}}</td>
-      </tr>
-    </tbody>
-{% endfor %}
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">LOCATION</th>
+      <th scope="col">BUILDING NANE</th>
+    </tr>
+  </thead>
+  {% for ip in map %}
+  <tbody>
+    <tr>
+      <th scope="row">
+        <input type="checkbox" name="select" id="select">
+      </th>
+      <td>{{ip.loc}}</td>
+      <td>{{ip.name}}</td>
+    </tr>
+  </tbody>
+  {% endfor %}
 </table>
 
 
 <script>
   {% block jquery %}
 
-  $(document).ready(function(){
-    $("#date").blur(function(){
-        $('#yourFormId').submit();
-      });
+  $(document).ready(function () {
+    $("#date").blur(function () {
+      $('#yourFormId').submit();
     });
+  });
 
   {% endblock %}
 </script>

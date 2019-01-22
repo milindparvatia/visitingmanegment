@@ -18,13 +18,13 @@
 <!-- <h1 class="h2">Log Book</h1> -->
 <div class="btn-toolbar mb-2 mb-md-0">
   <div class="btn-group mr-2">
-    <a href="/addnewvisit" class="btn btn-dark">Add New</a>
+    <a href="{% url 'addnewvisit' %}" class="btn btn-dark">Add New</a>
   </div>
 </div>
 </div>
 
 <br>
-<table class="table table-hover table-responsive">
+<table class="table table-hover table-responsive" id="filterTable">
   <thead>
     <tr>
       <th scope="col">#</th>
@@ -87,6 +87,12 @@
 <script>
   {% block jquery %}
 
+  $('#filterTable tr').click(function (event) {
+    if (event.target.type !== 'checkbox') {
+      $(':checkbox', this).trigger('click');
+    }
+  });
+
   function GetURLParameter(sParam) {
     var sPageURL = window.location.search.substring(1);
     var sURLVariables = sPageURL.split('&');
@@ -128,8 +134,7 @@
       method: 'GET',
       url: 'delselected/',
       data: {
-        'id[]': id,
-        'key': q
+        'id[]': id
       },
       beforeSend: function (xhr) {
         xhr.setRequestHeader(

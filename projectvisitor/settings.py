@@ -46,7 +46,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-BOOTSTRAP4 = {'include_jquery': True,}
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+BOOTSTRAP4 = {'include_jquery': True, }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -153,7 +164,7 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "app/static"),
-    #'/var/www/static/',
+    # '/var/www/static/',
 ]
 
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
