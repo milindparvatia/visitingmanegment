@@ -7,22 +7,22 @@
       <div class="sidebar-sticky">
         <ul class="nav flex-column">
           <li class="nav-item">
-            <a class="nav-link active" href="{% url 'logbook' %}">
+            <a class="nav-link active" href="{% url 'logbook' slug=slug %}">
               <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Log Book">people</i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'addressbook' %}">
+            <a class="nav-link" href="{% url 'addressbook' slug=slug %}">
               <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Visitors Address Book">contacts</i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'analytics' %}">
+            <a class="nav-link" href="{% url 'analytics' slug=slug %}">
               <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Analytics">show_chart</i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'locations' %}">
+            <a class="nav-link" href="{% url 'locations' slug=slug %}">
               <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Locations overview">location_on</i>
             </a>
           </li>

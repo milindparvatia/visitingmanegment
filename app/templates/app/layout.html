@@ -22,7 +22,7 @@
 
   <nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark">
     {% if user.is_authenticated %}
-    <a class="navbar-brand" href="{% url 'logbook' %}">Visitor</a>
+    <a class="navbar-brand" href="{% url 'logbook' slug=slug %}">Visitor</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -32,20 +32,23 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
-            Location
+            {{slug}}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% for ip in map %}
-            <a class="dropdown-item" href="{{ip.name}}">{{ip.name}}</a>
+            <a class="dropdown-item" href="..\..\{{ip.slug}}\logbook">{{ip.name}}</a>
             {% endfor %}
 
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'colleagues' %}">Colleagues</a>
+          <a class="nav-link" href="{% url 'colleagues' slug=slug %}">Colleagues</a>
         </li>
       </ul>
       <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'settings' slug=slug %}">Settings</a>
+        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">

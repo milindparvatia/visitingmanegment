@@ -76,8 +76,11 @@ def register(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
-def logbook(request):
-    query_list = Meeting.objects.all().order_by('-date')
+def logbook(request, slug):
+    print(slug)
+    map_key = Map.objects.all().filter(slug=slug).values('id')
+    query_list = Meeting.objects.all().filter(
+        location_id=map_key[0]['id']).order_by('-date')
     query_list_host = Host.objects.prefetch_related('relateds')
     query_list_visitor = Visitor.objects.prefetch_related('relateds')
 
@@ -86,7 +89,6 @@ def logbook(request):
     
     datequery = request.POST.get("date")
     if not datequery:
-        print('1')
         today = datetime.date.today()
         datequery = today
     
@@ -96,7 +98,6 @@ def logbook(request):
     query = request.GET.get("q")
 
     if query:
-        print(query_list)
         query_list_visitor_list = query_list_visitor.filter(
             Q(full_name__icontains=query) |
             Q(email__icontains=query) |
@@ -127,11 +128,13 @@ def logbook(request):
         "objects_all": report,
         "objects_all1":query_list_host,
         'form1':form,
-        'form':user_form
+        'form': user_form,
+        'slug': slug,
         }
         return render(request, 'account/logbook.html', instance)
     elif mapdata.exists():
         instance = {
+            'slug':slug,
             "map": mapdata,
             "query_list_visitor": query_list_visitor,
             "objects_all": query_list,
@@ -171,7 +174,8 @@ def delselected(request,id):
     }
     return render(request,'account/logbook.html',data)
 
-def addnewvisit(request):
+def addnewvisit(request,slug):
+    print(slug)
     form2 = MeetingForm(request.POST)
     form1 = VisitorForm(request.POST)
     form = ToDoForm()
@@ -224,11 +228,14 @@ def addnewvisit(request):
         "map": mapdata,
         'form': form,
         'form1':form1,
-        'form2':form2
+        'form2': form2,
+        'slug': slug,
         }
     return render(request, 'account/addnewvisit.html', instance)
 
-def addressbook(request):
+
+def addressbook(request, slug):
+    print(slug)
     query_list = Visitor.objects.all()
 
     query = request.GET.get("q")
@@ -245,11 +252,14 @@ def addressbook(request):
 
     instance = {
         "map":mapdata,
-        "objects_all":query_list
+        "objects_all": query_list,
+        'slug': slug,
     }
     return render(request, 'account/addressbook.html', instance)
 
-def colleagues(request):
+
+def colleagues(request, slug):
+    print(slug)
     query_list = Host.objects.all()
     query = request.GET.get("q")
 
@@ -263,47 +273,72 @@ def colleagues(request):
 
     instance = {
         "map":mapdata,
-        "objects_all":query_list
+        "objects_all": query_list,
+        'slug': slug,
     }
     return render(request, 'account/colleagues.html', instance)
 
-def addnewhost(request):
+
+def addnewhost(request, slug):
+    print(slug)
     form = HostForm(request.POST)
+    mapdata = Map.objects.all()
     if form.is_valid():
         instance = form.save(commit=False)
         # instance.user = request.user
         print(form.cleaned_data.get("full_name"))
         fname= form.cleaned_data.get("full_name")
         instance.save()
-        messages.success(request, "Successfully Create New Entry for "+fname)
+        messages.success(request, "Successfully Create New Entry for " + fname)
     else:
         form = HostForm()
-            
-    mapdata = Map.objects.all()
-
+    
     instance = {
         "map":mapdata,
-        'form':form
+        'form': form,
+        'slug': slug,
         }
-    return render(request, 'account/addnewhost.html', instance)
+    return render(request,'account/addnewhost.html', instance)
 
-def locations(request):
+def locations(request, slug):
+    print(slug)
     user_form = ToDoForm()
     mapdata = Map.objects.all()
 
     instance = {
         "map":mapdata,
-        'form': user_form
+        'form': user_form,
+        'slug': slug,
     }
     return render(request, 'account/locations.html', instance)
+
+
+def urllocation(request,slug=None):
+    print(slug)
+
+    return render(request, 'account/logbook.html')
+
 
 def addnewlocations(request):
     form = MapForm()
 
     context = {
-        'form':form
+        'form': form,
     }
     return render(request,'account/addnewlocations.html',context)
+
+
+def addnewlocationsother(requests, lug=None):
+    print(slug)
+    form = MapForm()
+
+    context = {
+        'form': form,
+        'slug': slug,
+    }
+    return render(request, 'account/addnewlocations.html', context)
+
+
 
 def newlocations(request):
     if request.method == 'POST':
@@ -317,16 +352,33 @@ def newlocations(request):
         print(name)
         savemap = Map(loc = loc, name = name, lon = lon, lat = lat)
         savemap.save()
-        return redirect('../logbook/')
+        url = '../'+name+'/logbook'
+        return redirect(url)
     else:
-        return redirect('../logbook/')
+        return redirect(url)
 
-def analytics(request):
+
+def analytics(request, slug=None):
+    print(slug)
     mapdata = Map.objects.all()
     datalist = Visitor.objects.all().order_by('-date')
 
     instance = {
         "map":mapdata,
-        "datalist":datalist
+        "datalist": datalist,
+        'slug': slug,
     }
-    return render(request,'account/analytics.html', instance)
+    return render(request, 'account/analytics.html', instance)
+
+
+def settings(request, slug=None):
+    print(slug)
+    mapdata = Map.objects.all()
+    datalist = Visitor.objects.all().order_by('-date')
+
+    instance = {
+        "map": mapdata,
+        "datalist": datalist,
+        'slug': slug,
+    }
+    return render(request, 'account/settings.html', instance)

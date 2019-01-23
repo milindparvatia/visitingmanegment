@@ -1,15 +1,30 @@
 from django.db import models
 from django import forms
 import datetime
+from django.db.models.signals import pre_save
+from django.utils.text import slugify
+
 
 class Map(models.Model):
     loc = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(unique=True)
     lon = models.FloatField()
     lat = models.FloatField()
 
     def __str__(self):
         return self.name
+
+def pre_save_name_receiver(sender, instance, *args, **kwargs):
+    slug = slugify(instance.name)
+    exists = Map.objects.filter(slug=slug).exists()
+    if exists:
+        slug = "%s-%s" % (slug, instance.id)
+    instance.slug = slug
+
+
+pre_save.connect(pre_save_name_receiver, sender=Map)
+
 
 class Host(models.Model):
     full_name = models.CharField(max_length=30)
@@ -20,11 +35,13 @@ class Host(models.Model):
     def __str__(self):
         return self.full_name
 
+
 STATUS_CHOICES = (
-   ('expected', 'expected'),
-   ('check-in', 'check-in'),
-   ('check-out', 'check-out')
+    ('expected', 'expected'),
+    ('check-in', 'check-in'),
+    ('check-out', 'check-out')
 )
+
 
 class Visitor(models.Model):
     full_name = models.CharField(max_length=30)
@@ -34,14 +51,17 @@ class Visitor(models.Model):
     licenseplate = models.CharField(max_length=20)
     about = models.CharField(max_length=50, null=True)
     comment = models.CharField(max_length=100, null=True)
-    
+
     def __str__(self):
         return self.full_name
 
+
 class Meeting(models.Model):
-    visitor = models.ForeignKey(Visitor, on_delete=models.CASCADE,related_name='relateds')
-    host = models.ManyToManyField(Host,related_name='relateds')
-    status = models.CharField(choices=STATUS_CHOICES, blank=False, max_length=128)
+    visitor = models.ForeignKey(
+        Visitor, on_delete=models.CASCADE, related_name='relateds')
+    host = models.ManyToManyField(Host, related_name='relateds')
+    status = models.CharField(choices=STATUS_CHOICES,
+                              blank=False, max_length=128)
     location = models.ForeignKey(Map, on_delete=models.CASCADE)
     date = models.DateField(default=datetime.date.today)
     start_time = models.TimeField()

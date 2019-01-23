@@ -1,9 +1,16 @@
-{% extends "account/dashboardlayout.html" %}
 {% load crispy_forms_tags %}
 
 {% block content1 %}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+  rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" crossorigin="anonymous"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <style>
-      /* Always set the map height explicitly to define the size of the div
+  /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
         height: 100%;
@@ -23,142 +30,140 @@
   <br>
   <div class="row">
     <div class="col">
-        <form action="/logbook/" method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                    {{ form.loc|as_crispy_field }}
-                </div>
-              <div class="form-group">
-                  {{ form.name|as_crispy_field }}
-              </div>
-                <div class="form-group mx-auto">
-                  <button type="submit" id="savemap"onclick="SaveMap()" class="btn btn-primary">Save Visit</button>
-                  <a href="/locations" class="btn btn-success">Cancel</a>
-                  <input type="hidden" name="next" value="{{next}}">
-              </div>        
-          </form>
+      <form action="{% url 'logbook' slug=slug %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          {{ form.loc|as_crispy_field }}
+        </div>
+        <div class="form-group">
+          {{ form.name|as_crispy_field }}
+        </div>
+        <div class="form-group mx-auto">
+          <button type="submit" id="savemap" onclick="SaveMap()" class="btn btn-primary">Save Visit</button>
+          <a href="{% url 'locations' slug=slug %}" class="btn btn-success">Cancel</a>
+          <input type="hidden" name="next" value="{{next}}">
+        </div>
+      </form>
     </div>
     <div class="col">
-        <div id="map"></div>
+      <div id="map"></div>
     </div>
   </div>
 </div>
 <script>
-  var loc,name,lonmap,latmap
-    function initAutocomplete() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 23.0225, lng: 72.5714},
-            zoom: 13,
-            mapTypeId: 'roadmap'
-        });
+  var loc, name, lonmap, latmap
+  function initAutocomplete() {
+    var map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: 23.0225, lng: 72.5714 },
+      zoom: 13,
+      mapTypeId: 'roadmap'
+    });
 
-        // Create the search box and link it to the UI element.
-        var input = document.getElementById('pac-input');
-        var searchBox = new google.maps.places.SearchBox(input);
-        // map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    // Create the search box and link it to the UI element.
+    var input = document.getElementById('pac-input');
+    var searchBox = new google.maps.places.SearchBox(input);
+    // map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
-        
-        // Bias the SearchBox results towards current map's viewport.
-        map.addListener('bounds_changed', function() {
-          searchBox.setBounds(map.getBounds());
-        });
 
-        var markers = [];
-        // Listen for the event fired when the user selects a prediction and retrieve
-        // more details for that place.
-        
-        searchBox.addListener('places_changed', function() {
-          var places = searchBox.getPlaces();
+    // Bias the SearchBox results towards current map's viewport.
+    map.addListener('bounds_changed', function () {
+      searchBox.setBounds(map.getBounds());
+    });
 
-          if (places.length == 0) {
-            return;
-          }
-          
-          // Clear out the old markers.
-          markers.forEach(function(marker) {
-            marker.setMap(null);
-          });
-          markers = [];
+    var markers = [];
+    // Listen for the event fired when the user selects a prediction and retrieve
+    // more details for that place.
 
-          // For each place, get the icon, name and location.
-          var bounds = new google.maps.LatLngBounds();
-          places.forEach(function(place) {
-            if (!place.geometry) {
-              console.log("Returned place contains no geometry");
-              return;
-            }
-            var icon = {
-              url: place.icon,
-              size: new google.maps.Size(71, 71),
-              origin: new google.maps.Point(0, 0),
-              anchor: new google.maps.Point(17, 34),
-              scaledSize: new google.maps.Size(25, 25)
-            };
+    searchBox.addListener('places_changed', function () {
+      var places = searchBox.getPlaces();
 
-            // Create a marker for each place.
-            markers.push(new google.maps.Marker({
-              map: map,
-              icon: icon,
-              title: place.name,
-              position: place.geometry.location
-            }));
-
-            if (place.geometry.viewport) {
-                
-              // Only geocodes have viewport.
-              bounds.union(place.geometry.viewport);
-            } else {
-              bounds.extend(place.geometry.location);
-            }
-          });
-          
-          var savedata = bounds;
-          console.log(savedata);
-          lonmap = savedata.ma.l
-          latmap = savedata.ga.l
-          console.log(savedata.ma.l);
-          console.log(savedata.ga.l);
-          map.fitBounds(bounds);
-        });
+      if (places.length == 0) {
+        return;
       }
 
-    // $("#savemap").click(function() {
-    //   loc = $("#pac-input").val()
-    //   name = $("#name").val()
-    // });
+      // Clear out the old markers.
+      markers.forEach(function (marker) {
+        marker.setMap(null);
+      });
+      markers = [];
 
-    function SaveMap(){
-      event.preventDefault();
-      loc = $("#pac-input").val()
-      name = $("#name").val()
-        $.ajax({
-            method: 'POST',
-            url: '/newlocations/',
-            data: {
-              'loc' : loc,
-              'name' : name,
-              'lon': lonmap,
-              'lat' : latmap
-            },
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader(
-                  "X-CSRFToken", 
-                  "{{ csrf_token }}"
-                  );
-                },
-            success: function(response){
-              console.log("succ");
-              window.location.replace("../logbook/");
-            },
-            error: function(error_data){
-                    console.log("error");
-                    console.log(error_data);
-                }
-        }); 
-      };
+      // For each place, get the icon, name and location.
+      var bounds = new google.maps.LatLngBounds();
+      places.forEach(function (place) {
+        if (!place.geometry) {
+          console.log("Returned place contains no geometry");
+          return;
+        }
+        var icon = {
+          url: place.icon,
+          size: new google.maps.Size(71, 71),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(17, 34),
+          scaledSize: new google.maps.Size(25, 25)
+        };
+
+        // Create a marker for each place.
+        markers.push(new google.maps.Marker({
+          map: map,
+          icon: icon,
+          title: place.name,
+          position: place.geometry.location
+        }));
+
+        if (place.geometry.viewport) {
+
+          // Only geocodes have viewport.
+          bounds.union(place.geometry.viewport);
+        } else {
+          bounds.extend(place.geometry.location);
+        }
+      });
+
+      var savedata = bounds;
+      console.log(savedata);
+      lonmap = savedata.ma.l
+      latmap = savedata.ga.l
+      console.log(savedata.ma.l);
+      console.log(savedata.ga.l);
+      map.fitBounds(bounds);
+    });
+  }
+
+  // $("#savemap").click(function() {
+  //   loc = $("#pac-input").val()
+  //   name = $("#name").val()
+  // });
+
+  function SaveMap() {
+    event.preventDefault();
+    loc = $("#pac-input").val()
+    name = $("#name").val()
+    $.ajax({
+      method: 'POST',
+      url: '/newlocations/',
+      data: {
+        'loc': loc,
+        'name': name,
+        'lon': lonmap,
+        'lat': latmap
+      },
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader(
+          "X-CSRFToken",
+          "{{ csrf_token }}"
+        );
+      },
+      success: function (response) {
+        console.log("succ");
+        window.location.replace("../logbook/");
+      },
+      error: function (error_data) {
+        console.log("error");
+        console.log(error_data);
+      }
+    });
+  };
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMlG5eOnUMdABa9akVC9eU7UXZ6O9fCP8&libraries=places&callback=initAutocomplete"
-         async defer></script>
+  async defer></script>
 {% endblock %}
-
-      
