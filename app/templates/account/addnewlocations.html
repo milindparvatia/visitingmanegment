@@ -13,7 +13,7 @@
   /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 100%;
+        height: 75%;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
@@ -30,7 +30,7 @@
   <br>
   <div class="row">
     <div class="col">
-      <form action="{% url 'logbook' slug=slug %}" method="POST">
+      <form action="/addnewlocations/" method="POST">
         {% csrf_token %}
         <div class="form-group">
           {{ form.loc|as_crispy_field }}
@@ -40,7 +40,7 @@
         </div>
         <div class="form-group mx-auto">
           <button type="submit" id="savemap" onclick="SaveMap()" class="btn btn-primary">Save Visit</button>
-          <a href="{% url 'locations' slug=slug %}" class="btn btn-success">Cancel</a>
+          <a href="/locations" class="btn btn-success">Cancel</a>
           <input type="hidden" name="next" value="{{next}}">
         </div>
       </form>
@@ -51,7 +51,7 @@
   </div>
 </div>
 <script>
-  var loc, name, lonmap, latmap
+  var loc, name, lonmap, latmap, url
   function initAutocomplete() {
     var map = new google.maps.Map(document.getElementById('map'), {
       center: { lat: 23.0225, lng: 72.5714 },
@@ -129,10 +129,13 @@
     });
   }
 
-  // $("#savemap").click(function() {
-  //   loc = $("#pac-input").val()
-  //   name = $("#name").val()
-  // });
+  function convertToSlug(Text) {
+    return Text
+      .toLowerCase()
+      .replace(/ /g, '-')
+      .replace(/[^\w-]+/g, '')
+      ;
+  }
 
   function SaveMap() {
     event.preventDefault();
@@ -140,7 +143,7 @@
     name = $("#name").val()
     $.ajax({
       method: 'POST',
-      url: '/newlocations/',
+      url: '/addnewlocations/',
       data: {
         'loc': loc,
         'name': name,
@@ -155,7 +158,10 @@
       },
       success: function (response) {
         console.log("succ");
-        window.location.replace("../logbook/");
+        slug = convertToSlug(name);
+        console.log(slug);
+        url = "../" + slug + "/logbook/"
+        window.location.replace(url);
       },
       error: function (error_data) {
         console.log("error");

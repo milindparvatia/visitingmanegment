@@ -51,7 +51,7 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
 def index(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect("/logbook/")
+        return HttpResponseRedirect("account/logbook/")
     else:
         return render(request, 'app/index.html')
 
@@ -312,51 +312,45 @@ def locations(request, slug):
     }
     return render(request, 'account/locations.html', instance)
 
-
-def urllocation(request,slug=None):
-    print(slug)
-
-    return render(request, 'account/logbook.html')
-
-
 def addnewlocations(request):
-    form = MapForm()
-
-    context = {
-        'form': form,
-    }
-    return render(request,'account/addnewlocations.html',context)
-
-
-def addnewlocationsother(requests, lug=None):
-    print(slug)
-    form = MapForm()
-
-    context = {
-        'form': form,
-        'slug': slug,
-    }
-    return render(request, 'account/addnewlocations.html', context)
-
-
-
-def newlocations(request):
-    if request.method == 'POST':
-        print(request.POST.get('loc'))
-        loc = request.POST.get('loc')
-        name = request.POST.get('name')
-        lon = request.POST.get('lon')
-        lat = request.POST.get('lat')
-        print(lon)
-        print(lat)
-        print(name)
-        savemap = Map(loc = loc, name = name, lon = lon, lat = lat)
-        savemap.save()
-        url = '../'+name+'/logbook'
-        return redirect(url)
+    form = MapForm(request.POST or None)
+    
+    if form.is_valid():
+        instance = form.save()
+        # instance.user = request.user
+        # fname = form.cleaned_data.get("name")
+        # instance.save()
+        old_slug = Map.objects.get(id=instance.pk)
+        print(old_slug.slug)
+        # messages.success(request, "Successfully Create New Entry for " + fname)
+        slug = old_slug.slug
+        context = {
+            'form': form,
+            'slug': slug
+        }
+        return render(request,'account/logbook.html',context)
+        # return render(request, url)
     else:
-        return redirect(url)
+        context = {
+            'form': form,
+        }
+        print('addnewlocations error')
+        return render(request,'account/addnewlocations.html',context)
 
+# def newlocations(request):
+#     if request.method == 'POST':
+#         print(request.POST.get('loc'))
+#         loc = request.POST.get('loc')
+#         name = request.POST.get('name')
+#         lon = request.POST.get('lon')
+#         lat = request.POST.get('lat')
+#         print(lon)
+#         print(lat)
+#         print(name)
+#         savemap = Map(loc = loc, name = name, lon = lon, lat = lat)
+#         savemap.save(commit=False)
+        
+#         print(savemap)
 
 def analytics(request, slug=None):
     print(slug)

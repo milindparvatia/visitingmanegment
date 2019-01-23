@@ -11,7 +11,9 @@ class MapForm(forms.ModelForm):
         model = Map
         fields = [
             'loc',
-            'name'
+            'name',
+            'lat',
+            'lon'
         ]
 
     def __init__(self, *args, **kwargs):

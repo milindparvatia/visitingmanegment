@@ -23,5 +23,5 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('addnewlocations/', views.addnewlocations, name='addnewlocations'),
-    path('newlocations/', views.newlocations, name='newlocations'),
+    # path('newlocations/', views.newlocations, name='newlocations'),
 ]

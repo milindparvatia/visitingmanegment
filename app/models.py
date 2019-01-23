@@ -14,6 +14,8 @@ class Map(models.Model):
 
     def __str__(self):
         return self.name
+        return self.slug
+
 
 def pre_save_name_receiver(sender, instance, *args, **kwargs):
     slug = slugify(instance.name)

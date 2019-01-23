@@ -32,4 +32,4 @@ class MAPSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Map
-        fields = ('url', 'id', 'loc', 'lon', 'lat', 'name')
+        fields = ('url', 'id', 'loc', 'lon', 'lat', 'name', 'slug')

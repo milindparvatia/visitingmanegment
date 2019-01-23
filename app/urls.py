@@ -12,8 +12,6 @@ urlpatterns = [
     path('colleagues/', views.colleagues, name='colleagues'),
     path('addnewvisit/', views.addnewvisit, name='addnewvisit'),
     path('addnewhost/', views.addnewhost, name='addnewhost'),
-    path('addnewlocations/', views.addnewlocationsother,
-         name='addnewlocationsother'),
     url(r'^logbook/delselected/(?:id=(?P<id>\d+)/)?$',
         views.delselected, name='delselected'),
     path('settings/', views.settings, name='settings'),
