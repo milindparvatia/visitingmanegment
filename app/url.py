@@ -6,6 +6,7 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 router = routers.DefaultRouter()
+router.register(r'User', views.UserViewSet)
 router.register(r'Visitor', views.VisitorViewSet)
 router.register(r'Host', views.HostViewSet)
 router.register(r'Map', views.MAPViewSet)

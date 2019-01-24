@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Host, Visitor, Map, Meeting
-from .serializers import HostSerializer, MeetingSerializer, VisitorSerializer, MAPSerializer
+from .serializers import HostSerializer, MeetingSerializer, VisitorSerializer, MAPSerializer, UserSerializer
 from .forms import VisitorForm, HostForm, RegistraionForm, MeetingForm, MapForm, ToDoForm, StatusForm
 
 from rest_framework import viewsets, status
@@ -24,6 +24,13 @@ from projectvisitor.settings import EMAIL_HOST_USER
 
 import datetime
 import pandas as pd
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 class VisitorViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -367,12 +374,8 @@ def analytics(request, slug=None):
 
 def settings(request, slug=None):
     print(slug)
-    mapdata = Map.objects.all()
-    datalist = Visitor.objects.all().order_by('-date')
 
     instance = {
-        "map": mapdata,
-        "datalist": datalist,
         'slug': slug,
     }
-    return render(request, 'account/settings.html', instance)
+    return render(request, 'account/settings/settingslayout.html', instance)

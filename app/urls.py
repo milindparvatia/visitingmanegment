@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'^logbook/delselected/(?:id=(?P<id>\d+)/)?$',
         views.delselected, name='delselected'),
     path('settings/', views.settings, name='settings'),
+
 ]

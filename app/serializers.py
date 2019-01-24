@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from app.models import Visitor, Host, Map, Meeting
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
@@ -33,3 +34,10 @@ class MAPSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Map
         fields = ('url', 'id', 'loc', 'lon', 'lat', 'name', 'slug')
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('url', 'first_name', 'last_name', 'is_active', 'last_login', 'date_joined',
+                  'username', 'password', 'email', 'groups')
