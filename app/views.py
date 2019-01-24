@@ -58,7 +58,9 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
 def index(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect("account/logbook/")
+        map_key = Map.objects.first()
+        url = map_key.slug + '/logbook'
+        return HttpResponseRedirect(url)
     else:
         return render(request, 'app/index.html')
 
@@ -83,9 +85,13 @@ def register(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
-def logbook(request, slug):
-    print(slug)
-    map_key = Map.objects.all().filter(slug=slug).values('id')
+def logbook(request, slug=None):
+    if slug:
+        print(slug)
+        map_key = Map.objects.all().filter(slug=slug).values('id')
+    else:
+        map_key = Map.objects.first()
+
     query_list = Meeting.objects.all().filter(
         location_id=map_key[0]['id']).order_by('-date')
     query_list_host = Host.objects.prefetch_related('relateds')
