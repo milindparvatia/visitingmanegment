@@ -55,6 +55,8 @@
             Hello {{user.username}}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'view' slug=slug %}">View Profile</a>
+            <a class="dropdown-item" href="{% url 'edit' slug=slug %}">Manage Profile</a>
             <a class="dropdown-item" href="{% url 'logout' %}">Log out</a>
           </div>
         </li>

@@ -1,6 +1,6 @@
 from django import forms
 import datetime
-from .models import Visitor, Host, Map, Meeting
+from .models import Visitor, Host, Map, Meeting, UserProfile
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -127,3 +127,17 @@ class MeetingForm(forms.ModelForm):
             'start_time': TimePickerInput().start_of('party time'),
             'end_time': TimePickerInput().end_of('party time'),
         }
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = [
+            'user',
+            'mobile',
+            'licenseplate',
+            'about',
+            'comment',
+            'location',
+            'profile_pic'
+        ]

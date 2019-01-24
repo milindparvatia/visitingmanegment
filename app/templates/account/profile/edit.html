@@ -1,0 +1,42 @@
+{% extends "account/profile/manage.html" %}
+{% load crispy_forms_tags %}
+{% block profilemanage %}
+<br>
+<div class=" row">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            <ul {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <class class="container">
+        <div class="col-3"></div>
+        <div class="col-9">
+            <div class="container">
+                <form action="{% url 'edit' slug=slug %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form1|crispy }}
+                    </div>
+                    <div class="form-group">
+                        {{ form2|crispy }}
+                    </div>
+                    <div class="form-group mx-auto">
+                        <button type="submit" class="btn btn-primary">Save Visit</button>
+                        <button type="submit" class="btn btn-secondary">Save And Create New One</button>
+                        <a href="/logbook" class="btn btn-success">Cancel</a>
+                        <input type="hidden" name="next" value="{{next}}">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </class>
+</div>
+{% endblock %}

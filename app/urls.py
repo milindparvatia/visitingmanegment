@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, url_settings, url_profile
 from rest_framework import routers
 from django.conf.urls import url, include
 
@@ -14,6 +14,6 @@ urlpatterns = [
     path('addnewhost/', views.addnewhost, name='addnewhost'),
     url(r'^logbook/delselected/(?:id=(?P<id>\d+)/)?$',
         views.delselected, name='delselected'),
-    path('settings/', views.settings, name='settings'),
-
+    path('settings/', include('app.url_settings')),
+    path('profile/', include('app.url_profile')),
 ]
