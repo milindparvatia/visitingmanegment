@@ -24,4 +24,6 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('addnewlocations/', views.addnewlocations, name='addnewlocations'),
+    url(r'^search/', include('haystack.urls')),
+
 ]

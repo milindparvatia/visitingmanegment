@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
@@ -5,7 +6,7 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Host, Visitor, Map, Meeting
 from .serializers import HostSerializer, MeetingSerializer, VisitorSerializer, MAPSerializer, UserSerializer
-from .forms import VisitorForm, HostForm, RegistraionForm, UserForm, MeetingForm, MapForm, ToDoForm, StatusForm
+from .forms import VisitorForm, HostForm, RegistraionForm, SearchVisitorForm,UserForm, MeetingForm, MapForm, ToDoForm, StatusForm
 
 from rest_framework import viewsets, status
 from rest_framework.generics import ListAPIView
@@ -256,6 +257,39 @@ def addnewvisit(request, slug):
     }
     return render(request, 'account/addnewvisit.html', instance)
 
+from haystack.query import SearchQuerySet
+
+
+def search_visitor(request, slug=None):
+    
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/searchvisitor.html', instance)
+
+
+def searchlist(request, slug=None):
+    visitor = SearchQuerySet().autocomplete(
+        content_auto=request.POST.get('search_text', ''))[:5]
+    print(visitor)
+    instance = {
+        'visitor': visitor,
+        'slug': slug,
+    }
+    return render(request, 'account/searchlist.html', instance)
+
+
+def search_list(request, slug=None):
+    sqs = SearchQuerySet().autocomplete(
+        content_auto=request.GET.get('q', ''))[:5]
+    suggestions = [result.text for result in sqs]
+    # Make sure you return a JSON object, not a bare list.
+    # Otherwise, you could be vulnerable to an XSS attack.
+    print(suggestions)
+    the_data = json.dumps({
+        'results': suggestions
+    })
+    return HttpResponse(the_data, content_type='application/json')
 
 def addressbook(request, slug):
     print(slug)
@@ -440,3 +474,12 @@ def edit(request, slug=None):
         "map": mapdata,
     }
     return render(request, 'account/profile/edit.html', instance)
+
+
+def password(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/profile/password.html', instance)

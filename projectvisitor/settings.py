@@ -33,9 +33,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'haystack',
     'bootstrap_datepicker_plus',
     'crispy_forms',
-    'app.apps.AppConfig',
+    'app',
     'rest_framework',
     'bootstrap4',
     'django.contrib.admin',
@@ -57,6 +58,13 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
+}
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
+    },
 }
 
 BOOTSTRAP4 = {'include_jquery': True, }

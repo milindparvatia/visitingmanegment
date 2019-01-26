@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container-fluid">
   <div class="row">
-    <nav class="col-md-0 d-xl-block bg-light sidebar">
+    <nav class="col-md-1 d-xl-block bg-light sidebar">
       <div class="sidebar-sticky">
         <ul class="nav flex-column">
           <li class="nav-item">
@@ -30,10 +30,11 @@
       </div>
     </nav>
 
-    <main role="main" class="col">
+    <main role="main" class="col-11">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         {% block content1 %}{% endblock %}
       </div>
     </main>
   </div>
-  {% endblock %}
+</div>
+{% endblock %}

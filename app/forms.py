@@ -134,10 +134,20 @@ class UserForm(forms.ModelForm):
         model = UserProfile
         fields = [
             'user',
+            'company_name',
             'mobile',
             'licenseplate',
             'about',
             'comment',
             'location',
             'profile_pic'
+        ]
+
+
+class SearchVisitorForm(forms.ModelForm):
+    class Meta:
+        model = Visitor
+        fields = [
+            'full_name',
+            'email'
         ]

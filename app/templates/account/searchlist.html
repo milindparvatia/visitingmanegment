@@ -1,0 +1,28 @@
+<div class="card text-center">
+
+    {% for name in visitor %}
+    <div class="row">
+        <div class="col" style="width: 520px;">
+            <div class="list-group" id="list-tab" role="tablist">
+                <a class="list-group-item list-group-item-action" id="list-home-list" data-toggle="list" href="#list-home"
+                    role="tab" aria-controls="home">
+                    <div class="row">
+                        <div class="col-2">{{name.object.full_name}}</div>
+                        <div class="col-10">{{name.object.email}}</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    {%empty%}
+    <div class="row">
+        <div class="col" style="width: 520px;">
+            <div class="list-group" id="list-tab" role="tablist">
+                <a href="{% url 'addnewvisit' slug=slug %}" class="list-group-item list-group-item-action">No matched,
+                    create new account ?</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>

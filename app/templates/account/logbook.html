@@ -7,7 +7,6 @@
 {% endblock %}
 
 {% block content1 %}
-
 <form class="form-inline">
   <input class="form-control mr-sm-2" placeholder="Search" type="search" name="q" id="query" aria-label="Search">
 </form>
@@ -18,69 +17,74 @@
 <!-- <h1 class="h2">Log Book</h1> -->
 <div class="btn-toolbar mb-2 mb-md-0">
   <div class="btn-group mr-2">
-    <a href="{% url 'addnewvisit' slug=slug %}" class="btn btn-dark">Add New</a>
+    <a href="{% url 'searchvisitor' slug=slug %}" class="btn btn-dark">Add New</a>
   </div>
 </div>
 </div>
 
-<br>
-<table class="table table-hover table-responsive" id="filterTable">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">STATUS</th>
-      <th scope="col">CHECKIN</th>
-      <th scope="col">CHECKOUT</th>
-      <th scope="col">DATE</th>
-      <th scope="col">VISITOR</th>
-      <th scope="col">COMPANY</th>
-      <th scope="col">HOST</th>
-      <th scope="col">EMAIL</th>
-      <th scope="col">MOBILE</th>
-      <th scope="col">LICENSEPLATE</th>
-      <th scope="col">ABOUT</th>
-      <th scope="col">COMMENT</th>
-    </tr>
-  </thead>
+<div class="card mx-auto">
+  <div class="card-body">
 
-  <tbody>
-    {% for ip in objects_all %}
-    <tr>
-      <th>
-        <input type="checkbox" name="fid[]" class="checkbox" id="{{ip.id}}">
-      </th>
-      <td>
-        <form action="/statusupdate/{{ip.id}}/" class="form-inline" id="updateForm" method="POST">
-          {% csrf_token %}
-          <div class="form-group">
-            <select name="{{ form1.status.name }}" class="form-control" id="{{ip.id}}">
-              <option value="{{ choice.0 }}">{{ ip.status }}</option>
-              {% for choice in form1.status.field.choices %}
-              <option value="{{ choice.0 }}">{{ choice.0 }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary">Save</button>
+    <div class=" row mx-auto">
+      <br>
+      <table class="table table-hover table-responsive" id="filterTable">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">STATUS</th>
+            <th scope="col">CHECKIN</th>
+            <th scope="col">CHECKOUT</th>
+            <th scope="col">DATE</th>
+            <th scope="col">VISITOR</th>
+            <th scope="col">COMPANY</th>
+            <th scope="col">HOST</th>
+            <th scope="col">EMAIL</th>
+            <th scope="col">MOBILE</th>
+            <th scope="col">LICENSEPLATE</th>
+            <th scope="col">ABOUT</th>
+            <th scope="col">COMMENT</th>
+          </tr>
+        </thead>
 
-        </form>
-      </td>
-      <td>{{ip.start_time}}</td>
-      <td>{{ip.end_time}}</td>
-      <td>{{ip.date}}</td>
+        <tbody>
+          {% for ip in objects_all %}
+          <tr>
+            <th>
+              <input type="checkbox" name="fid[]" class="checkbox" id="{{ip.id}}">
+            </th>
+            <td>
+              <form style="width: 180px;" action="/statusupdate/{{ip.id}}/" class="form-inline" id="updateForm" method="POST">
+                {% csrf_token %}
+                <select name="{{ form1.status.name }}" class="form-control" id="{{ip.id}}">
+                  <option value="{{ choice.0 }}">{{ ip.status }}</option>
+                  {% for choice in form1.status.field.choices %}
+                  <option value="{{ choice.0 }}">{{ choice.0 }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Save</button>
+              </form>
+            </td>
+            <td>{{ip.start_time}}</td>
+            <td>{{ip.end_time}}</td>
+            <td>
+              <div style="width: 100px;">{{ip.date}}</div>
+            </td>
 
-      <td>{% for data in ip.visitor.full_name %}{{ data }}{% endfor %}</td>
-      <td>{% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
-      <td>{% for data in ip.host.all %}{{ data }}{% endfor %}</td>
-      <td>{% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
-      <td>{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</td>
-      <td>{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</td>
-      <td>{% for data in ip.visitor.about %}{{ data }}{% endfor %}</td>
-      <td>{% for data in ip.visitor.comment %}{{ data }}{% endfor %}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-
-</table>
+            <td>{% for data in ip.visitor.full_name %}{{ data }}{% endfor %}</td>
+            <td>{% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
+            <td>{% for data in ip.host.all %}{{ data }}{% endfor %}</td>
+            <td>{% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
+            <td>{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</td>
+            <td>{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</td>
+            <td>{% for data in ip.visitor.about %}{{ data }}{% endfor %}</td>
+            <td>{% for data in ip.visitor.comment %}{{ data }}{% endfor %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <button id="delt" class="btn btn-danger" onclick="Delselected()">Delete</button>
 

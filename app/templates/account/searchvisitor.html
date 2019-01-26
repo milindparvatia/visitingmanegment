@@ -1,0 +1,63 @@
+{% extends "app/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<br>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <ul {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</ul>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+</ul>
+{% endif %}
+<div class="container">
+    <div class="card mx-auto card-container w-50 p-5">
+        <h1 class="card-title">Enter the name of Visitor</h1>
+        <p id="profile-name" class="profile-name-card"></p>
+        <form method="post" action="/search/" class="autocomplete-me">
+            <div class="form-group row">
+                <input type="text" class="textinput textInput form-control" name="search" id="search">
+                <div id="search-results"></div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    {% block jquery %}
+    $(function () {
+        $('#search').keyup(function () {
+            $.ajax({
+                method: 'POST',
+                url: '/search/searchlist/',
+                data: {
+                    'search_text': $('#search').val(),
+
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        "X-CSRFToken",
+                        "{{ csrf_token }}"
+                    );
+                },
+                success: searchSuccess,
+                dataType: 'html',
+                error: function (error_data) {
+                    console.log("error");
+                    console.log(error_data);
+                }
+            })
+        })
+    });
+
+    function searchSuccess(data, textStatus, jqXHR) {
+        $('#search-results').html(data);
+        console.log(data);
+    }
+    {% endblock %}
+</script>
+{% endblock %}

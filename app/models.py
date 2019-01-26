@@ -73,6 +73,7 @@ class Meeting(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    company_name = models.CharField(max_length=20, null=True)
     mobile = models.CharField(max_length=20, null=True)
     licenseplate = models.CharField(max_length=20, null=True)
     about = models.CharField(max_length=50, null=True)
