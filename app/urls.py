@@ -21,4 +21,5 @@ urlpatterns = [
         views.delselected, name='delselected'),
     path('settings/', include('app.url_settings')),
     path('profile/', include('app.url_profile')),
+    url(r'^search/', include('haystack.urls')),
 ]

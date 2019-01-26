@@ -261,7 +261,7 @@ from haystack.query import SearchQuerySet
 
 
 def search_visitor(request, slug=None):
-    
+    print(slug)
     instance = {
         'slug': slug,
     }
@@ -269,9 +269,10 @@ def search_visitor(request, slug=None):
 
 
 def searchlist(request, slug=None):
+    
     visitor = SearchQuerySet().autocomplete(
         content_auto=request.POST.get('search_text', ''))[:5]
-    print(visitor)
+    print(slug)
     instance = {
         'visitor': visitor,
         'slug': slug,

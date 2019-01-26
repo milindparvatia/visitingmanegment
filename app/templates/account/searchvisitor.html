@@ -19,7 +19,7 @@
     <div class="card mx-auto card-container w-50 p-5">
         <h1 class="card-title">Enter the name of Visitor</h1>
         <p id="profile-name" class="profile-name-card"></p>
-        <form method="post" action="/search/" class="autocomplete-me">
+        <form method="post" action="" class="autocomplete-me">
             <div class="form-group row">
                 <input type="text" class="textinput textInput form-control" name="search" id="search">
                 <div id="search-results"></div>
@@ -30,13 +30,15 @@
 <script>
     {% block jquery %}
     $(function () {
+        var slug = window.location.pathname;
+        var metaslug = slug.split('/');
+        console.log(metaslug[1]);
         $('#search').keyup(function () {
             $.ajax({
                 method: 'POST',
-                url: '/search/searchlist/',
+                url: '../../' + metaslug[1] + '/searchlist/',
                 data: {
                     'search_text': $('#search').val(),
-
                 },
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader(
