@@ -53,7 +53,8 @@
               <input type="checkbox" name="fid[]" class="checkbox" id="{{ip.id}}">
             </th>
             <td>
-              <form style="width: 180px;" action="/statusupdate/{{ip.id}}/" class="form-inline" id="updateForm" method="POST">
+              <form style="width: 180px;" action="../statusupdate/{{ip.id}}/" class="form-inline" id="updateForm"
+                method="POST">
                 {% csrf_token %}
                 <select name="{{ form1.status.name }}" class="form-control" id="{{ip.id}}">
                   <option value="{{ choice.0 }}">{{ ip.status }}</option>
@@ -133,10 +134,14 @@
     }
 
   });
+
   function Delselected() {
+    var slug = window.location.pathname;
+    var metaslug = slug.split('/');
+    console.log(metaslug[1]);
     $.ajax({
       method: 'GET',
-      url: 'delselected/',
+      url: '../../' + metaslug[1] + '/delselected/',
       data: {
         'id[]': id
       },

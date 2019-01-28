@@ -7,6 +7,7 @@ from django.db.models.signals import pre_save
 
 
 class Map(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     loc = models.CharField(max_length=100)
     name = models.CharField(max_length=50)
     slug = models.SlugField(unique=True)
@@ -30,6 +31,7 @@ pre_save.connect(pre_save_slug_receiver, sender=Map)
 
 
 class Host(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=30)
     email = models.EmailField(max_length=20)
     mobile = models.IntegerField()
@@ -47,6 +49,7 @@ STATUS_CHOICES = (
 
 
 class Visitor(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=30)
     company_name = models.CharField(max_length=20)
     email = models.EmailField(max_length=20)
@@ -60,6 +63,7 @@ class Visitor(models.Model):
 
 
 class Meeting(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     visitor = models.ForeignKey(
         Visitor, on_delete=models.CASCADE, related_name='relateds')
     host = models.ManyToManyField(Host, related_name='relateds')

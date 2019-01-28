@@ -7,7 +7,6 @@ from django.conf.urls import url, include
 
 urlpatterns = [
     path('logbook/', views.logbook, name='logbook'),
-    url(r'^statusupdate/(?P<id>\d+)/', views.statusupdate, name='statusupdate'),
     path('addressbook/', views.addressbook, name='addressbook'),
     path('locations/', views.locations, name='locations'),
     path('analytics/', views.analytics, name='analytics'),
@@ -17,7 +16,8 @@ urlpatterns = [
     path('search_visitor/', views.search_visitor, name='searchvisitor'),
     path('searchlist/', views.searchlist, name='searchslist'),
     path('search_list/', views.search_list, name='searchs_list'),
-    url(r'^logbook/delselected/(?:id=(?P<id>\d+)/)?$',
+    url(r'^statusupdate/(?P<id>\d+)/', views.statusupdate, name='statusupdate'),
+    url(r'^delselected/(?:id=(?P<id>\d+)/)?$',
         views.delselected, name='delselected'),
     path('settings/', include('app.url_settings')),
     path('profile/', include('app.url_profile')),

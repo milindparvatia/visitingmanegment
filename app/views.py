@@ -1,3 +1,4 @@
+from rest_framework import generics
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
@@ -16,6 +17,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from django.core.mail import send_mail
 from django.contrib import messages
@@ -27,39 +30,95 @@ import pandas as pd
 from haystack.query import SearchQuerySet
 import json
 
+
+
 class UserViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JSONWebTokenAuthentication,
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(username=self.request.user)
+        return query_set
 
 class VisitorViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JSONWebTokenAuthentication,
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Visitor.objects.all()
     serializer_class = VisitorSerializer
 
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(user=self.request.user)
+        return query_set
+
 
 class HostViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JSONWebTokenAuthentication,
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Host.objects.all()
     serializer_class = HostSerializer
 
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(user=self.request.user)
+        return query_set
+
 
 class MAPViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JSONWebTokenAuthentication,
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Map.objects.all()
     serializer_class = MAPSerializer
 
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(user=self.request.user)
+        return query_set
 
 class MeetingViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JSONWebTokenAuthentication,
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(user=self.request.user)
+        return query_set
+
 
 
 def index(request):
@@ -169,7 +228,7 @@ def logbook(request, slug=None):
         return redirect('../addnewlocations/')
 
 
-def statusupdate(request, id=None):
+def statusupdate(request, slug, id=None):
     instance = get_object_or_404(Meeting, id=id)
 
     form = StatusForm(request.POST or None, instance=instance)
@@ -180,17 +239,21 @@ def statusupdate(request, id=None):
     else:
         form = StatusForm()
 
-    instance = {'form': form}
+    instance = {
+        'slug': slug,
+        'form': form
+        }
     return HttpResponseRedirect('../../logbook/')
 
 
-def delselected(request, id):
+def delselected(request, id, slug=None):
     query = request.GET.getlist("id[]")
 
     for target_list in query:
         arg = Meeting.objects.get(id=target_list).delete()
 
     data = {
+        'slug': slug,
         "context": arg
     }
     return render(request, 'account/logbook.html', data)
@@ -206,30 +269,32 @@ def addnewvisit(request, slug):
     b = form2.is_valid()
 
     if a and b:
-        instance1 = form1.save()
+        instance1 = form1.save(commit=False)
+        instance1.user = request.user
+        instance1.save()
 
-        name = form1.cleaned_data.get("full_name")
-        email = form1.cleaned_data.get("email")
-        hostname = form2.cleaned_data.get("host")
-        fromtime = form2.cleaned_data.get("start_time").strftime('%H:%M:%S')
-        totime = form2.cleaned_data.get("end_time").strftime('%H:%M:%S')
-        ondate = form2.cleaned_data.get("date").strftime('%m-%d-%Y')
-        hostval = hostname.values()
-        list_result = [entry for entry in hostval]
-        hname = list_result[0]['full_name']
+        # name = form1.cleaned_data.get("full_name")
+        # email = form1.cleaned_data.get("email")
+        # hostname = form2.cleaned_data.get("host")
+        # fromtime = form2.cleaned_data.get("start_time").strftime('%H:%M:%S')
+        # totime = form2.cleaned_data.get("end_time").strftime('%H:%M:%S')
+        # ondate = form2.cleaned_data.get("date").strftime('%m-%d-%Y')
+        # hostval = hostname.values()
+        # list_result = [entry for entry in hostval]
+        # hname = list_result[0]['full_name']
 
-        hostsubject = 'New apointment is created with '+name
-        hostmessage = 'New visit is added with '+hname + \
-            ' on '+ondate + ' from '+fromtime + ' to '+totime
-        hostsender_email = email
-        hostreceipient_email = EMAIL_HOST_USER
+        # hostsubject = 'New apointment is created with '+name
+        # hostmessage = 'New visit is added with '+hname + \
+        #     ' on '+ondate + ' from '+fromtime + ' to '+totime
+        # hostsender_email = email
+        # hostreceipient_email = EMAIL_HOST_USER
 
-        reciversubject = 'New apointment is created with '+hname
-        recivermessage = 'New visit is added with '+name + \
-            ' on '+ondate + ' from '+fromtime + ' to '+totime
-        sender_email = EMAIL_HOST_USER
-        receipient_email = email
-        messages.success(request, "Successfully Create New Entry for "+name)
+        # reciversubject = 'New apointment is created with '+hname
+        # recivermessage = 'New visit is added with '+name + \
+        #     ' on '+ondate + ' from '+fromtime + ' to '+totime
+        # sender_email = EMAIL_HOST_USER
+        # receipient_email = email
+        # messages.success(request, "Successfully Create New Entry for "+name)
 
         # send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
         # send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
@@ -238,6 +303,7 @@ def addnewvisit(request, slug):
 
         instance1.save()
         instance2 = form2.save(commit=False)
+        instance2.user = request.user
         instance2.visitor_id = instance1.pk
         instance2.save()
         form2.save_m2m()
@@ -270,7 +336,9 @@ def search_visitor(request, slug=None):
 def searchlist(request, slug=None):
     
     visitor = SearchQuerySet().autocomplete(
-        content_auto=request.POST.get('search_text', ''))[:5]
+        content_auto=request.POST.get('search_text', ''))
+    if visitor:
+        visitor[:5]
     print(slug)
     instance = {
         'visitor': visitor,
@@ -342,7 +410,7 @@ def addnewhost(request, slug):
     mapdata = Map.objects.all()
     if form.is_valid():
         instance = form.save(commit=False)
-        # instance.user = request.user
+        instance.user = request.user
         print(form.cleaned_data.get("full_name"))
         fname = form.cleaned_data.get("full_name")
         instance.save()
@@ -375,10 +443,10 @@ def addnewlocations(request):
     form = MapForm(request.POST or None)
 
     if form.is_valid():
-        instance = form.save()
-        # instance.user = request.user
+        instance = form.save(commit=False)
+        instance.user = request.user
         # fname = form.cleaned_data.get("name")
-        # instance.save()
+        instance.save()
         old_slug = Map.objects.get(id=instance.pk)
         print(old_slug.slug)
         # messages.success(request, "Successfully Create New Entry for " + fname)
