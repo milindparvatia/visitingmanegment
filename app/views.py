@@ -29,7 +29,7 @@ import pandas as pd
 
 from haystack.query import SearchQuerySet
 import json
-
+from rest_framework import status
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -441,7 +441,7 @@ def locations(request, slug):
 
 def addnewlocations(request):
     form = MapForm(request.POST or None)
-
+    mapdata = Map.objects.all()
     if form.is_valid():
         instance = form.save(commit=False)
         instance.user = request.user
@@ -459,6 +459,7 @@ def addnewlocations(request):
         # return render(request, url)
     else:
         context = {
+            'Map': mapdata,
             'form': form,
         }
         print('addnewlocations error')
