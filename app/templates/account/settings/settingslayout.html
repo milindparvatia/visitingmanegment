@@ -1,0 +1,50 @@
+{% extends "account/dashboardlayout.html" %}
+{% block content1 %}
+
+<h1 class="h2">Settings</h1>
+</div>
+<div class="card mx-auto">
+    <div class="card-body">
+        <div class=" row mx-auto">
+            <div class="col-3">
+                <div class="card">
+                    <h5 class="card-header">General Settings</h5>
+                    <div class="list-group" id="list-tab" role="tablist">
+                        <a class="list-group-item list-group-item-action" href="{% url 'company' slug=slug %}">Company</a>
+                        <a class="list-group-item list-group-item-action" href="{% url 'user' slug=slug %}">User
+                            management</a>
+                        <a class="list-group-item list-group-item-action" href="{% url 'rights' slug=slug %}">User
+                            rights</a>
+                        <h5 class="card-header">Visits List</h5>
+                        <a class="list-group-item list-group-item-action" href="{% url 'kiosklist' slug=slug %}">Kiosk
+                            list</a>
+                        <a class="list-group-item list-group-item-action" href="#" aria-controls="profile">Configure
+                            Kiosk</a>
+                        <a class="list-group-item list-group-item-action" href="{% url 'logbooksettings' slug=slug %}">Logbook</a>
+                        <a class="list-group-item list-group-item-action" href="{% url 'notifications' slug=slug %}">Notifications</a>
+                        <a class="list-group-item list-group-item-action" href="{% url 'printer' slug=slug %}">Bagde
+                            and Printer</a>
+                        <a class="card-header list-group-item list-group-item-action" href="{% url 'buildingsecurity' slug=slug %}">
+                            <h5>Building Security</h5>
+                        </a>
+
+                        <a class="card-header list-group-item list-group-item-action" href="{% url 'privacy' slug=slug %}">
+                            <h5>Privacy</h5>
+                        </a>
+                        <a class="card-header list-group-item list-group-item-action" href="{% url 'integrations' slug=slug %}">
+                            <h5>Integrations</h5>
+                        </a>
+                        <a class="card-header list-group-item list-group-item-action" href="{% url 'billing' slug=slug %}">
+                            <h5>Billing Plan</h5>
+
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-9">
+                {% block settings %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

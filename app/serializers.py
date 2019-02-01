@@ -8,7 +8,7 @@ class VisitorSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Visitor
         fields = ('url', 'id', 'full_name', 'email', 'mobile',
-                  'comment', 'company_name', 'licenseplate', 'about')
+                  'comment', 'company_name', 'licenseplate', 'about', 'user')
 
 
 class HostSerializer(serializers.HyperlinkedModelSerializer):
@@ -16,7 +16,8 @@ class HostSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Host
-        fields = ('url', 'id', 'full_name', 'email', 'mobile', 'comment')
+        fields = ('url', 'id', 'full_name', 'email',
+                  'mobile', 'comment', 'user')
 
 
 class MeetingSerializer(serializers.HyperlinkedModelSerializer):
@@ -25,7 +26,7 @@ class MeetingSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Meeting
         fields = ('url', 'id', 'status', 'visitor', 'host',
-                  'location', 'date', 'start_time', 'end_time')
+                  'location', 'date', 'start_time', 'end_time', 'user')
 
 
 class MAPSerializer(serializers.HyperlinkedModelSerializer):
@@ -33,7 +34,7 @@ class MAPSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Map
-        fields = ('url', 'id', 'loc', 'lon', 'lat', 'name', 'slug')
+        fields = ('url', 'id', 'loc', 'lon', 'lat', 'name', 'slug', 'user')
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

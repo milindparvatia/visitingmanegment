@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Host, Visitor, Map, Meeting
 from .serializers import HostSerializer, MeetingSerializer, VisitorSerializer, MAPSerializer, UserSerializer
-from .forms import VisitorForm, HostForm, RegistraionForm, SearchVisitorForm,UserForm, MeetingForm, MapForm, ToDoForm, StatusForm
+from .forms import VisitorForm, HostForm, RegistraionForm, SearchVisitorForm, UserForm, MeetingForm, MapForm, ToDoForm, StatusForm
 from django.db.models import Q, FilteredRelation
 from itertools import chain
 import operator
@@ -30,6 +30,8 @@ import pandas as pd
 from haystack.query import SearchQuerySet
 import json
 from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -48,6 +50,7 @@ class UserViewSet(viewsets.ModelViewSet):
         queryset = self.queryset
         query_set = queryset.filter(username=self.request.user)
         return query_set
+
 
 class VisitorViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
@@ -102,6 +105,7 @@ class MAPViewSet(viewsets.ModelViewSet):
         query_set = queryset.filter(user=self.request.user)
         return query_set
 
+
 class MeetingViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
                               SessionAuthentication, BasicAuthentication]
@@ -120,10 +124,9 @@ class MeetingViewSet(viewsets.ModelViewSet):
         return query_set
 
 
-
 def index(request):
     if request.user.is_authenticated:
-        map_key = Map.objects.first()
+        map_key = Map.objects.filter(user=request.user).first()
         url = map_key.slug + '/logbook'
         return HttpResponseRedirect(url)
     else:
@@ -197,7 +200,7 @@ def logbook(request, slug=None):
                 report = chain(report, query_list_vi)
                 y = y+1
 
-    mapdata = Map.objects.all()
+    mapdata = Map.objects.filter(user=request.user)
 
     if mapdata.exists() and query:
         instance = {
@@ -242,7 +245,7 @@ def statusupdate(request, slug, id=None):
     instance = {
         'slug': slug,
         'form': form
-        }
+    }
     return HttpResponseRedirect('../../logbook/')
 
 
@@ -312,7 +315,7 @@ def addnewvisit(request, slug):
         form1 = VisitorForm()
         form2 = MeetingForm()
 
-    mapdata = Map.objects.all()
+    mapdata = Map.objects.filter(user=request.user)
 
     instance = {
         "map": mapdata,
@@ -324,7 +327,6 @@ def addnewvisit(request, slug):
     return render(request, 'account/addnewvisit.html', instance)
 
 
-
 def search_visitor(request, slug=None):
     print(slug)
     instance = {
@@ -334,7 +336,7 @@ def search_visitor(request, slug=None):
 
 
 def searchlist(request, slug=None):
-    
+
     visitor = SearchQuerySet().autocomplete(
         content_auto=request.POST.get('search_text', ''))
     if visitor:
@@ -359,9 +361,10 @@ def search_list(request, slug=None):
     })
     return HttpResponse(the_data, content_type='application/json')
 
+
 def addressbook(request, slug):
-    print(slug)
-    query_list = Visitor.objects.all()
+    print(request.user)
+    query_list = Visitor.objects.filter(user=request.user)
 
     query = request.GET.get("q")
 
@@ -373,7 +376,7 @@ def addressbook(request, slug):
             # Q(address__icontains=query)
         )
 
-    mapdata = Map.objects.all()
+    mapdata = Map.objects.filter(user=request.user)
 
     instance = {
         "map": mapdata,
@@ -385,7 +388,7 @@ def addressbook(request, slug):
 
 def colleagues(request, slug):
     print(slug)
-    query_list = Host.objects.all()
+    query_list = Host.objects.filter(user=request.user)
     query = request.GET.get("q")
 
     if query:
@@ -394,7 +397,7 @@ def colleagues(request, slug):
             Q(email__icontains=query) |
             Q(mobile__icontains=query)
         )
-    mapdata = Map.objects.all()
+    mapdata = Map.objects.filter(user=request.user)
 
     instance = {
         "map": mapdata,
@@ -407,7 +410,7 @@ def colleagues(request, slug):
 def addnewhost(request, slug):
     print(slug)
     form = HostForm(request.POST)
-    mapdata = Map.objects.all()
+    mapdata = Map.objects.filter(user=request.user)
     if form.is_valid():
         instance = form.save(commit=False)
         instance.user = request.user
@@ -429,7 +432,7 @@ def addnewhost(request, slug):
 def locations(request, slug):
     print(slug)
     user_form = ToDoForm()
-    mapdata = Map.objects.all()
+    mapdata = Map.objects.filter(user=request.user)
 
     instance = {
         "map": mapdata,
@@ -441,7 +444,7 @@ def locations(request, slug):
 
 def addnewlocations(request):
     form = MapForm(request.POST or None)
-    mapdata = Map.objects.all()
+    mapdata = Map.objects.filter(user=request.user)
     if form.is_valid():
         instance = form.save(commit=False)
         instance.user = request.user
@@ -483,7 +486,7 @@ def addnewlocations(request):
 
 def analytics(request, slug=None):
     print(slug)
-    mapdata = Map.objects.all()
+    mapdata = Map.objects.filter(user=request.user)
     datalist = Visitor.objects.all().order_by('-date')
 
     instance = {
@@ -494,14 +497,103 @@ def analytics(request, slug=None):
     return render(request, 'account/analytics.html', instance)
 
 
-def settings(request, slug=None):
+def settings_general_company(request, slug=None):
     print(slug)
 
     instance = {
         'slug': slug,
     }
-    return render(request, 'account/settings/company.html', instance)
+    return render(request, 'account/settings/general/company.html', instance)
 
+
+def settings_general_management(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/general/usermanagement.html', instance)
+
+
+def settings_general_rights(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/general/user-rights.html', instance)
+
+
+def settings_other_billing(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/othersettings/billing-plan.html', instance)
+
+
+def settings_other_buildingsecurity(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/othersettings/building-security.html', instance)
+
+
+def settings_other_integrations(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/othersettings/integrations.html', instance)
+
+
+def settings_other_privacy(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/othersettings/privacy.html', instance)
+
+
+def settings_visitslist_kiosklist(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/visitslist/kiosk_list.html', instance)
+
+
+def settings_visitslist_logbook(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/visitslist/logbook.html', instance)
+
+
+def settings_visitslist_printer(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/visitslist/printer.html', instance)
+
+
+def settings_visitslist_notifications(request, slug=None):
+    print(slug)
+
+    instance = {
+        'slug': slug,
+    }
+    return render(request, 'account/settings/visitslist/notifications.html', instance)
 
 def view(request, slug=None):
     print(slug)
@@ -514,7 +606,7 @@ def view(request, slug=None):
 
 def edit(request, slug=None):
     print(slug)
-    mapdata = Map.objects.all()
+    mapdata = Map.objects.filter(user=request.user)
     if request.method == 'Post':
         form1 = UserChangeForm(request.Post)
         form2 = UserForm(request.POST)

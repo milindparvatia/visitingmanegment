@@ -35,7 +35,7 @@ class Host(models.Model):
     full_name = models.CharField(max_length=30)
     email = models.EmailField(max_length=20)
     mobile = models.IntegerField()
-    comment = models.CharField(max_length=100, null=True)
+    comment = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.full_name
@@ -54,9 +54,9 @@ class Visitor(models.Model):
     company_name = models.CharField(max_length=20)
     email = models.EmailField(max_length=20)
     mobile = models.CharField(max_length=20)
-    licenseplate = models.CharField(max_length=20)
-    about = models.CharField(max_length=50, null=True)
-    comment = models.CharField(max_length=100, null=True)
+    licenseplate = models.CharField(max_length=20, blank=True)
+    about = models.CharField(max_length=50, blank=True)
+    comment = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.full_name
@@ -67,8 +67,7 @@ class Meeting(models.Model):
     visitor = models.ForeignKey(
         Visitor, on_delete=models.CASCADE, related_name='relateds')
     host = models.ManyToManyField(Host, related_name='relateds')
-    status = models.CharField(choices=STATUS_CHOICES,
-                              blank=False, max_length=128)
+    status = models.CharField(choices=STATUS_CHOICES,max_length=128)
     location = models.ForeignKey(Map, on_delete=models.CASCADE)
     date = models.DateField(default=datetime.date.today)
     start_time = models.TimeField()
@@ -77,12 +76,12 @@ class Meeting(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    company_name = models.CharField(max_length=20, null=True)
-    mobile = models.CharField(max_length=20, null=True)
-    licenseplate = models.CharField(max_length=20, null=True)
-    about = models.CharField(max_length=50, null=True)
-    comment = models.CharField(max_length=100, null=True)
-    location = models.ForeignKey(Map, on_delete=models.CASCADE, null=True)
+    company_name = models.CharField(max_length=20, blank=True)
+    mobile = models.CharField(max_length=20, blank=True)
+    licenseplate = models.CharField(max_length=20, blank=True)
+    about = models.CharField(max_length=50, blank=True)
+    comment = models.CharField(max_length=100, blank=True)
+    location = models.ForeignKey(Map, on_delete=models.CASCADE, blank=True)
     profile_pic = models.ImageField(upload_to='media_data', blank=True)
 
 # def pre_save_user_receiver(sender, instance, *args, **kwargs):
