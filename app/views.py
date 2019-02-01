@@ -4,8 +4,8 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Host, Visitor, Map, Meeting
-from .serializers import HostSerializer, MeetingSerializer, VisitorSerializer, MAPSerializer, UserSerializer
+from .models import Host, Visitor, Map, Meeting, UserProfile
+from .serializers import HostSerializer, MeetingSerializer, UserProfileSerializer, VisitorSerializer, MAPSerializer, UserSerializer
 from .forms import VisitorForm, HostForm, RegistraionForm, SearchVisitorForm, UserForm, MeetingForm, MapForm, ToDoForm, StatusForm
 from django.db.models import Q, FilteredRelation
 from itertools import chain
@@ -51,6 +51,23 @@ class UserViewSet(viewsets.ModelViewSet):
         query_set = queryset.filter(username=self.request.user)
         return query_set
 
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JSONWebTokenAuthentication,
+                              SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(user=self.request.user)
+        return query_set
 
 class VisitorViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
@@ -419,7 +436,11 @@ def addnewhost(request, slug):
         instance.save()
         messages.success(request, "Successfully Create New Entry for " + fname)
     else:
-        form = HostForm()
+        hostdata = Host.objects.filter(id=1)
+        full_name = hostdata[0]
+        print(full_name)
+        data = {'full_name': full_name}
+        form = HostForm(data, initial=data)
 
     instance = {
         "map": mapdata,
@@ -605,30 +626,44 @@ def view(request, slug=None):
 
 
 def edit(request, slug=None):
-    print(slug)
     mapdata = Map.objects.filter(user=request.user)
-    if request.method == 'Post':
-        form1 = UserChangeForm(request.Post)
-        form2 = UserForm(request.POST)
-
+    user = request.user
+    userdata = User.objects.filter(username=user).values()
+    mainuserdata = userdata[0]
+    data1 = {'first_name': mainuserdata['first_name'], 'last_name': mainuserdata['last_name'],
+             'email': mainuserdata['email'], }
+    puserdata = UserProfile.objects.filter(user=user).values()
+    profileuserdata = puserdata[0]
+    # print(puserdata[0]['profile_pic'])
+    data2 = {'company_name': profileuserdata['company_name'], 'mobile': profileuserdata['mobile'],
+             'licenseplate': profileuserdata['licenseplate'], 'about': profileuserdata['about'],
+             'comment': profileuserdata['comment'], 'location': profileuserdata['location_id'],
+             'about': profileuserdata['about'],
+             }
+    insta1 = get_object_or_404(User, username=user)
+    insta2 = get_object_or_404(UserProfile, user=user)
+    if request.method == 'POST':
+        form1 = UserChangeForm(request.POST or None, instance=insta1)
+        form2 = UserForm(request.POST or None, instance=insta2)
+        print(form1.is_valid())
         if form1.is_valid() and form2.is_valid():
             instance1 = form1.save(commit=False)
             instance2 = form2.save(commit=False)
-            # instance.user = request.user
+            instance.user = request.user
             print(instance1)
             instance1.save()
-            # instance.user = request.user
+            instance.user = request.user
             print(instance2)
             instance2.save()
-            messages.success(request, "Successfully Create New Entry ")
+            messages.success(request, "Profile Successfully Updated")
         else:
             print('error')
     else:
-        form1 = UserChangeForm()
-        form2 = UserForm()
-        print('111')
+        form1 = UserChangeForm(data1, initial=data1) 
+        form2 = UserForm(data2, initial=data2)
 
     instance = {
+        'image' : puserdata[0]['profile_pic'],
         'form1': form1,
         'form2': form2,
         'slug': slug,

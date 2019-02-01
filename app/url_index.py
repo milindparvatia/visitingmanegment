@@ -11,6 +11,7 @@ router.register(r'Visitor', views.VisitorViewSet)
 router.register(r'Host', views.HostViewSet)
 router.register(r'Map', views.MAPViewSet)
 router.register(r'Meeting', views.MeetingViewSet)
+router.register(r'UserProfile', views.UserProfileViewSet)
 
 urlpatterns = [
     url(r'^api-token-auth/', obtain_jwt_token),
