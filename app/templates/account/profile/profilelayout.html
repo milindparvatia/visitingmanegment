@@ -1,19 +1,20 @@
 {% extends "account/dashboardlayout.html" %}
 {% block content1 %}
 
+{% if request.resolver_match.url_name == 'view' %}
+<h1 class="h2">View Profile</h1>
+{%else%}
 <h1 class="h2">Manage Profile</h1>
+{% endif %}
 </div>
 <div class="card">
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs">
             <li class="nav-item">
-                <a class="nav-link active" href="#">Edit</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'view' %}active{% endif %}" href="{% url 'view' slug=slug %}">View</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'edit' %}active{% endif %}" href="{% url 'edit' slug=slug %}">Edit</a>
             </li>
         </ul>
     </div>

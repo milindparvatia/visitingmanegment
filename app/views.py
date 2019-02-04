@@ -69,6 +69,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         query_set = queryset.filter(user=self.request.user)
         return query_set
 
+
 class VisitorViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
                               SessionAuthentication, BasicAuthentication]
@@ -218,9 +219,10 @@ def logbook(request, slug=None):
                 y = y+1
 
     mapdata = Map.objects.filter(user=request.user)
-
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     if mapdata.exists() and query:
         instance = {
+            'image': puserdata[0]['profile_pic'],
             "map": mapdata,
             "query_list_visitor": query_list_visitor_list,
             "objects_all": report,
@@ -232,6 +234,7 @@ def logbook(request, slug=None):
         return render(request, 'account/logbook.html', instance)
     elif mapdata.exists():
         instance = {
+            'image': puserdata[0]['profile_pic'],
             'slug': slug,
             "map": mapdata,
             "query_list_visitor": query_list_visitor,
@@ -243,6 +246,7 @@ def logbook(request, slug=None):
         return render(request, 'account/logbook.html', instance)
     else:
         instance = {
+            'image': puserdata[0]['profile_pic'],
             "map": mapdata,
         }
         return redirect('../addnewlocations/')
@@ -333,8 +337,9 @@ def addnewvisit(request, slug):
         form2 = MeetingForm()
 
     mapdata = Map.objects.filter(user=request.user)
-
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         "map": mapdata,
         'form': form,
         'form1': form1,
@@ -346,20 +351,23 @@ def addnewvisit(request, slug):
 
 def search_visitor(request, slug=None):
     print(slug)
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/searchvisitor.html', instance)
 
 
 def searchlist(request, slug=None):
-
     visitor = SearchQuerySet().autocomplete(
         content_auto=request.POST.get('search_text', ''))
     if visitor:
         visitor[:5]
     print(slug)
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'visitor': visitor,
         'slug': slug,
     }
@@ -394,8 +402,9 @@ def addressbook(request, slug):
         )
 
     mapdata = Map.objects.filter(user=request.user)
-
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         "map": mapdata,
         "objects_all": query_list,
         'slug': slug,
@@ -415,8 +424,9 @@ def colleagues(request, slug):
             Q(mobile__icontains=query)
         )
     mapdata = Map.objects.filter(user=request.user)
-
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         "map": mapdata,
         "objects_all": query_list,
         'slug': slug,
@@ -441,8 +451,9 @@ def addnewhost(request, slug):
         print(full_name)
         data = {'full_name': full_name}
         form = HostForm(data, initial=data)
-
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         "map": mapdata,
         'form': form,
         'slug': slug,
@@ -454,8 +465,9 @@ def locations(request, slug):
     print(slug)
     user_form = ToDoForm()
     mapdata = Map.objects.filter(user=request.user)
-
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         "map": mapdata,
         'form': user_form,
         'slug': slug,
@@ -509,8 +521,9 @@ def analytics(request, slug=None):
     print(slug)
     mapdata = Map.objects.filter(user=request.user)
     datalist = Visitor.objects.all().order_by('-date')
-
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         "map": mapdata,
         "datalist": datalist,
         'slug': slug,
@@ -520,8 +533,9 @@ def analytics(request, slug=None):
 
 def settings_general_company(request, slug=None):
     print(slug)
-
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/general/company.html', instance)
@@ -530,7 +544,9 @@ def settings_general_company(request, slug=None):
 def settings_general_management(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/general/usermanagement.html', instance)
@@ -539,7 +555,9 @@ def settings_general_management(request, slug=None):
 def settings_general_rights(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/general/user-rights.html', instance)
@@ -548,7 +566,9 @@ def settings_general_rights(request, slug=None):
 def settings_other_billing(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/othersettings/billing-plan.html', instance)
@@ -557,7 +577,9 @@ def settings_other_billing(request, slug=None):
 def settings_other_buildingsecurity(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/othersettings/building-security.html', instance)
@@ -566,7 +588,9 @@ def settings_other_buildingsecurity(request, slug=None):
 def settings_other_integrations(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/othersettings/integrations.html', instance)
@@ -575,7 +599,9 @@ def settings_other_integrations(request, slug=None):
 def settings_other_privacy(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/othersettings/privacy.html', instance)
@@ -584,7 +610,9 @@ def settings_other_privacy(request, slug=None):
 def settings_visitslist_kiosklist(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/visitslist/kiosk_list.html', instance)
@@ -593,7 +621,9 @@ def settings_visitslist_kiosklist(request, slug=None):
 def settings_visitslist_logbook(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/visitslist/logbook.html', instance)
@@ -602,7 +632,9 @@ def settings_visitslist_logbook(request, slug=None):
 def settings_visitslist_printer(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/visitslist/printer.html', instance)
@@ -611,15 +643,20 @@ def settings_visitslist_printer(request, slug=None):
 def settings_visitslist_notifications(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/settings/visitslist/notifications.html', instance)
 
+
 def view(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/profile/view.html', instance)
@@ -627,43 +664,48 @@ def view(request, slug=None):
 
 def edit(request, slug=None):
     mapdata = Map.objects.filter(user=request.user)
-    user = request.user
-    userdata = User.objects.filter(username=user).values()
-    mainuserdata = userdata[0]
-    data1 = {'first_name': mainuserdata['first_name'], 'last_name': mainuserdata['last_name'],
-             'email': mainuserdata['email'], }
-    puserdata = UserProfile.objects.filter(user=user).values()
-    profileuserdata = puserdata[0]
-    # print(puserdata[0]['profile_pic'])
-    data2 = {'company_name': profileuserdata['company_name'], 'mobile': profileuserdata['mobile'],
-             'licenseplate': profileuserdata['licenseplate'], 'about': profileuserdata['about'],
-             'comment': profileuserdata['comment'], 'location': profileuserdata['location_id'],
-             'about': profileuserdata['about'],
-             }
-    insta1 = get_object_or_404(User, username=user)
-    insta2 = get_object_or_404(UserProfile, user=user)
+    # userdata = User.objects.filter(username=user).values()
+    puserdata = UserProfile.objects.filter(user=request.user).values()
+    # mainuserdata = userdata[0]
+    # profileuserdata = puserdata[0]
+    # data1 = {'first_name': mainuserdata['first_name'], 'last_name': mainuserdata['last_name'],
+    #          'email': mainuserdata['email'],
+    #          }
+    # data2 = {'company_name': profileuserdata['company_name'], 'mobile': profileuserdata['mobile'],
+    #          'licenseplate': profileuserdata['licenseplate'], 'about': profileuserdata['about'],
+    #          'comment': profileuserdata['comment'], 'location': profileuserdata['location_id'],
+    #          'about': profileuserdata['about'],
+    #          }
+    instance1 = get_object_or_404(User, username=request.user)
+    instance2 = get_object_or_404(UserProfile, user=request.user)
     if request.method == 'POST':
-        form1 = UserChangeForm(request.POST or None, instance=insta1)
-        form2 = UserForm(request.POST or None, instance=insta2)
+        form1 = UserChangeForm(request.POST or None, instance=instance1)
+        form2 = UserForm(request.POST or None, instance=instance2)
+        print(form1.has_changed())
+        print(form2.has_changed())
         print(form1.is_valid())
-        if form1.is_valid() and form2.is_valid():
-            instance1 = form1.save(commit=False)
-            instance2 = form2.save(commit=False)
-            instance.user = request.user
-            print(instance1)
-            instance1.save()
-            instance.user = request.user
-            print(instance2)
-            instance2.save()
+        print(form2.is_valid())
+        if form1.is_valid() and form1.is_valid():  # ) and ():
+            form1.save()
+            form2.save()
+            # instance1 = 
+            # instance2 = 
+            # instance.user = request.user
+            # print(instance1)
+            # instance1.save()
+            # instance.user = request.user
+            # print(instance2)
+            # instance2.save()
             messages.success(request, "Profile Successfully Updated")
         else:
             print('error')
+            form1 = UserChangeForm()#data1, initial=data1)
+            form2 = UserForm()#data2, initial=data2)
     else:
-        form1 = UserChangeForm(data1, initial=data1) 
-        form2 = UserForm(data2, initial=data2)
-
+        form1 = UserChangeForm()#data1, initial=data1)
+        form2 = UserForm()#data2, initial=data2)
     instance = {
-        'image' : puserdata[0]['profile_pic'],
+        'image': puserdata[0]['profile_pic'],
         'form1': form1,
         'form2': form2,
         'slug': slug,
@@ -675,7 +717,9 @@ def edit(request, slug=None):
 def password(request, slug=None):
     print(slug)
 
+    puserdata = UserProfile.objects.filter(user=request.user).values()
     instance = {
+        'image': puserdata[0]['profile_pic'],
         'slug': slug,
     }
     return render(request, 'account/profile/password.html', instance)
