@@ -220,9 +220,13 @@ def logbook(request, slug=None):
 
     mapdata = Map.objects.filter(user=request.user)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     if mapdata.exists() and query:
         instance = {
-            'image': puserdata[0]['profile_pic'],
+            'image': image,
             "map": mapdata,
             "query_list_visitor": query_list_visitor_list,
             "objects_all": report,
@@ -234,7 +238,7 @@ def logbook(request, slug=None):
         return render(request, 'account/logbook.html', instance)
     elif mapdata.exists():
         instance = {
-            'image': puserdata[0]['profile_pic'],
+            'image': image,
             'slug': slug,
             "map": mapdata,
             "query_list_visitor": query_list_visitor,
@@ -246,7 +250,7 @@ def logbook(request, slug=None):
         return render(request, 'account/logbook.html', instance)
     else:
         instance = {
-            'image': puserdata[0]['profile_pic'],
+            'image': image,
             "map": mapdata,
         }
         return redirect('../addnewlocations/')
@@ -338,8 +342,12 @@ def addnewvisit(request, slug):
 
     mapdata = Map.objects.filter(user=request.user)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         "map": mapdata,
         'form': form,
         'form1': form1,
@@ -399,8 +407,12 @@ def use_old_visit(request,id=None, slug=None):
         form2 = MeetingForm()
     mapdata = Map.objects.filter(user=request.user)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         "objects_all": query_list,
         "map": mapdata,
         'form': form,
@@ -413,8 +425,12 @@ def use_old_visit(request,id=None, slug=None):
 def search_visitor(request, slug=None):
     print(slug)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/searchvisitor.html', instance)
@@ -427,8 +443,12 @@ def searchlist(request, slug=None):
         visitor[:5]
     print(slug)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'visitor': visitor,
         'slug': slug,
     }
@@ -464,8 +484,12 @@ def addressbook(request, slug):
 
     mapdata = Map.objects.filter(user=request.user)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         "map": mapdata,
         "objects_all": query_list,
         'slug': slug,
@@ -486,8 +510,12 @@ def colleagues(request, slug):
         )
     mapdata = Map.objects.filter(user=request.user)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         "map": mapdata,
         "objects_all": query_list,
         'slug': slug,
@@ -513,8 +541,12 @@ def addnewhost(request, slug):
         data = {'full_name': full_name}
         form = HostForm(data, initial=data)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         "map": mapdata,
         'form': form,
         'slug': slug,
@@ -527,8 +559,12 @@ def locations(request, slug):
     user_form = ToDoForm()
     mapdata = Map.objects.filter(user=request.user)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         "map": mapdata,
         'form': user_form,
         'slug': slug,
@@ -583,8 +619,12 @@ def analytics(request, slug=None):
     mapdata = Map.objects.filter(user=request.user)
     datalist = Visitor.objects.all().order_by('-date')
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         "map": mapdata,
         "datalist": datalist,
         'slug': slug,
@@ -595,8 +635,12 @@ def analytics(request, slug=None):
 def settings_general_company(request, slug=None):
     print(slug)
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/general/company.html', instance)
@@ -606,8 +650,12 @@ def settings_general_management(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/general/usermanagement.html', instance)
@@ -617,8 +665,12 @@ def settings_general_rights(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/general/user-rights.html', instance)
@@ -628,8 +680,12 @@ def settings_other_billing(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/othersettings/billing-plan.html', instance)
@@ -639,8 +695,12 @@ def settings_other_buildingsecurity(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/othersettings/building-security.html', instance)
@@ -650,8 +710,12 @@ def settings_other_integrations(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/othersettings/integrations.html', instance)
@@ -661,8 +725,12 @@ def settings_other_privacy(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/othersettings/privacy.html', instance)
@@ -672,8 +740,12 @@ def settings_visitslist_kiosklist(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/visitslist/kiosk_list.html', instance)
@@ -683,8 +755,12 @@ def settings_visitslist_logbook(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/visitslist/logbook.html', instance)
@@ -694,8 +770,12 @@ def settings_visitslist_printer(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/visitslist/printer.html', instance)
@@ -705,8 +785,12 @@ def settings_visitslist_notifications(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/settings/visitslist/notifications.html', instance)
@@ -716,8 +800,12 @@ def view(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/profile/view.html', instance)
@@ -727,6 +815,10 @@ def edit(request, slug=None):
     mapdata = Map.objects.filter(user=request.user)
     # userdata = User.objects.filter(username=user).values()
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     # mainuserdata = userdata[0]
     # profileuserdata = puserdata[0]
     # data1 = {'first_name': mainuserdata['first_name'], 'last_name': mainuserdata['last_name'],
@@ -766,7 +858,7 @@ def edit(request, slug=None):
         form1 = UserChangeForm()#data1, initial=data1)
         form2 = UserForm()#data2, initial=data2)
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'form1': form1,
         'form2': form2,
         'slug': slug,
@@ -779,8 +871,12 @@ def password(request, slug=None):
     print(slug)
 
     puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
     instance = {
-        'image': puserdata[0]['profile_pic'],
+        'image': image,
         'slug': slug,
     }
     return render(request, 'account/profile/password.html', instance)
