@@ -163,10 +163,12 @@ def register(request):
     if request.method == 'POST':
         form = RegistraionForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.save()
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
             user = authenticate(username=username, password=password)
+            profile_instance = UserProfile.objects.create(user=user)
             login(request, user)
             return HttpResponseRedirect('../addnewlocations/')
     else:

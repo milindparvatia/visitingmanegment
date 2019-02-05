@@ -3,7 +3,7 @@ from django import forms
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 
 
 class Map(models.Model):
@@ -82,16 +82,6 @@ class UserProfile(models.Model):
     about = models.CharField(max_length=50, blank=True, default='')
     comment = models.CharField(max_length=100, blank=True, default='')
     location = models.ForeignKey(
-        Map, on_delete=models.CASCADE, blank=True, default='')
+        Map, on_delete=models.CASCADE, null=True, default='')
     profile_pic = models.ImageField(
-        upload_to='media_data', blank=True, default='')
-
-# def pre_save_user_receiver(sender, instance, *args, **kwargs):
-#     user = slugify(instance.name)
-#     exists = Map.objects.filter(slug=slug).exists()
-#     if exists:
-#         slug = "%s-%s" % (slug, instance.id)
-#     instance.slug = slug
-
-
-# pre_save.connect(pre_save_user_receiver, sender=User)
+        upload_to='media_data', null=True, default='')
