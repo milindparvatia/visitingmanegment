@@ -1,0 +1,89 @@
+{% extends "app/layout.html" %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+
+{% block extrahead %}
+{{ form.media }}
+{% endblock %}
+
+{% block content %}
+<br>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <ul {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</ul>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div class="container">
+    <div class="card mx-auto card-container w-50 p-5">
+        <p id="profile-name" class="profile-name-card">
+            <h1 class="card-title">Create meeting with Old Visitor</h1>
+        </p>
+        {% for ip in objects_all %}
+        <form action="{% url 'useoldvisit' slug=slug id=ip.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group row">
+                <label for="fname" class="col-sm-2 col-form-label">Full Name</label>
+                <input class="form-control" id="fname" type="text" placeholder="{{ip.full_name}}" readonly>
+            </div>
+            <div class="form-group row">
+                <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
+                <input class="form-control" id="staticEmail" type="text" placeholder="{{ip.email}}" readonly>
+            </div>
+            <div class="form-group row">
+                <label for="cname" class="col-sm-2 col-form-label">Company Name</label>
+                <input class="form-control" id="cname" type="text" placeholder="{{ip.company_name}}" readonly>
+            </div>
+            <div class="form-group row">
+                <label for="mobile" class="col-sm-2 col-form-label">Mobile</label>
+                <input class="form-control" id="mobile" type="text" placeholder="{{ip.mobile}}" readonly>
+            </div>
+            <div class="form-group row">
+                <label for="licenseplate" class="col-sm-2 col-form-label">Licenseplate</label>
+                <input class="form-control" id="licenseplate" type="text" placeholder="{{ip.licenseplate}}" readonly>
+            </div>
+            <div class="form-group row">
+                <label for="about" class="col-sm-2 col-form-label">About</label>
+                <input class="form-control" id="about" type="text" placeholder="{{ip.about}}" readonly>
+            </div>
+            <div class="form-group row">
+                <label for="comment" class="col-sm-2 col-form-label">Comment</label>
+                <input class="form-control" id="comment" type="text" placeholder="{{ip.comment}}" readonly>
+            </div>
+            {% endfor %}
+            <div class="form-group">
+                {{ form2.host|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.location|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.date|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.start_time|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.end_time|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form2.status|as_crispy_field }}
+            </div>
+            <div class="form-group mx-auto">
+                <button type="submit" class="btn btn-primary">Save Visit</button>
+                <button type="submit" class="btn btn-secondary">Save And Create New One</button>
+                <a href="{% url 'logbook' slug=slug %}" class="btn btn-success">Cancel</a>
+                <input type="hidden" name="next" value="{{next}}">
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

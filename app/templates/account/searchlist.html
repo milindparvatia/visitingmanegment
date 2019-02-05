@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col" style="width: 520px;">
             <div class="list-group" id="list-tab" role="tablist">
-                <a class="list-group-item list-group-item-action" id="list-home-list" href="{% url 'addnewvisit' slug=slug %}">
+                <a class="list-group-item list-group-item-action" id="list-home-list" href="{% url 'useoldvisit' slug=slug id='1' %}">
                     <div class="row">
                         <div class="col-2">{{name.object.full_name}}</div>
                         <div class="col-10">{{name.object.email}}</div>

@@ -349,6 +349,67 @@ def addnewvisit(request, slug):
     return render(request, 'account/addnewvisit.html', instance)
 
 
+def use_old_visit(request,id=None, slug=None):
+    print(id)
+    query_list = Visitor.objects.filter(id=id)
+    form2 = MeetingForm(request.POST)
+    form = ToDoForm()
+
+    if form2.is_valid():
+        # instance1 = form1.save(commit=False)
+        # instance1.user = request.user
+        # instance1.save()
+
+        # name = form1.cleaned_data.get("full_name")
+        # email = form1.cleaned_data.get("email")
+        # hostname = form2.cleaned_data.get("host")
+        # fromtime = form2.cleaned_data.get("start_time").strftime('%H:%M:%S')
+        # totime = form2.cleaned_data.get("end_time").strftime('%H:%M:%S')
+        # ondate = form2.cleaned_data.get("date").strftime('%m-%d-%Y')
+        # hostval = hostname.values()
+        # list_result = [entry for entry in hostval]
+        # hname = list_result[0]['full_name']
+
+        # hostsubject = 'New apointment is created with '+name
+        # hostmessage = 'New visit is added with '+hname + \
+        #     ' on '+ondate + ' from '+fromtime + ' to '+totime
+        # hostsender_email = email
+        # hostreceipient_email = EMAIL_HOST_USER
+
+        # reciversubject = 'New apointment is created with '+hname
+        # recivermessage = 'New visit is added with '+name + \
+        #     ' on '+ondate + ' from '+fromtime + ' to '+totime
+        # sender_email = EMAIL_HOST_USER
+        # receipient_email = email
+        # messages.success(request, "Successfully Create New Entry for "+name)
+
+        # send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
+        # send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
+
+        # add karvanu che mailing
+
+        # instance1.save()
+        instance2 = form2.save(commit=False)
+        instance2.user = request.user
+        instance2.visitor_id = id
+        instance2.save()
+        form2.save_m2m()
+    else:
+        form = ToDoForm()
+        form2 = MeetingForm()
+    mapdata = Map.objects.filter(user=request.user)
+    puserdata = UserProfile.objects.filter(user=request.user).values()
+    instance = {
+        'image': puserdata[0]['profile_pic'],
+        "objects_all": query_list,
+        "map": mapdata,
+        'form': form,
+        # 'form1': form1,
+        'form2': form2,
+        'slug': slug,
+    }
+    return render(request, 'account/useoldvisit.html', instance)
+
 def search_visitor(request, slug=None):
     print(slug)
     puserdata = UserProfile.objects.filter(user=request.user).values()

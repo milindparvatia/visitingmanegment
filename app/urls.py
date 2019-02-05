@@ -12,6 +12,7 @@ urlpatterns = [
     path('analytics/', views.analytics, name='analytics'),
     path('colleagues/', views.colleagues, name='colleagues'),
     path('addnewvisit/', views.addnewvisit, name='addnewvisit'),
+    url(r'^useoldvisit/(?P<id>\d+)/', views.use_old_visit, name='useoldvisit'),
     path('addnewhost/', views.addnewhost, name='addnewhost'),
     path('search_visitor/', views.search_visitor, name='searchvisitor'),
     path('searchlist/', views.searchlist, name='searchslist'),
