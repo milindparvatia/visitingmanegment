@@ -57,6 +57,8 @@ class Visitor(models.Model):
     licenseplate = models.CharField(max_length=20, blank=True, default='')
     about = models.CharField(max_length=50, blank=True, default='')
     comment = models.CharField(max_length=100, blank=True, default='')
+    profile_pic = models.ImageField(
+        upload_to='media_data', default='media_data/profile-pic.png')
 
     def __str__(self):
         return self.full_name
@@ -84,4 +86,4 @@ class UserProfile(models.Model):
     location = models.ForeignKey(
         Map, on_delete=models.CASCADE, null=True, default='')
     profile_pic = models.ImageField(
-        upload_to='media_data', null=True, default='')
+        upload_to='media_data',  default='media_data/profile-pic.png')

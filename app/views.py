@@ -5,16 +5,16 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Host, Visitor, Map, Meeting, UserProfile
-from .serializers import HostSerializer, MeetingSerializer, UserProfileSerializer, VisitorSerializer, MAPSerializer, UserSerializer
+from .serializers import HostSerializer, MeetingSerializer,UserProfileSerializer, VisitorSerializer, MAPSerializer, UserSerializer
 from .forms import VisitorForm, HostForm, RegistraionForm, SearchVisitorForm, UserForm, MeetingForm, MapForm, ToDoForm, StatusForm
 from django.db.models import Q, FilteredRelation
 from itertools import chain
 import operator
 from functools import reduce
 
-from rest_framework import viewsets, status
-from rest_framework.generics import ListAPIView
+from rest_framework import viewsets, status, generics
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -529,6 +529,13 @@ def addnewhost(request, slug):
     print(slug)
     form = HostForm(request.POST)
     mapdata = Map.objects.filter(user=request.user)
+    
+    puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
+
     if form.is_valid():
         instance = form.save(commit=False)
         instance.user = request.user
@@ -537,16 +544,8 @@ def addnewhost(request, slug):
         instance.save()
         messages.success(request, "Successfully Create New Entry for " + fname)
     else:
-        hostdata = Host.objects.filter(id=1)
-        full_name = hostdata[0]
-        print(full_name)
-        data = {'full_name': full_name}
-        form = HostForm(data, initial=data)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
-    if puserdata:
-        image = puserdata[0]['profile_pic']
-    else:
-        image = puserdata
+        form = HostForm()
+    
     instance = {
         'image': image,
         "map": mapdata,

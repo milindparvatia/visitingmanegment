@@ -27,6 +27,7 @@ class MeetingSerializer(serializers.HyperlinkedModelSerializer):
         model = Meeting
         fields = ('url', 'id', 'status', 'visitor', 'host',
                   'location', 'date', 'start_time', 'end_time', 'user')
+        depth = 1
 
 
 class MAPSerializer(serializers.HyperlinkedModelSerializer):
