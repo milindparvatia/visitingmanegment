@@ -41,12 +41,13 @@ class MAPSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'first_name', 'last_name', 'is_active', 'last_login', 'date_joined',
+        fields = ('url', 'id', 'first_name', 'last_name', 'is_active', 'last_login', 'date_joined',
                   'username', 'password', 'email', 'groups')
 
 
 class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ('url', 'user', 'company_name', 'mobile', 'location',
+        fields = ('url', 'id', 'user', 'company_name', 'mobile', 'location',
                   'licenseplate', 'about', 'comment', 'profile_pic')
+                  
