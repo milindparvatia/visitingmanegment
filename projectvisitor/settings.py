@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'app',
     'schedule',
     'rest_framework',
+    'django_filters',
     'bootstrap4',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -99,7 +100,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.BaseSignalProcessor'
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 HAYSTACK_CONNECTIONS = {
     'default': {

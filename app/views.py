@@ -1,4 +1,4 @@
-from rest_framework import generics
+from django.utils.timezone import localdate
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
@@ -7,14 +7,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Host, Visitor, Map, Meeting, UserProfile
 from .serializers import HostSerializer, MeetingSerializer,UserProfileSerializer, VisitorSerializer, MAPSerializer, UserSerializer
 from .forms import VisitorForm, HostForm, RegistraionForm, SearchVisitorForm, UserForm, MeetingForm, MapForm, ToDoForm, StatusForm
-from django.db.models import Q, FilteredRelation
-from itertools import chain
-import operator
-from functools import reduce
+from django.db.models import Q
 
-from rest_framework import viewsets, status, generics
-from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+
+from rest_framework import viewsets, status, generics, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -24,14 +20,9 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from projectvisitor.settings import EMAIL_HOST_USER
 
-import datetime
-import pandas as pd
-
 from haystack.query import SearchQuerySet
 import json
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from itertools import chain
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -74,10 +65,11 @@ class VisitorViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
                               SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-
+    
     queryset = Visitor.objects.all()
     serializer_class = VisitorSerializer
-
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ['full_name']
     def get_queryset(self):
         """
         This view should return a list of all the purchases
@@ -190,7 +182,7 @@ def logbook(request, slug=None):
 
     datequery = request.POST.get("date")
     if not datequery:
-        today = datetime.date.today()
+        today = localdate()
         datequery = today
 
     query_list = query_list.filter(
