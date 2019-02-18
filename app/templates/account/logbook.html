@@ -3,6 +3,8 @@
 {% load bootstrap4 %}
 
 {% block extrahead %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/clickable.css' %}">
 {{ form.media }}
 {% endblock %}
 
@@ -49,7 +51,7 @@
 
         <tbody>
           {% for ip in objects_all %}
-          <tr>
+          <tr class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
             <th>
               <input type="checkbox" name="fid[]" class="checkbox" id="{{ip.id}}">
             </th>
@@ -87,6 +89,76 @@
             <td>{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</td>
             <td>{% for data in ip.visitor.about %}{{ data }}{% endfor %}</td>
             <td>{% for data in ip.visitor.comment %}{{ data }}{% endfor %}</td>
+            <div class="container demo">
+              <!-- Modal -->
+              <div class="modal right fade" id="{{ip.id}}" tabindex="-1" role="dialog" aria-labelledby="{{ip.id}}"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header row">
+                      <div class="col-2">
+                        <div class="row">
+                          <div class="col">
+                            <img src="{% for data in ip.visitor.profile_pic.url %}{{ data }}{% endfor %}"
+                              alt="Profile Picture" width="75" height="75">
+                          </div>
+                        </div>
+                      </div>
+                      <h4 class="modal-title col" id="{{ip.id}}">
+                        <div class="row">
+                          <div class="col">
+                            {% for data in ip.visitor.full_name%}{{ data }}{% endfor%}
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-4">
+                            <form style="width: 180px;" action="../statusupdate/{{ip.id}}/" class="form-inline"
+                              id="updateForm" method="POST">
+                              {% csrf_token %}
+                              <select name="{{ form1.status.name }}" class="form-control form-control-sm"
+                                id="{{ip.id}}">
+                                <option value="{{ choice.0 }}">{{ ip.status }}</option>
+                                {% for choice in form1.status.field.choices %}
+                                <option value="{{ choice.0 }}">{{ choice.0 }}</option>
+                                {% endfor %}
+                              </select>
+                              <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                          </div>
+                          <div class="col">
+
+                          </div>
+
+
+                          </form>
+                        </div>
+                      </h4>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="container">
+                        <div class="row list-group list-group-flush">
+                          <div class="col">
+                            <div class="row list-group-item">{% for data in ip.host.all %}{{ data }}{%endfor %}</div>
+                            <div class="row list-group-item">{% for data in ip.visitor.email %}{{ data }}{% endfor %}
+                            </div>
+                            <div class="row list-group-item">{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}
+                            </div>
+                            <div class="row list-group-item">
+                              {% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</div>
+                            <div class="row list-group-item">{% for data in ip.visitor.about %}{{ data }}{% endfor %}
+                            </div>
+                            <div class="row list-group-item">{% for data in ip.visitor.comment %}{{ data }}{% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div><!-- modal-content -->
+                </div><!-- modal-dialog -->
+              </div><!-- modal -->
+            </div><!-- container -->
           </tr>
           {% endfor %}
         </tbody>

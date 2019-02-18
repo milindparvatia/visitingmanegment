@@ -1,7 +1,6 @@
 {% extends "account/dashboardlayout.html" %}
 
 {% block content1 %}
-
 <h1 class="h2">Colleagues</h1>
 <div class="btn-toolbar mb-2 mb-md-0">
   <div class="btn-group mr-2">
@@ -68,13 +67,6 @@
     </tr>
   </tbody>
   {% empty %}
-</table>
-<br>
-<div class="container">
-  <div class="card mx-auto card-container w-75 p-5">
-    <h1 class="card-title">looks like there's no data about what you searched, maybe try some other character ?</h1>
-  </div>
-</div>
 </table>
 {% endfor %}
 {% endblock %}

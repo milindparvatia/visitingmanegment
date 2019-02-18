@@ -6,12 +6,14 @@
   <title>Visitor</title>
   {% load staticfiles %}
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-    rel="stylesheet" />
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"
+    integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" crossorigin="anonymous"
     integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
   {% block extrahead %}
@@ -42,12 +44,14 @@
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'colleagues' %}active{% endif %}" href="{% url 'colleagues' slug=slug %}">Colleagues</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'colleagues' %}active{% endif %}"
+            href="{% url 'colleagues' slug=slug %}">Colleagues</a>
         </li>
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'company' %}active{% endif %}" href="{% url 'company' slug=slug %}">Settings</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'company' %}active{% endif %}"
+            href="{% url 'company' slug=slug %}">Settings</a>
         </li>
         <img src="/media/{{ image }}" alt="Profile Picture" width="35" height="35">
         <li class="nav-item dropdown">
@@ -58,7 +62,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item" href="{% url 'view' slug=slug %}">View Profile</a>
-            <a class="dropdown-item" href="{% url 'edit' slug=slug %}">Manage Profile</a>
+            <a class="dropdown-item" href="{% url 'edituser' slug=slug %}">Manage Profile</a>
             <a class="dropdown-item" href="{% url 'logout' %}">Log out</a>
           </div>
         </li>
@@ -73,19 +77,22 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">Home<span
-              class="sr-only">(current)</span></a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
+            href="{% url 'index' %}">Home<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}"
+            href="{% url 'contact' %}">Contact</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">About</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}"
+            href="{% url 'about' %}">About</a>
         </li>
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Log
+          <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}"
+            href="{% url 'login' %}">Log
             in</a>
         </li>
       </ul>

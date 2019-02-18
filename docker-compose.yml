@@ -1,14 +1,47 @@
 version: '3'
 
 services:
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:latest
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+    ports:
+      - "5673:5672"
   db:
     image: postgres
+    ports:
+      - "5432"
   web:
-    build: .
-    command: python3 manage.py runserver 0.0.0.0:8000
+    image: visitor
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
     ports:
       - "8000:8000"
+    links:
+      - rabbit
+      - db
+    depends_on:
+      - rabbit
+      - migration
+      - celery
+  migration:
+    build: .
+    image: visitor
+    command: python manage.py migrate
+    volumes:
+      - .:/code
+    links:
+      - db
     depends_on:
       - db
+  celery:
+    build: .
+    command: celery -A projectvisitor worker -l info -E
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - rabbit

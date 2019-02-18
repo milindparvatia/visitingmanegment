@@ -129,7 +129,7 @@ class MeetingForm(forms.ModelForm):
         }
 
 
-class UserForm(forms.ModelForm):
+class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = [
@@ -141,6 +141,19 @@ class UserForm(forms.ModelForm):
             'comment',
             'location',
             'profile_pic'
+        ]
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'password',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'is_active'
         ]
 
 

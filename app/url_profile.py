@@ -5,6 +5,7 @@ from django.conf.urls import url, include
 
 urlpatterns = [
     path('view/', views.view, name='view'),
-    path('edit/', views.edit, name='edit'),
+    path('edituser/', views.edituser, name='edituser'),
+    path('edituserprofile/', views.edituserprofile, name='edituserprofile'),
     path('password/', views.password, name='password'),
 ]

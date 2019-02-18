@@ -2,25 +2,29 @@
 
 {% block content1 %}
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-  rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous"
+  integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"
+  integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" crossorigin="anonymous"
   integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <style>
   /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
-      #map {
-        height: 75%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
+  #map {
+    height: 75%;
+  }
+
+  /* Optional: Makes the sample page fill the window. */
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
 </style>
 <br>
 <div class="container">
@@ -40,8 +44,8 @@
         </div>
         <div class="form-group mx-auto">
           <button type="submit" id="savemap" onclick="SaveMap()" class="btn btn-primary">Save Visit</button>
-          {% if Map > 0 %}
-          <a href="/locations" class="btn btn-success">Cancel</a>
+          {% if Map %}
+          <a href="../{{Map}}/locations" class="btn btn-success">Cancel</a>
           {% else %}
           <br>
           <br>
@@ -176,6 +180,7 @@
     });
   };
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMlG5eOnUMdABa9akVC9eU7UXZ6O9fCP8&libraries=places&callback=initAutocomplete"
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMlG5eOnUMdABa9akVC9eU7UXZ6O9fCP8&libraries=places&callback=initAutocomplete"
   async defer></script>
 {% endblock %}

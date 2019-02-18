@@ -11,10 +11,16 @@
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs">
             <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'view' %}active{% endif %}" href="{% url 'view' slug=slug %}">View</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'view' %}active{% endif %}"
+                    href="{% url 'view' slug=slug %}">View</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'edit' %}active{% endif %}" href="{% url 'edit' slug=slug %}">Edit</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'edituser' %}active{% endif %}"
+                    href="{% url 'edituser' slug=slug %}">Edit</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'edituserprofile' %}active{% endif %}"
+                    href="{% url 'edituserprofile' slug=slug %}">Edit Profile</a>
             </li>
         </ul>
     </div>

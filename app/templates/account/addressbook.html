@@ -49,7 +49,7 @@
       <th scope="col">NANE</th>
       <th scope="col">EMAIL</th>
       <th scope="col">COMPANY</th>
-      <th scope="col">ADDRESS BOOK</th>
+      <th scope="col">licenseplate</th>
     </tr>
   </thead>
   {% for ip in objects_all %}
@@ -61,7 +61,7 @@
       <td>{{ip.full_name}}</td>
       <td>{{ip.email}}</td>
       <td>{{ip.company_name}}</td>
-      <td>{{ip.address}}</td>
+      <td>{{ip.licenseplate}}</td>
     </tr>
   </tbody>
   {% empty %}
