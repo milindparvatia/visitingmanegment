@@ -13,7 +13,6 @@ from rest_framework import viewsets, status, generics, filters
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import 
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from django.contrib import messages
