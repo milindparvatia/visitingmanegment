@@ -13,7 +13,7 @@ from rest_framework import viewsets, status, generics, filters
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import 
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from django.contrib import messages
@@ -26,7 +26,7 @@ from .tasks import add, sendmail
 
 class UserViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              SessionAuthentication, BasicAuthentication]
+                              ]
     permission_classes = [IsAuthenticated]
 
     queryset = User.objects.all()
@@ -44,7 +44,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              SessionAuthentication, BasicAuthentication]
+                              ]
     permission_classes = [IsAuthenticated]
 
     queryset = UserProfile.objects.all()
@@ -62,7 +62,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 class VisitorViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              SessionAuthentication, BasicAuthentication]
+                              ]
     permission_classes = [IsAuthenticated]
     
     queryset = Visitor.objects.all()
@@ -81,7 +81,7 @@ class VisitorViewSet(viewsets.ModelViewSet):
 
 class HostViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              SessionAuthentication, BasicAuthentication]
+                              ]
     permission_classes = [IsAuthenticated]
 
     queryset = Host.objects.all()
@@ -99,7 +99,7 @@ class HostViewSet(viewsets.ModelViewSet):
 
 class MAPViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              SessionAuthentication, BasicAuthentication]
+                              ]
     permission_classes = [IsAuthenticated]
 
     queryset = Map.objects.all()
@@ -117,7 +117,7 @@ class MAPViewSet(viewsets.ModelViewSet):
 
 class MeetingViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              SessionAuthentication, BasicAuthentication]
+                              ]
     permission_classes = [IsAuthenticated]
 
     queryset = Meeting.objects.all()
@@ -488,6 +488,35 @@ def addressbook(request, slug):
     }
     return render(request, 'account/addressbook.html', instance)
 
+
+def addressbookdetail(request,id, slug):
+    print(request.user)
+    print(id)
+    query_list = Visitor.objects.filter(id=id)
+
+    # query = request.GET.get("q")
+
+    # if query:
+    #     query_list = query_list.filter(
+    #         Q(full_name__icontains=query) |
+    #         Q(email__icontains=query) |
+    #         Q(company_name__icontains=query)
+    #         # Q(address__icontains=query)
+    #     )
+
+    mapdata = Map.objects.filter(user=request.user)
+    puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
+    instance = {
+        'image': image,
+        "map": mapdata,
+        "objects_all": query_list,
+        'slug': slug,
+    }
+    return render(request, 'account/addressbookdetail.html', instance)
 
 def colleagues(request, slug):
     print(slug)

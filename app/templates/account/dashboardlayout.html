@@ -1,29 +1,41 @@
 {% extends "app/layout.html" %}
 
+{% block extrahead %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+{{ form.media }}
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
   <div class="row">
     <nav class="col-md-1 d-xl-block bg-light sidebar">
-      <div class="sidebar-sticky">
+      <div class="sidebar-sticky" style="height:100vh;">
         <ul class="nav flex-column">
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'logbook' %}active{% endif %}" href="{% url 'logbook' slug=slug %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'logbook' %}active{% endif %}"
+              href="{% url 'logbook' slug=slug %}">
               <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Log Book">people</i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'addressbook' %}active{% endif %}" href="{% url 'addressbook' slug=slug %}">
-              <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Visitors Address Book">contacts</i>
+            <a class="nav-link {% if request.resolver_match.url_name == 'addressbook' %}active{% endif %}"
+              href="{% url 'addressbook' slug=slug %}">
+              <i class="material-icons" data-toggle="tooltip" data-placement="right"
+                title="Visitors Address Book">contacts</i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}" href="{% url 'analytics' slug=slug %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}"
+              href="{% url 'analytics' slug=slug %}">
               <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Analytics">show_chart</i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'locations' %}active{% endif %}" href="{% url 'locations' slug=slug %}">
-              <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Locations overview">location_on</i>
+            <a class="nav-link {% if request.resolver_match.url_name == 'locations' %}active{% endif %}"
+              href="{% url 'locations' slug=slug %}">
+              <i class="material-icons" data-toggle="tooltip" data-placement="right"
+                title="Locations overview">location_on</i>
             </a>
           </li>
         </ul>
@@ -31,7 +43,8 @@
     </nav>
 
     <main role="main" class="col-11">
-      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         {% block content1 %}{% endblock %}
       </div>
     </main>
