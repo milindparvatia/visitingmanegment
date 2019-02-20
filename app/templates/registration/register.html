@@ -31,4 +31,15 @@
                         </form>
                 </div>
 
+                <script>
+                        {% block jquery %}
+                        function sync() {
+                                var n1 = document.getElementById('id_first_name');
+                                var n2 = document.getElementById('id_last_name');
+                                var n3 = document.getElementById('id_username');
+                                n3.value = n1.value + n2.value;
+                        }
+                        {% endblock %}
+                </script>
+
                 {% endblock %}

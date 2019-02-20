@@ -36,6 +36,8 @@ class Host(models.Model):
     email = models.EmailField(max_length=20)
     mobile = models.IntegerField()
     comment = models.CharField(max_length=100, blank=True, default='')
+    profile_pic = models.ImageField(
+        upload_to='host_data', default='media_data/profile-pic.png')
 
     def __str__(self):
         return self.full_name
@@ -58,7 +60,7 @@ class Visitor(models.Model):
     about = models.CharField(max_length=50, blank=True, default='')
     comment = models.CharField(max_length=100, blank=True, default='')
     profile_pic = models.ImageField(
-        upload_to='media_data', default='media_data/profile-pic.png')
+        upload_to='visitor_data', default='media_data/profile-pic.png')
 
     def __str__(self):
         return self.full_name
@@ -77,6 +79,7 @@ class Meeting(models.Model):
 
 
 class UserProfile(models.Model):
+    full_name = models.CharField(max_length=50, blank=True, default='')
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=20, blank=True, default='')
     mobile = models.CharField(max_length=20, blank=True, default='')
@@ -86,4 +89,4 @@ class UserProfile(models.Model):
     location = models.ForeignKey(
         Map, on_delete=models.CASCADE, null=True, default='')
     profile_pic = models.ImageField(
-        upload_to='media_data',  default='media_data/profile-pic.png')
+        upload_to='user_data',  default='media_data/profile-pic.png')

@@ -45,23 +45,21 @@
 <table class="table table-hover">
   <thead>
     <tr>
-      <th scope="col">Select</th>
+      <th scope="col">IMAGE</th>
       <th scope="col">NANE</th>
       <th scope="col">EMAIL</th>
       <th scope="col">COMPANY</th>
-      <th scope="col">licenseplate</th>
+
     </tr>
   </thead>
   {% for ip in objects_all %}
   <tbody>
-    <tr class="clickable" data-href="{{ip.id}}">
-      <th scope="row">
-        <input type="checkbox" name="select" id="select">
-      </th>
-      <td>{{ip.full_name}}</td>
+    <tr class="clickable">
+      <td><img src="/media/{{ ip.profile_pic }}" class="img-thumbnail" alt="Profile Picture" width="50" height="50">
+      </td>
+      <td><a href="{{ip.id}}" style="color: inherit;">{{ip.full_name}}</a></td>
       <td>{{ip.email}}</td>
       <td>{{ip.company_name}}</td>
-      <td>{{ip.licenseplate}}</td>
     </tr>
   </tbody>
   {% empty %}
@@ -77,16 +75,7 @@
 </table>
 <script>
   {% block jquery %}
-  var elements = document.getElementsByClassName('clickable');
-  for (var i = 0; i < elements.length; i++) {
-    var element = elements[i];
-    element.addEventListener('click', function () {
-      var href = this.dataset.href;
-      if (href) {
-        window.location.assign(href);
-      };
-    });
-  };
+
   {% endblock %}
 </script>
 {% endblock %}

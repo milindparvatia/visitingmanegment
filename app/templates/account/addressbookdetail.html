@@ -1,19 +1,186 @@
 {% extends "account/dashboardlayout.html" %}
 
+{% block extrahead %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/clickable.css' %}">
+{{ form.media }}
+{% endblock %}
+
 {% block content1 %}
-<div class="row">
-  <div class="col-8">
-    {% for visitor in objects_all %}
-    <div class="card">
-      <h5 class="card-header">{{visitor.full_name}}</h5>
-      <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
+<div class="col">
+  <div class="row">
+    <div class="col-4">
+      {% for ip in objects_all %}
+      <div class="card" style="height:80vh;">
+        <h5 class="card-header">
+          <div class="row">
+            <div class="col-3">
+              <img src="{% for data in ip.visitor.profile_pic.url %}{{ data }}{% endfor %}" alt="Profile Picture"
+                width="75" height="75">
+            </div>
+            <div class="col-9">
+              {% for data in ip.visitor.full_name%}{{ data }}{% endfor%}
+            </div>
+          </div>
+        </h5>
+        <div class="card-body">
+          <h5 class="card-title">Email</h5>
+          <p class="card-text">{% for data in ip.visitor.email %}{{ data }}{% endfor %}</p>
+          <h5 class="card-title">Mobile</h5>
+          <p class="card-text">{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</p>
+          <h5 class="card-title">License Plate</h5>
+          <p class="card-text">{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</p>
+        </div>
+        <h5 class="card-header">
+          <div class="row">
+            <div class="col-7">
+              <a href="#" data-toggle="modal" data-target="#exampleModal">Delete Profile</a>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">You Sure Want permenantly Delete this Profile</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    {% lorem %}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="delt" class="btn btn-danger" onclick="Delselected()">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <a href="{% url 'addressbookedit' id=id slug=slug %}">Edit Profile</a>
+            </div>
+          </div>
+        </h5>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="col-8">
+      <div class="card mx-auto">
+        <div class="card-header">
+          <h4>Visit History</h4>
+        </div>
+        <div class="card-body">
+          <div class=" row mx-auto">
+            <br>
+            <table class="table table-bordered table-hover table-responsive" id="filterTable">
+              <thead>
+                <tr>
+                  <th scope="col">STATUS</th>
+                  <th scope="col">CHECK IN</th>
+                  <th scope="col">CHECK OUT</th>
+                  <th scope="col">DATE</th>
+                  <th scope="col"></th>
+                  <th scope="col">VISITOR</th>
+                  <th scope="col">COMPANY</th>
+                  <th scope="col">HOST</th>
+                  <th scope="col">EMAIL</th>
+                  <th scope="col">MOBILE</th>
+                  <th scope="col">LICENSEPLATE</th>
+                  <th scope="col">ABOUT</th>
+                  <th scope="col">COMMENT</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ip in objects_all %}
+                <tr>
+                  <td>
+                    <form style="width: 180px;" action="../statusupdate/{{ip.id}}/" class="form-inline" id="updateForm"
+                      method="POST">
+                      {% csrf_token %}
+                      <select name="{{ form1.status.name }}" class="form-control" id="{{ip.id}}">
+                        <option value="{{ choice.0 }}">{{ ip.status }}</option>
+                        {% for choice in form1.status.field.choices %}
+                        <option value="{{ choice.0 }}">{{ choice.0 }}</option>
+                        {% endfor %}
+                      </select>
+                      <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                  </td>
+                  <td>
+                    <div style="width: 100px;">{{ip.start_time}}</div>
+                  </td>
+                  <td>
+                    <div style="width: 100px;">{{ip.end_time}}</div>
+                  </td>
+                  <td>
+                    <div style="width: 100px;">{{ip.date}}</div>
+                  </td>
+                  <td><img src="{% for data in ip.visitor.profile_pic.url %}{{ data }}{% endfor %}"
+                      alt="Profile Picture" width="35" height="35"></td>
+                  <td>
+                    {% for data in ip.visitor.full_name%}{{ data }}{% endfor%}
+                  </td>
+                  <td>{% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
+                  <td>{% for data in ip.host.all %}{{ data }}{%endfor %}</td>
+                  <td>{% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
+                  <td>{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</td>
+                  <td>{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</td>
+                  <td>{% for data in ip.visitor.about %}{{ data }}{% endfor %}</td>
+                  <td>{% for data in ip.visitor.comment %}{{ data }}{% endfor %}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-    {% endfor %}
   </div>
-  <div class="col"></div>
 </div>
+
+<script>
+  {% block jquery %}
+
+  function GetURLParameter(sParam) {
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) {
+      var sParameterName = sURLVariables[i].split('=');
+      if (sParameterName[0] == sParam) {
+        return sParameterName[1];
+      }
+    }
+  }
+
+
+  function Delselected() {
+    var slug = window.location.pathname;
+    var metaslug = slug.split('/');
+    var id = [metaslug[3]]
+
+    $.ajax({
+      method: 'GET',
+      url: '../../../' + metaslug[1] + '/delselectedaddress/',
+      data: {
+        'id[]': id
+      },
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader(
+          "X-CSRFToken",
+          "{{ csrf_token }}"
+        );
+      },
+      success: function (response) {
+        console.log("succ");
+        window.location.replace("../../addressbook/")
+      },
+      error: function (error_data) {
+        console.log("error");
+        console.log(error_data);
+      }
+    });
+  };
+  {% endblock %}
+</script>
 {% endblock %}

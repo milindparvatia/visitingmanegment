@@ -1,0 +1,69 @@
+{% extends "app/layout.html" %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+
+{% block extrahead %}
+{{ form.media }}
+{% endblock %}
+
+{% block content %}
+<br>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <ul {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</ul>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div class="container">
+    <div class="card mx-auto card-container w-50 p-5">
+        <p id="profile-name" class="profile-name-card">
+            <h1 class="card-title">Add New Visitor</h1>
+        </p>
+        <form enctype="multipart/form-data" action="{% url 'addressbookedit' id=id slug=slug %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.full_name|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                <img src="/media/{{ form.profile_pic.value }}" class="img-thumbnail" alt="Profile Picture" width="400"
+                    height="400">
+            </div>
+            <div class="form-group">
+                {{ form.profile_pic|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.company_name|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.email|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.mobile|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.licenseplate|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.about|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.comment|as_crispy_field }}
+            </div>
+            <div class="form-group mx-auto">
+                <button type="submit" class="btn btn-primary">Save Visit</button>
+                <button type="submit" class="btn btn-secondary">Save And Create New One</button>
+                <a href="{% url 'logbook' slug=slug %}" class="btn btn-success">Cancel</a>
+                <input type="hidden" name="next" value="{{next}}">
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

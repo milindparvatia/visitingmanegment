@@ -8,8 +8,12 @@ from django.conf.urls import url, include
 urlpatterns = [
     path('logbook/', views.logbook, name='logbook'),
     path('addressbook/', views.addressbook, name='addressbook'),
-    url(r'^addressbook/(?P<id>\d+)/',
+    url(r'^addressbook/(?P<id>\d+)/edit/$',
+        views.addressbookedit, name='addressbookedit'),
+    url(r'^addressbook/(?P<id>\d+)/$',
         views.addressbookdetail, name='addressbookdetail'),
+    url(r'^delselectedaddress/(?:id=(?P<id>\d+)/)?$',
+        views.delselectedaddress, name='delselectedaddress'),
     path('locations/', views.locations, name='locations'),
     path('analytics/', views.analytics, name='analytics'),
     path('colleagues/', views.colleagues, name='colleagues'),

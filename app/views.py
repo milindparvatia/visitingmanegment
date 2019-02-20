@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import localdate
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
@@ -13,6 +14,7 @@ from rest_framework import viewsets, status, generics, filters
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from django.contrib import messages
@@ -25,7 +27,7 @@ from .tasks import add, sendmail
 
 class UserViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              ]
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = User.objects.all()
@@ -43,7 +45,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              ]
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = UserProfile.objects.all()
@@ -61,13 +63,14 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 class VisitorViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              ]
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    
+
     queryset = Visitor.objects.all()
     serializer_class = VisitorSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ['full_name']
+
     def get_queryset(self):
         """
         This view should return a list of all the purchases
@@ -80,7 +83,7 @@ class VisitorViewSet(viewsets.ModelViewSet):
 
 class HostViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              ]
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Host.objects.all()
@@ -98,7 +101,7 @@ class HostViewSet(viewsets.ModelViewSet):
 
 class MAPViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              ]
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Map.objects.all()
@@ -116,7 +119,7 @@ class MAPViewSet(viewsets.ModelViewSet):
 
 class MeetingViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
-                              ]
+                              SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Meeting.objects.all()
@@ -134,9 +137,13 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
 def index(request):
     if request.user.is_authenticated:
-        map_key = Map.objects.filter(user=request.user).first()
-        url = map_key.slug + '/logbook'
-        return HttpResponseRedirect(url)
+        try:
+            map_key = Map.objects.filter(user=request.user).get()
+            map_data = Map.objects.filter(user=request.user).first()
+            url = map_data.slug + '/logbook'
+            return HttpResponseRedirect(url)
+        except ObjectDoesNotExist:
+            return HttpResponseRedirect('../addnewlocations/')
     else:
         return render(request, 'app/index.html')
 
@@ -156,9 +163,12 @@ def register(request):
             instance = form.save(commit=False)
             instance.save()
             username = form.cleaned_data['username']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            full_name= first_name +' '+ last_name
             password = form.cleaned_data['password1']
             user = authenticate(username=username, password=password)
-            profile_instance = UserProfile.objects.create(user=user)
+            profile_instance = UserProfile.objects.create(user=user, full_name=full_name)
             login(request, user)
             return HttpResponseRedirect('../addnewlocations/')
     else:
@@ -470,7 +480,6 @@ def addressbook(request, slug):
             Q(full_name__icontains=query) |
             Q(email__icontains=query) |
             Q(company_name__icontains=query)
-            # Q(address__icontains=query)
         )
 
     mapdata = Map.objects.filter(user=request.user)
@@ -490,18 +499,12 @@ def addressbook(request, slug):
 
 def addressbookdetail(request,id, slug):
     print(request.user)
-    print(id)
-    query_list = Visitor.objects.filter(id=id)
 
-    # query = request.GET.get("q")
-
-    # if query:
-    #     query_list = query_list.filter(
-    #         Q(full_name__icontains=query) |
-    #         Q(email__icontains=query) |
-    #         Q(company_name__icontains=query)
-    #         # Q(address__icontains=query)
-    #     )
+    map_key = Map.objects.all().filter(slug=slug).values('id')
+    query_list = Meeting.objects.all().filter(
+        location_id=map_key[0]['id'], visitor_id=id).order_by('-date')
+    query_list_host = Host.objects.prefetch_related('relateds')
+    query_list_visitor = Visitor.objects.prefetch_related('relateds')
 
     mapdata = Map.objects.filter(user=request.user)
     puserdata = UserProfile.objects.filter(user=request.user).values()
@@ -510,12 +513,64 @@ def addressbookdetail(request,id, slug):
     else:
         image = puserdata
     instance = {
+        'id':id,
+        "query_list_visitor": query_list_visitor,
+        "objects_all1": query_list_host,
         'image': image,
         "map": mapdata,
         "objects_all": query_list,
         'slug': slug,
     }
     return render(request, 'account/addressbookdetail.html', instance)
+
+
+def addressbookedit(request, id, slug):
+    mapdata = Map.objects.filter(user=request.user)
+    puserdata = UserProfile.objects.filter(user=request.user).values()
+    if puserdata:
+        image = puserdata[0]['profile_pic']
+    else:
+        image = puserdata
+    
+    idlists = request.GET.getlist("id[]")
+    
+    for idlist in idlists:
+        id = idlist
+    
+    instance = get_object_or_404(Visitor, id=id)
+        
+    if request.method == 'POST':
+        form = VisitorForm(request.POST or None,
+                        request.FILES or None,instance=instance)    
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.user = request.user
+            print(form.cleaned_data.get("full_name"))
+            fname = form.cleaned_data.get("full_name")
+            instance.save()
+            messages.success(request, "Successfully Create New Entry for " + fname)
+    else:
+        form = VisitorForm(instance=instance)
+
+    instance = {
+        'image': image,
+        "map": mapdata,
+        'form': form,
+        'slug': slug,
+        'id':id
+    }
+    return render(request, 'account/editvisitor.html', instance)
+
+def delselectedaddress(request, id, slug=None):
+    query = request.GET.getlist("id[]")
+
+    for target_list in query:
+        arg = Visitor.objects.get(id=target_list).delete()
+
+    data = {
+        'slug': slug
+    }
+    return render(request, 'account/addressbook.html', data)
 
 def colleagues(request, slug):
     print(slug)
@@ -610,13 +665,16 @@ def addnewlocations(request):
         # return render(request, url)
     else:
         mapdata = Map.objects.filter(user=request.user).values()
-        mapdata = mapdata[0]['slug']
-        context = {
-            'Map': mapdata,
-            'form': form,
-
-        }
-        print('addnewlocations error')
+        if mapdata.exists():
+            mapdata = mapdata[0]['slug']
+            context = {
+                'Map': mapdata,
+                'form': form,
+            }
+        else:
+            context = {
+                'form': form,
+            }
         return render(request, 'account/addnewlocations.html', context)
 
 

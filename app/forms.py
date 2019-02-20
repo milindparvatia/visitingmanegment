@@ -38,6 +38,12 @@ class RegistraionForm(UserCreationForm):
             "password2"
         ]
 
+    # def __init__(self, *args, **kwargs):
+    #     super(RegistraionForm, self).__init__(*args, **kwargs)
+    #     self.fields['username'].widget.attrs['readonly'] = True
+    #     self.fields['first_name'].widget.attrs = {'onkeyup': 'sync()'}
+    #     self.fields['last_name'].widget.attrs = {'onkeyup': 'sync()'}
+
     def save(self, commit=True):
         user = super(RegistraionForm, self).save(commit=False)
         user.first_name = self.cleaned_data['first_name']
@@ -85,8 +91,15 @@ class VisitorForm(forms.ModelForm):
             "mobile",
             "licenseplate",
             "about",
-            "comment"
+            "comment",
+            'profile_pic'
         ]
+
+    def __init__(self, *args, **kwargs):
+        super(VisitorForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            self.fields['email'].widget.attrs['readonly'] = True
 
 
 class HostForm(forms.ModelForm):
