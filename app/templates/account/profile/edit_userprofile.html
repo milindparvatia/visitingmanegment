@@ -16,7 +16,7 @@
 </ul>
 {% endif %}
 <div class="container">
-    <form enctype="multipart/form-data" action="{% url 'edituserprofile' slug=slug %}" method="POST">
+    <form action="{% url 'edituserprofile' slug=slug %}" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
         <div class=" row">
             <div class="col-2"></div>

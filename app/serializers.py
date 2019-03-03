@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User
-from app.models import Visitor, Host, Map, Meeting, UserProfile
-from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
+from app.models import *
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class VisitorSerializer(serializers.HyperlinkedModelSerializer):
@@ -11,13 +12,11 @@ class VisitorSerializer(serializers.HyperlinkedModelSerializer):
                   'comment', 'company_name', 'licenseplate', 'about', 'user')
 
 
-class HostSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name="host-detail")
+class TheCompanySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
-        model = Host
-        fields = ('url', 'id', 'full_name', 'email',
-                  'mobile', 'comment', 'user')
+        model = TheCompany
+        fields = ('url', 'id', 'name', 'location')
 
 
 class MeetingSerializer(serializers.HyperlinkedModelSerializer):
@@ -41,13 +40,12 @@ class MAPSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'id', 'first_name', 'last_name', 'is_active', 'last_login', 'date_joined',
-                  'username', 'password', 'email', 'groups')
+        fields = ('url', 'id', 'is_active', 'last_login', 'date_joined',
+                  'password', 'email', 'groups')
 
 
-class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ('url', 'id', 'user', 'company_name', 'mobile', 'location',
-                  'licenseplate', 'about', 'comment', 'profile_pic')
-                  
+# class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = UserProfile
+#         fields = ('url', 'id', 'user', 'hosts', 'company_name', 'comp', 'mobile', 'location',
+#                   'licenseplate', 'about', 'comment', 'profile_pic')

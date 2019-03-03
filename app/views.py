@@ -1,14 +1,22 @@
+from .tokens import account_activation_token
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_text
+from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.base_user import BaseUserManager
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import localdate
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Host, Visitor, Map, Meeting, UserProfile
-from .serializers import HostSerializer, MeetingSerializer,UserProfileSerializer, VisitorSerializer, MAPSerializer, UserSerializer
-from .forms import VisitorForm, HostForm, RegistraionForm, SearchVisitorForm, UserForm, UserProfileForm, MeetingForm, MapForm, ToDoForm, StatusForm
+from .models import *
+from .serializers import *
+from .forms import *
 from django.db.models import Q
+
 
 from rest_framework import viewsets, status, generics, filters
 from rest_framework.response import Response
@@ -19,6 +27,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from django.contrib import messages
 from projectvisitor.settings import EMAIL_HOST_USER
+from projectvisitor import settings
 
 from itertools import chain
 from haystack.query import SearchQuerySet
@@ -33,32 +42,32 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def get_queryset(self):
-        """
-        This view should return a list of all the purchases
-        for the currently authenticated user.
-        """
-        queryset = self.queryset
-        query_set = queryset.filter(username=self.request.user)
-        return query_set
+    # def get_queryset(self):
+    #     """
+    #     This view should return a list of all the purchases
+    #     for the currently authenticated user.
+    #     """
+    #     queryset = self.queryset
+    #     query_set = queryset.filter(username=self.request.user)
+    #     return query_set
 
 
-class UserProfileViewSet(viewsets.ModelViewSet):
-    authentication_classes = [JSONWebTokenAuthentication,
-                              SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+# class UserProfileViewSet(viewsets.ModelViewSet):
+#     authentication_classes = [JSONWebTokenAuthentication,
+#                               SessionAuthentication, BasicAuthentication]
+#     permission_classes = [IsAuthenticated]
 
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
+#     queryset = User.objects.all()
+#     serializer_class = UserProfileSerializer
 
-    def get_queryset(self):
-        """
-        This view should return a list of all the purchases
-        for the currently authenticated user.
-        """
-        queryset = self.queryset
-        query_set = queryset.filter(user=self.request.user)
-        return query_set
+    # def get_queryset(self):
+    #     """
+    #     This view should return a list of all the purchases
+    #     for the currently authenticated user.
+    #     """
+    #     queryset = self.queryset
+    #     query_set = queryset.filter(user=self.request.user)
+    #     return query_set
 
 
 class VisitorViewSet(viewsets.ModelViewSet):
@@ -81,22 +90,22 @@ class VisitorViewSet(viewsets.ModelViewSet):
         return query_set
 
 
-class HostViewSet(viewsets.ModelViewSet):
+class TheCompanyViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
                               SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
-    queryset = Host.objects.all()
-    serializer_class = HostSerializer
+    queryset = TheCompany.objects.all()
+    serializer_class = TheCompanySerializer
 
-    def get_queryset(self):
-        """
-        This view should return a list of all the purchases
-        for the currently authenticated user.
-        """
-        queryset = self.queryset
-        query_set = queryset.filter(user=self.request.user)
-        return query_set
+    # def get_queryset(self):
+    #     """
+    #     This view should return a list of all the purchases
+    #     for the currently authenticated user.
+    #     """
+    #     queryset = self.queryset
+    #     query_set = queryset.filter(user=self.request.user)
+    #     return query_set
 
 
 class MAPViewSet(viewsets.ModelViewSet):
@@ -138,9 +147,13 @@ class MeetingViewSet(viewsets.ModelViewSet):
 def index(request):
     if request.user.is_authenticated:
         try:
-            map_key = Map.objects.filter(user=request.user).get()
-            map_data = Map.objects.filter(user=request.user).first()
-            url = map_data.slug + '/logbook'
+            user = User.objects.filter(email=request.user)
+            print(user)
+            map_key = TheCompany.objects.filter(name=user[0].our_company)
+            print(map_key[0].id)
+            map_data = Map.objects.filter(id=map_key[0].id)
+            print(map_data[0].slug)
+            url = map_data[0].slug + '/logbook'
             return HttpResponseRedirect(url)
         except ObjectDoesNotExist:
             return HttpResponseRedirect('../addnewlocations/')
@@ -161,14 +174,16 @@ def register(request):
         form = RegistraionForm(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
-            instance.save()
-            username = form.cleaned_data['username']
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            full_name= first_name +' '+ last_name
+            
+            email = form.cleaned_data['email']
+            company_name = form.cleaned_data['company_name']
             password = form.cleaned_data['password1']
-            user = authenticate(username=username, password=password)
-            profile_instance = UserProfile.objects.create(user=user, full_name=full_name)
+            company_instance = TheCompany.objects.create(name=company_name)
+            instance.our_company = company_instance
+
+            instance.save()
+            user = authenticate(username=email, password=password)
+            
             login(request, user)
             return HttpResponseRedirect('../addnewlocations/')
     else:
@@ -177,12 +192,12 @@ def register(request):
     return render(request, 'registration/register.html', context)
 
 
-def logbook(request, slug=None):
+def logbook(request, slug):
     print(slug)
-    map_key = Map.objects.all().filter(slug=slug).values('id')
-    query_list = Meeting.objects.all().filter(
-        location_id=map_key[0]['id']).order_by('-date')
-    query_list_host = Host.objects.prefetch_related('relateds')
+    map_key = Map.objects.filter(slug=slug).values('id')
+    mapdata=map_key
+    query_list = Meeting.objects.all().filter(location_id=map_key[0]['id']).order_by('-date')
+    # query_list_host = Host.objects.prefetch_related('relateds')
     query_list_visitor = Visitor.objects.prefetch_related('relateds')
 
     user_form = ToDoForm(request.POST or None)
@@ -221,8 +236,8 @@ def logbook(request, slug=None):
                 report = chain(report, query_list_vi)
                 y = y + 1
 
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -233,7 +248,7 @@ def logbook(request, slug=None):
             "map": mapdata,
             "query_list_visitor": query_list_visitor_list,
             "objects_all": report,
-            "objects_all1": query_list_host,
+            # "objects_all1": query_list_host,
             'form1': form,
             'form': user_form,
             'slug': slug,
@@ -246,7 +261,7 @@ def logbook(request, slug=None):
             "map": mapdata,
             "query_list_visitor": query_list_visitor,
             "objects_all": query_list,
-            "objects_all1": query_list_host,
+            # "objects_all1": query_list_host,
             'form1': form,
             'form': user_form
         }
@@ -277,7 +292,7 @@ def statusupdate(request, slug, id=None):
     return HttpResponseRedirect('../../logbook/')
 
 
-def delselected(request, id, slug=None):
+def delselected(request, id, slug):
     query = request.GET.getlist("id[]")
 
     for target_list in query:
@@ -291,60 +306,65 @@ def delselected(request, id, slug=None):
 
 
 def addnewvisit(request, slug):
-    print(slug)
-    form2 = MeetingForm(request.POST)
-    form1 = VisitorForm(request.POST)
-    form = ToDoForm()
+    user = User.objects.filter(email=request.user)
+    query_list = User.objects.filter(colleague=user[0].colleague)
+    thecompany = TheCompany.objects.filter(name=user[0].our_company)
+    print(thecompany)
+    
+    if request.method == 'POST':
+        form2 = MeetingForm(thecompany[0], request.POST)
+        form1 = VisitorForm(request.POST)
+        form = ToDoForm()
 
-    a = form1.is_valid()
-    b = form2.is_valid()
+        a = form1.is_valid()
+        b = form2.is_valid()
 
-    if a and b:
-        instance1 = form1.save(commit=False)
-        instance1.user = request.user
-        instance1.save()
+        if a and b:
+            instance1 = form1.save(commit=False)
+            instance1.user = request.user
+            instance1.save()
 
-        name = form1.cleaned_data.get("full_name")
-        email = form1.cleaned_data.get("email")
-        hostname = form2.cleaned_data.get("host")
-        fromtime = form2.cleaned_data.get("start_time").strftime('%H:%M:%S')
-        totime = form2.cleaned_data.get("end_time").strftime('%H:%M:%S')
-        ondate = form2.cleaned_data.get("date").strftime('%m-%d-%Y')
-        hostval = hostname.values()
-        list_result = [entry for entry in hostval]
-        hname = list_result[0]['full_name']
+            name = form1.cleaned_data.get("full_name")
+            email = form1.cleaned_data.get("email")
+            hostname = form2.cleaned_data.get("host")
+            fromtime = form2.cleaned_data.get("start_time").strftime('%H:%M:%S')
+            totime = form2.cleaned_data.get("end_time").strftime('%H:%M:%S')
+            ondate = form2.cleaned_data.get("date").strftime('%m-%d-%Y')
+            hostval = hostname.values()
+            list_result = [entry for entry in hostval]
+            hname = list_result[0]['full_name']
 
-        hostsubject = 'New apointment is created with '+name
-        hostmessage = 'New visit is added with '+hname + \
-            ' on '+ondate + ' from '+fromtime + ' to '+totime
-        hostsender_email = email
-        hostreceipient_email = EMAIL_HOST_USER
+            hostsubject = 'New apointment is created with '+name
+            hostmessage = 'New visit is added with '+hname + \
+                ' on '+ondate + ' from '+fromtime + ' to '+totime
+            hostsender_email = email
+            hostreceipient_email = EMAIL_HOST_USER
 
-        reciversubject = 'New apointment is created with '+hname
-        recivermessage = 'New visit is added with '+name + \
-            ' on '+ondate + ' from '+fromtime + ' to '+totime
-        sender_email = EMAIL_HOST_USER
-        receipient_email = email
-        messages.success(request, "Successfully Create New Entry for "+name)
+            reciversubject = 'New apointment is created with '+hname
+            recivermessage = 'New visit is added with '+name + \
+                ' on '+ondate + ' from '+fromtime + ' to '+totime
+            sender_email = EMAIL_HOST_USER
+            receipient_email = email
+            messages.success(request, "Successfully Create New Entry for "+name)
 
-        sendmail.delay(hostsubject, hostmessage,
-                       hostsender_email, hostreceipient_email)
-        sendmail.delay(reciversubject, recivermessage,
-                       sender_email, receipient_email)
+            sendmail.delay(hostsubject, hostmessage,
+                        hostsender_email, hostreceipient_email)
+            sendmail.delay(reciversubject, recivermessage,
+                        sender_email, receipient_email)
 
-        instance1.save()
-        instance2 = form2.save(commit=False)
-        instance2.user = request.user
-        instance2.visitor_id = instance1.pk
-        instance2.save()
-        form2.save_m2m()
+            instance2 = form2.save(commit=False)
+            instance2.user = request.user
+            instance2.visitor_id = instance1.pk
+            instance2.save()
+            form2.save_m2m()
     else:
         form = ToDoForm()
         form1 = VisitorForm()
-        form2 = MeetingForm()
+        form2 = MeetingForm(thecompany[0])
 
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -360,7 +380,7 @@ def addnewvisit(request, slug):
     return render(request, 'account/addnewvisit.html', instance)
 
 
-def use_old_visit(request,id=None, slug=None):
+def use_old_visit(request,id=None, slug):
     print(id)
     query_list = Visitor.objects.filter(id=id)
     form2 = MeetingForm(request.POST)
@@ -407,8 +427,9 @@ def use_old_visit(request,id=None, slug=None):
         form2.save_m2m()
     else:
         form2 = MeetingForm()
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -423,9 +444,10 @@ def use_old_visit(request,id=None, slug=None):
     }
     return render(request, 'account/useoldvisit.html', instance)
 
-def search_visitor(request, slug=None):
+
+def search_visitor(request, slug):
     print(slug)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -437,13 +459,13 @@ def search_visitor(request, slug=None):
     return render(request, 'account/searchvisitor.html', instance)
 
 
-def searchlist(request, slug=None):
+def searchlist(request, slug):
     visitor = SearchQuerySet().autocomplete(
         content_auto=request.POST.get('search_text', ''))
     if visitor:
         visitor[:5]
     print(slug)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -456,7 +478,7 @@ def searchlist(request, slug=None):
     return render(request, 'account/searchlist.html', instance)
 
 
-def search_list(request, slug=None):
+def search_list(request, slug):
     sqs = SearchQuerySet().autocomplete(
         content_auto=request.GET.get('q', ''))[:5]
     suggestions = [result.text for result in sqs]
@@ -482,8 +504,9 @@ def addressbook(request, slug):
             Q(company_name__icontains=query)
         )
 
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -503,11 +526,12 @@ def addressbookdetail(request,id, slug):
     map_key = Map.objects.all().filter(slug=slug).values('id')
     query_list = Meeting.objects.all().filter(
         location_id=map_key[0]['id'], visitor_id=id).order_by('-date')
-    query_list_host = Host.objects.prefetch_related('relateds')
+    # query_list_host = Host.objects.prefetch_related('relateds')
     query_list_visitor = Visitor.objects.prefetch_related('relateds')
 
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -515,7 +539,7 @@ def addressbookdetail(request,id, slug):
     instance = {
         'id':id,
         "query_list_visitor": query_list_visitor,
-        "objects_all1": query_list_host,
+        # "objects_all1": query_list_host,
         'image': image,
         "map": mapdata,
         "objects_all": query_list,
@@ -525,8 +549,9 @@ def addressbookdetail(request,id, slug):
 
 
 def addressbookedit(request, id, slug):
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -561,7 +586,8 @@ def addressbookedit(request, id, slug):
     }
     return render(request, 'account/editvisitor.html', instance)
 
-def delselectedaddress(request, id, slug=None):
+
+def delselectedaddress(request, id, slug):
     query = request.GET.getlist("id[]")
 
     for target_list in query:
@@ -572,9 +598,15 @@ def delselectedaddress(request, id, slug=None):
     }
     return render(request, 'account/addressbook.html', data)
 
+
 def colleagues(request, slug):
-    print(slug)
-    query_list = Host.objects.filter(user=request.user)
+    user = User.objects.filter(email=request.user)
+    print(user[0].our_company)
+    thethe = TheCompany.objects.filter(name=user[0].our_company)
+    print(thethe)
+    # hosts = User.objects.filter(email=request.user).values('our_company')
+    query_list = User.objects.filter(our_company=thethe[0])
+    print(query_list)
     query = request.GET.get("q")
 
     if query:
@@ -583,8 +615,9 @@ def colleagues(request, slug):
             Q(email__icontains=query) |
             Q(mobile__icontains=query)
         )
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -599,26 +632,48 @@ def colleagues(request, slug):
 
 
 def addnewhost(request, slug):
-    print(slug)
-    form = HostForm(request.POST)
-    mapdata = Map.objects.filter(user=request.user)
-    
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = map_key.values()
+    randomstring = BaseUserManager().make_random_password()
+
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
         image = puserdata
+    if request.method == 'POST':
+        print('isPost')
+        form = ColleaguesForm(request.POST)
+        if form.is_valid():
+            print(map_key[0].our_company)
+            instance = form.save(commit=False)
+            instance.is_active = False
+            instance.set_password(randomstring)
+            instance.our_company= map_key[0].our_company
+            instance.save()
+            print(instance)
+            fname = form.cleaned_data.get("full_name")
+            
+            current_site = get_current_site(request)
+            print(instance.id)
+            mail_subject = 'Activate your account.'
+            message = render_to_string('account_active_email.html', {
+                'usertocreate': instance,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(instance.pk)).decode(),
+                'token': account_activation_token.make_token(instance),
+            })
+            to_email = form.cleaned_data.get('email')
+            sender_email = EMAIL_HOST_USER
 
-    if form.is_valid():
-        instance = form.save(commit=False)
-        instance.user = request.user
-        print(form.cleaned_data.get("full_name"))
-        fname = form.cleaned_data.get("full_name")
-        instance.save()
-        messages.success(request, "Successfully Create New Entry for " + fname)
-    else:
-        form = HostForm()
-    
+            sendmail.delay(mail_subject, message,
+                           sender_email, to_email)
+            
+            messages.success(request, "Successfully Create New Entry for " + fname)
+    else:   
+        print('error')
+        form = ColleaguesForm()
+
     instance = {
         'image': image,
         "map": mapdata,
@@ -628,11 +683,38 @@ def addnewhost(request, slug):
     return render(request, 'account/addnewhost.html', instance)
 
 
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        print(uid)
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        print('1')
+        logout()
+        msg11 = 'Thank you for your email confirmation. Now you can login your account with username and password we genrated for you and send you in your mail.'
+    else:
+        msg11 = 'Activation link is invalid!'
+        
+    instance = {
+        'msg': msg11,
+    }
+    return render(request, 'app/user_added.html', instance)
+
+
+def user_added(request):
+    return render(request, 'app/user_added.html')
+
+
 def locations(request, slug):
     print(slug)
     user_form = ToDoForm()
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -646,27 +728,42 @@ def locations(request, slug):
     return render(request, 'account/locations.html', instance)
 
 
-def addnewlocations(request):
+def addnewlocations(request,slug):
+    print(request.user)
     form = MapForm(request.POST or None)
     if form.is_valid():
         instance = form.save(commit=False)
-        instance.user = request.user
         # fname = form.cleaned_data.get("name")
+        instance.user = request.user
         instance.save()
         old_slug = Map.objects.get(id=instance.pk)
-        print(old_slug.slug)
         # messages.success(request, "Successfully Create New Entry for " + fname)
         slug = old_slug.slug
+    
+        ismap = Map.objects.filter(name=instance.name)
+        super_user = User.objects.filter(email=instance.user)
+        print(super_user[0].our_company)
+        thecompany = TheCompany.objects.filter(name=super_user[0].our_company)
+        print(thecompany)
+        exists = thecompany.exists()
+        if exists:
+            print(1)
+            company = TheCompany.objects.get(name=super_user[0].our_company)
+            print(ismap)
+            print(instance)
+            print(old_slug)
+            company.location.add(ismap[0].id)
+
         context = {
             'form': form,
             'slug': slug
         }
         return render(request, 'account/logbook.html', context)
-        # return render(request, url)
     else:
-        mapdata = Map.objects.filter(user=request.user).values()
-        if mapdata.exists():
-            mapdata = mapdata[0]['slug']
+        user = User.objects.filter(email=request.user)
+        map_key = TheCompany.objects.filter(name=user[0].our_company)
+        if map_key[0].location.all().exists():
+            mapdata = map_key[0].location.all()[0].slug
             context = {
                 'Map': mapdata,
                 'form': form,
@@ -678,11 +775,12 @@ def addnewlocations(request):
         return render(request, 'account/addnewlocations.html', context)
 
 
-def analytics(request, slug=None):
+def analytics(request, slug):
     print(slug)
-    mapdata = Map.objects.filter(user=request.user)
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
     datalist = Visitor.objects.all().order_by('-date')
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -696,9 +794,9 @@ def analytics(request, slug=None):
     return render(request, 'account/analytics.html', instance)
 
 
-def settings_general_company(request, slug=None):
+def settings_general_company(request, slug):
     print(slug)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -710,10 +808,10 @@ def settings_general_company(request, slug=None):
     return render(request, 'account/settings/general/company.html', instance)
 
 
-def settings_general_management(request, slug=None):
+def settings_general_management(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -725,10 +823,10 @@ def settings_general_management(request, slug=None):
     return render(request, 'account/settings/general/usermanagement.html', instance)
 
 
-def settings_general_rights(request, slug=None):
+def settings_general_rights(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -740,10 +838,10 @@ def settings_general_rights(request, slug=None):
     return render(request, 'account/settings/general/user-rights.html', instance)
 
 
-def settings_other_billing(request, slug=None):
+def settings_other_billing(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -755,10 +853,10 @@ def settings_other_billing(request, slug=None):
     return render(request, 'account/settings/othersettings/billing-plan.html', instance)
 
 
-def settings_other_buildingsecurity(request, slug=None):
+def settings_other_buildingsecurity(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -770,10 +868,10 @@ def settings_other_buildingsecurity(request, slug=None):
     return render(request, 'account/settings/othersettings/building-security.html', instance)
 
 
-def settings_other_integrations(request, slug=None):
+def settings_other_integrations(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -785,10 +883,10 @@ def settings_other_integrations(request, slug=None):
     return render(request, 'account/settings/othersettings/integrations.html', instance)
 
 
-def settings_other_privacy(request, slug=None):
+def settings_other_privacy(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -800,10 +898,10 @@ def settings_other_privacy(request, slug=None):
     return render(request, 'account/settings/othersettings/privacy.html', instance)
 
 
-def settings_visitslist_kiosklist(request, slug=None):
+def settings_visitslist_kiosklist(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -815,10 +913,10 @@ def settings_visitslist_kiosklist(request, slug=None):
     return render(request, 'account/settings/visitslist/kiosk_list.html', instance)
 
 
-def settings_visitslist_logbook(request, slug=None):
+def settings_visitslist_logbook(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -830,10 +928,10 @@ def settings_visitslist_logbook(request, slug=None):
     return render(request, 'account/settings/visitslist/logbook.html', instance)
 
 
-def settings_visitslist_printer(request, slug=None):
+def settings_visitslist_printer(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -845,10 +943,10 @@ def settings_visitslist_printer(request, slug=None):
     return render(request, 'account/settings/visitslist/printer.html', instance)
 
 
-def settings_visitslist_notifications(request, slug=None):
+def settings_visitslist_notifications(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -860,16 +958,16 @@ def settings_visitslist_notifications(request, slug=None):
     return render(request, 'account/settings/visitslist/notifications.html', instance)
 
 
-def view(request, slug=None):
+def view(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
         image = puserdata
     user = User.objects.filter(username=request.user)
-    userprofile = UserProfile.objects.filter(user=request.user)
+    userprofile = User.objects.filter(email=request.user)
     instance = {
         'user': user,
         'userprofile': userprofile,
@@ -879,9 +977,10 @@ def view(request, slug=None):
     return render(request, 'account/profile/view.html', instance)
 
 
-def edituser(request, slug=None):
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+def edituser(request, slug):
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = User.objects.filter(email=request.user).values()
     
     print(puserdata)
     if puserdata:
@@ -907,10 +1006,11 @@ def edituser(request, slug=None):
     return render(request, 'account/profile/edit_user.html', instance)
 
 
-def edituserprofile(request, slug=None):
-    mapdata = Map.objects.filter(user=request.user)
-    puserdata = UserProfile.objects.filter(user=request.user).values()
-    instance = get_object_or_404(UserProfile, user=request.user)
+def edituserprofile(request, slug):
+    map_key = User.objects.filter(email=request.user)
+    mapdata = Map.objects.filter(slug=slug)
+    puserdata = User.objects.filter(email=request.user).values()
+    instance = get_object_or_404(User, user=request.user)
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -936,10 +1036,10 @@ def edituserprofile(request, slug=None):
     return render(request, 'account/profile/edit_userprofile.html', instance)
 
 
-def password(request, slug=None):
+def password(request, slug):
     print(slug)
 
-    puserdata = UserProfile.objects.filter(user=request.user).values()
+    puserdata = User.objects.filter(email=request.user).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:

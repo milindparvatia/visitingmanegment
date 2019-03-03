@@ -3,6 +3,10 @@
 {% load crispy_forms_tags %}
 
 {% block extrahead %}
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css">
+{% load static %}
+<script src="{% static 'django_select2/django_select2.js' %}"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 {{ form.media }}
 {% endblock %}
 
@@ -77,5 +81,4 @@
         </form>
     </div>
 </div>
-
 {% endblock %}

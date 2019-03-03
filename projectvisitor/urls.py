@@ -20,10 +20,11 @@ from django.conf.urls import url
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('<slug:slug>/', include('app.urls')),
+    url(r'^select2/', include('django_select2.urls')),
     path('', include('app.url_index')),
+    path('<slug:slug>/', include('app.urls')),
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
 ]
 
 if settings.DEBUG:

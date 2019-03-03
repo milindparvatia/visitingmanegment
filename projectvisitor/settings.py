@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 import django_heroku
 import datetime
 
@@ -44,6 +45,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'django_select2',
     'haystack',
     'bootstrap_datepicker_plus',
     'crispy_forms',
@@ -53,11 +55,14 @@ INSTALLED_APPS = [
     'bootstrap4',
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+SITE_ID = 1
 
 # JWT settings
 JWT_AUTH = {
@@ -179,6 +184,16 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'pqr',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
@@ -230,5 +245,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media_data")
 LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/'
+
+AUTH_USER_MODEL = 'app.User'
 
 django_heroku.settings(locals())
