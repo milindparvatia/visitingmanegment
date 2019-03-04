@@ -5,6 +5,8 @@ from .models import *
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput
 from django.contrib.auth.forms import UserCreationForm
 from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class MapForm(forms.ModelForm):
@@ -216,6 +218,7 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
+            'full_name',
             'password',
             'email',
             'is_active',
@@ -223,7 +226,8 @@ class UserForm(forms.ModelForm):
             'licenseplate',
             'about',
             'comment',
-            'profile_pic'
+            'profile_pic',
+            'our_company'
         ]
 
 

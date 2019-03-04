@@ -1,5 +1,10 @@
 {% autoescape off %}
 Hi {{ usertocreate.email }},
+Your Temporary password is {{randomstring}},
 Please click on the link to confirm your registration,
 {{ domain }}{% url 'activate' uidb64=uid token=token %}
+and change your one time password from setting menu.
+
+thank you,
+Milind Parvatia
 {% endautoescape %}

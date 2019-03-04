@@ -101,11 +101,8 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'mobile']
 
-    def __str__(self):
-        return self.email
-
     def __unicode__(self):
-        return "{0}".format(self.full_name)
+        return u'%s %s' % (self.full_name, self.email)
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -132,7 +129,8 @@ STATUS_CHOICES = (
 
 
 class Visitor(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    our_company = models.ForeignKey(
+        TheCompany, on_delete=models.CASCADE, null=True, default='')
     full_name = models.CharField(max_length=30)
     company_name = models.CharField(max_length=20)
     email = models.EmailField(max_length=20)
@@ -148,7 +146,8 @@ class Visitor(models.Model):
 
 
 class Meeting(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    our_company = models.ForeignKey(
+        TheCompany, on_delete=models.CASCADE, null=True, default='')
     visitor = models.ForeignKey(
         Visitor, on_delete=models.CASCADE, related_name='related_visitor')
     host = models.ManyToManyField(

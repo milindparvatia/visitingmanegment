@@ -81,7 +81,7 @@
               {% for data in ip.visitor.full_name%}{{ data }}{% endfor%}
             </td>
             <td>{% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
-            <td>{% for data in ip.host.all %}{{ data }}{%endfor %}</td>
+            <td>{% for data in ip.host.all %}{{ data }}<br>{%endfor %}</td>
             <td>{% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
             <td>{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</td>
             <td>{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</td>

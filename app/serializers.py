@@ -8,8 +8,8 @@ User = get_user_model()
 class VisitorSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Visitor
-        fields = ('url', 'id', 'full_name', 'email', 'mobile',
-                  'comment', 'company_name', 'licenseplate', 'about', 'user')
+        fields = ('url', 'id',  'our_company', 'full_name', 'email', 'mobile',
+                  'comment', 'company_name', 'licenseplate', 'about', 'profile_pic')
 
 
 class TheCompanySerializer(serializers.HyperlinkedModelSerializer):
@@ -25,7 +25,7 @@ class MeetingSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Meeting
         fields = ('url', 'id', 'status', 'visitor', 'host',
-                  'location', 'date', 'start_time', 'end_time', 'user')
+                  'location', 'date', 'start_time', 'end_time', 'our_company')
         depth = 1
 
 
@@ -34,18 +34,11 @@ class MAPSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Map
-        fields = ('url', 'id', 'loc', 'lon', 'lat', 'name', 'slug', 'user')
+        fields = ('url', 'id', 'loc', 'lon', 'lat', 'name', 'slug')
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'id', 'is_active', 'last_login', 'date_joined',
-                  'password', 'email', 'groups')
-
-
-# class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = UserProfile
-#         fields = ('url', 'id', 'user', 'hosts', 'company_name', 'comp', 'mobile', 'location',
-#                   'licenseplate', 'about', 'comment', 'profile_pic')
+        fields = ('url', 'id',  'full_name', 'is_active', 'last_login', 'is_admin',
+                  'password', 'email', 'mobile', 'licenseplate', 'about', 'comment', 'profile_pic', 'our_company')
