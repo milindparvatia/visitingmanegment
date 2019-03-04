@@ -638,14 +638,13 @@ def addnewlocations(request,slug=None):
         slug = old_slug.slug
     
         ismap = Map.objects.filter(name=instance.name)
-        
-        if request.user.our_company.exists():
-            print(1)
-            company = TheCompany.objects.get(name=request.user.our_company)
-            print(ismap)
-            print(instance)
-            print(old_slug)
-            company.location.add(ismap[0].id)
+    
+        print(1)
+        company = TheCompany.objects.get(name=request.user.our_company)
+        print(ismap)
+        print(instance)
+        print(old_slug)
+        company.location.add(ismap[0].id)
 
         context = {
             'form': form,
