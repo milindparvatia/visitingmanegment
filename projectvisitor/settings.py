@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 import django_heroku
 import datetime
 
@@ -40,7 +39,6 @@ SECRET_KEY = '#k#8#t7zz-iqji_2dfoa^rca1_#8+xi7z2^tdvbgzz(_3xw&4s'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
