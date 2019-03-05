@@ -678,6 +678,43 @@ def addnewlocations(request,slug=None):
         return render(request, 'account/addnewlocations.html', context)
 
 
+def editlocations(request, slug, id):
+    instance = get_object_or_404(Map, id=id)
+    if request.method == 'POST':
+        form = MapForm(request.POST, instance=instance)
+        print('isPost')
+        print(form)
+        print(form.is_valid())
+        if form.is_valid():
+            print('isvalid.')
+            instance = form.save(commit=False)
+            # fname = form.cleaned_data.get("name")
+            instance.save()
+            old_slug = Map.objects.get(id=instance.pk)
+            # messages.success(request, "Successfully Create New Entry for " + fname)
+            slug = old_slug.slug
+        
+            print('11')
+            context = {
+                'form': form,
+                'slug': slug
+            }
+            return render(request, 'account/logbook.html', context)
+            print('111111')
+    else:
+        form = MapForm(instance=instance)
+        location_data = Map.objects.filter(id=id)
+        print(location_data)
+        mapdata_all = request.user.our_company.location.all()
+        mapdata = mapdata_all[0].slug
+        context = {
+            'locations': location_data,
+            'Map': mapdata,
+            'form': form,
+        }
+        return render(request, 'account/editlocations.html', context)
+
+
 def analytics(request, slug):
     print(slug)
     datalist = Visitor.objects.all().order_by('-date')
@@ -853,7 +890,9 @@ def edituser(request,id, slug):
                 'slug': slug,
                 "map": mapdata,
             }
-            return redirect('../../../')
+            return render(request, 'account/profile/edit_user.html', instance)
+        else:
+            print('eroor')
     else:
         form = UserForm(instance=request.user)
     instance = {

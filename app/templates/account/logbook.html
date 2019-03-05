@@ -39,7 +39,9 @@
             <th scope="col"></th>
             <th scope="col">VISITOR</th>
             <th scope="col">COMPANY</th>
-            <th scope="col">HOST</th>
+            <th scope="col">HOST NAME</th>
+            <th scope="col">HOST EMAIL</th>
+            <th scope="col">HOST MOBILE</th>
             <th scope="col">EMAIL</th>
             <th scope="col">MOBILE</th>
             <th scope="col">LICENSEPLATE</th>
@@ -49,7 +51,7 @@
         </thead>
         <tbody>
           {% for ip in objects_all %}
-          <tr class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+          <tr>
             <th>
               <input type="checkbox" name="fid[]" class="checkbox" id="{{ip.id}}">
             </th>
@@ -75,18 +77,35 @@
             <td>
               <div style="width: 100px;">{{ip.date}}</div>
             </td>
-            <td><img src="{% for data in ip.visitor.profile_pic.url %}{{ data }}{% endfor %}" alt="Profile Picture"
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              <img src="{% for data in ip.visitor.profile_pic.url %}{{ data }}{% endfor %}" alt="Profile Picture"
                 width="35" height="35"></td>
-            <td>
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
               {% for data in ip.visitor.full_name%}{{ data }}{% endfor%}
             </td>
-            <td>{% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
-            <td>{% for data in ip.host.all %}{{ data }}<br>{%endfor %}</td>
-            <td>{% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
-            <td>{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</td>
-            <td>{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</td>
-            <td>{% for data in ip.visitor.about %}{{ data }}{% endfor %}</td>
-            <td>{% for data in ip.visitor.comment %}{{ data }}{% endfor %}</td>
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              {% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
+
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              <div style="width: 120px;">
+                {% for data in ip.host.all %}{{ data.full_name }}<br>{%endfor %}
+              </div>
+            </td>
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              {% for data in ip.host.all %}{{ data.email }}<br>{%endfor %}</td>
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              {% for data in ip.host.all %}{{ data.mobile }}<br>{%endfor %}</td>
+
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              {% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              {% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</td>
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              {% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</td>
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              {% for data in ip.visitor.about %}{{ data }}{% endfor %}</td>
+            <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+              {% for data in ip.visitor.comment %}{{ data }}{% endfor %}</td>
             <div class="container demo">
               <!-- Modal -->
               <div class="modal right fade" id="{{ip.id}}" tabindex="-1" role="dialog" aria-labelledby="{{ip.id}}"

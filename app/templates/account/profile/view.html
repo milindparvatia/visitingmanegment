@@ -16,17 +16,40 @@
 </ul>
 {% endif %}
 <div class="container">
-    <h1>hey</h1>
     {% for values in user %}
-    {{values.full_name}}
-    {{values.our_company}}
-    {{values.email}}
-    {{values.mobile}}
-    {{values.licenseplate}}
-    {{values.about}}
-    {{values.comment}}
-    {% endfor %}
+    <div class="col mx-auto">
+        <div class="row mx-auto">
+            <div class="col-3">
+                <h5>hey {{values.full_name}}</h5>
+                <img src="{{values.profile_pic.url}}" alt="Profile Picture" width="200" height="200">
+            </div>
+            <div class="col-4">
+                <h5>
+                    {{values.our_company}}
+                    {{values.email}}
+                </h5>
+            </div>
 
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <h5>
+
+                </h5>
+            </div>
+            <div class="col-3">
+
+            </div>
+            <div class="col-3">
+                <h5>
+                    {{values.about}}
+                    {{values.licenseplate}}
+                    {{values.comment}}
+                </h5>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 </div>
 {% endblock %}
