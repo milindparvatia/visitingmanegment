@@ -302,10 +302,10 @@ def addnewvisit(request, slug):
             receipient_email = email
             messages.success(request, "Successfully Create New Entry for "+name)
 
-            sendmail.delay(hostsubject, hostmessage,
-                        hostsender_email, hostreceipient_email)
-            sendmail.delay(reciversubject, recivermessage,
-                        sender_email, receipient_email)
+            # sendmail.delay(hostsubject, hostmessage,
+            #             hostsender_email, hostreceipient_email)
+            # sendmail.delay(reciversubject, recivermessage,
+            #             sender_email, receipient_email)
 
             instance2 = form2.save(commit=False)
             instance2.our_company = request.user.our_company
