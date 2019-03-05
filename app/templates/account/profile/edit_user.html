@@ -16,30 +16,51 @@
 </ul>
 {% endif %}
 <div class="container">
-    <form action="{% url 'edituser' slug=slug %}" method="POST">
+    <form action="{% url 'edituser' id=request.user.id slug=slug %}" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
         <div class=" row">
             <div class="col-2"></div>
             <div class="col-4">
                 <div class="form-group">
-                    {{ form1.first_name|as_crispy_field }}
+                    {{ form.full_name|as_crispy_field }}
                 </div>
                 <div class="form-group">
-                    {{ form1.last_name|as_crispy_field }}
+                    to change password click on this below <a href="{% url 'password' id=request.user.id slug=slug %}"
+                        class="btn btn-success">Change Password</a>
                 </div>
-
                 <div class="form-group">
-                    {{ form1.password|as_crispy_field }}
+                    {{ form.our_company|as_crispy_field }}
+                </div>
+                <div class="form-group">
+                    {{ form.licenseplate|as_crispy_field }}
+                </div>
+                <div class="form-group">
+                    {{ form.about|as_crispy_field }}
+                </div>
+                <div class="form-group">
+                    {{ form.comment|as_crispy_field }}
+                </div>
+                <div class="form-group">
+                    {{ form.mobile|as_crispy_field }}
                 </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
-                    {{ form1.email|as_crispy_field }}
+                    {{ form.email|as_crispy_field }}
                 </div>
                 <div class="form-group">
-                    {{ form1.is_active|as_crispy_field }}
+                    {{ form.is_active|as_crispy_field }}
+                </div>
+                <div class="form-group">
+                    <img src="/media/{{ image }}" class="img-thumbnail" alt="Profile Picture" width="400" height="400">
+                </div>
+                <div class="form-group">
+                    {{ form.profile_pic|as_crispy_field }}
                 </div>
             </div>
+        </div>
+        <br><br>
+        <div class="row">
             <div class="form-group mx-auto">
                 <button type="submit" class="btn btn-primary">Save Visit</button>
                 <button type="submit" class="btn btn-secondary">Save And Create New One</button>
@@ -47,8 +68,9 @@
                 <input type="hidden" name="next" value="{{next}}">
             </div>
         </div>
-        <div class="col-2"></div>
-    </form>
+</div>
+<div class="col-2"></div>
+</form>
 </div>
 </div>
 {% endblock %}

@@ -14,17 +14,14 @@
     integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous"
     integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"></script>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
   {% block extrahead %}
   {% endblock %}
 </head>
 
 <body>
-
   <nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark">
     {% if user.is_authenticated %}
-    <a class="navbar-brand" href="{% url 'logbook' slug=slug %}">Visitor</a>
+    <a class="navbar-brand" href="{% url 'index'  %}">Visitor</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -58,11 +55,11 @@
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
 
-            Hello {{user.username}}
+            Hello {{user.full_name}}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{% url 'view' slug=slug %}">View Profile</a>
-            <a class="dropdown-item" href="{% url 'edituser' slug=slug %}">Manage Profile</a>
+            <a class="dropdown-item" href="{% url 'view' id=request.user.id slug=slug %}">View Profile</a>
+            <a class="dropdown-item" href="{% url 'edituser' id=request.user.id slug=slug %}">Manage Profile</a>
             <a class="dropdown-item" href="{% url 'logout' %}">Log out</a>
           </div>
         </li>
@@ -99,9 +96,7 @@
     </div>
     {% endif %}
   </nav>
-
   {% block content %}{% endblock %}
-
 </body>
 
 </html>

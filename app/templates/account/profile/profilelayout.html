@@ -3,8 +3,10 @@
 
 {% if request.resolver_match.url_name == 'view' %}
 <h1 class="h2">View Profile</h1>
-{%else%}
+{% elif request.resolver_match.url_name == 'edituser' %}
 <h1 class="h2">Manage Profile</h1>
+{% elif request.resolver_match.url_name == 'password' %}
+<h1 class="h2">Manage Password</h1>
 {% endif %}
 </div>
 <div class="card">
@@ -12,15 +14,15 @@
         <ul class="nav nav-tabs card-header-tabs">
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'view' %}active{% endif %}"
-                    href="{% url 'view' slug=slug %}">View</a>
+                    href="{% url 'view' id=request.user.id slug=slug %}">View</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'edituser' %}active{% endif %}"
-                    href="{% url 'edituser' slug=slug %}">Edit</a>
+                    href="{% url 'edituser' id=request.user.id slug=slug %}">Edit</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'edituserprofile' %}active{% endif %}"
-                    href="{% url 'edituserprofile' slug=slug %}">Edit Profile</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'password' %}active{% endif %}"
+                    href="{% url 'password' id=request.user.id slug=slug %}">Password</a>
             </li>
         </ul>
     </div>

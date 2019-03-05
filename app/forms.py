@@ -1,9 +1,12 @@
+from django_select2.forms import Select2MultipleWidget
 from django import forms
 import datetime
-from .models import Visitor, Host, Map, Meeting, UserProfile
+from .models import *
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class MapForm(forms.ModelForm):
@@ -25,15 +28,15 @@ class MapForm(forms.ModelForm):
 
 
 class RegistraionForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+    company_name = forms.CharField(required=True)
 
     class Meta:
         model = User
         fields = [
-            "first_name",
-            "last_name",
-            "username",
             "email",
+            'full_name',
+            'company_name',
+            'mobile',
             "password1",
             "password2"
         ]
@@ -46,14 +49,28 @@ class RegistraionForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super(RegistraionForm, self).save(commit=False)
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
 
         if commit:
             user.save()
 
         return user
+
+
+class ColleaguesForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = [
+            "full_name",
+            "email",
+            "password1",
+            "password2"
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(ColleaguesForm, self).__init__(*args, **kwargs)
+        self.fields['password1'].required = False
+        self.fields['password2'].required = False
 
 
 class ToDoForm(forms.Form):
@@ -102,22 +119,9 @@ class VisitorForm(forms.ModelForm):
             self.fields['email'].widget.attrs['readonly'] = True
 
 
-class HostForm(forms.ModelForm):
-    attrs = {
-        'class': 'form-control'
-    }
-
-    class Meta:
-        model = Host
-        fields = [
-            "full_name",
-            "email",
-            "mobile",
-            "comment"
-        ]
-
-
 class MeetingForm(forms.ModelForm):
+    host = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(), widget=Select2MultipleWidget)
     date = forms.DateField(
         widget=DatePickerInput(
             format='%m/%d/%Y',
@@ -131,7 +135,6 @@ class MeetingForm(forms.ModelForm):
         fields = [
             "status",
             "location",
-            "host",
             'start_time',
             'end_time',
             'status'
@@ -141,33 +144,71 @@ class MeetingForm(forms.ModelForm):
             'end_time': TimePickerInput().end_of('party time'),
         }
 
+    def __init__(self, thecompany, *args, **kwargs):
+        super(MeetingForm, self).__init__(*args, **kwargs)
+        self.fields['host'].queryset = User.objects.filter(
+            our_company=thecompany)
 
-class UserProfileForm(forms.ModelForm):
+    # def __init__(self, *args, **kwargs):
+    #     # Only in case we build the form from an instance
+    #     # (otherwise, 'toppings' list should be empty)
+    #     if kwargs.get('instance'):
+    #         # We get the 'initial' keyword argument or initialize it
+    #         # as a dict if it didn't exist.
+    #         initial = kwargs.setdefault('initial', {})
+    #         # The widget for a ModelMultipleChoiceField expects
+    #         # a list of primary key for the selected data.
+    #         initial['host'] = [
+    #             t.pk for t in kwargs['instance'].our_company.all()]
+
+    #     forms.ModelForm.__init__(self, *args, **kwargs)
+
+    def save(self, commit=True):
+        # Get the unsave Pizza instance
+        instance = forms.ModelForm.save(self, False)
+
+        # Prepare a 'save_m2m' method for the form,
+        old_save_m2m = self.save_m2m
+
+        def save_m2m():
+            old_save_m2m()
+            # This is where we actually link the pizza with hosts
+            instance.host.clear()
+            instance.host.add(*self.cleaned_data['host'])
+        self.save_m2m = save_m2m
+
+        # Do we need to save all changes now?
+        if commit:
+            instance.save()
+            self.save_m2m()
+
+        return instance
+
+
+class UserForm(forms.ModelForm):
+    profile_pic = forms.ImageField(label='User Logo', required=False,
+                                   widget=forms.FileInput)
+
     class Meta:
-        model = UserProfile
+        model = User
         fields = [
-            'user',
-            'company_name',
+            'full_name',
+            'password',
+            'email',
+            'is_active',
             'mobile',
             'licenseplate',
             'about',
             'comment',
-            'location',
-            'profile_pic'
+            'profile_pic',
+            'our_company'
         ]
 
-
-class UserForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = [
-            'password',
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'is_active'
-        ]
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            self.fields['our_company'].widget.attrs['readonly'] = True
 
 
 class SearchVisitorForm(forms.ModelForm):

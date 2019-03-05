@@ -9,14 +9,15 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify
 router = routers.DefaultRouter()
 router.register(r'User', views.UserViewSet)
 router.register(r'Visitor', views.VisitorViewSet)
-router.register(r'Host', views.HostViewSet)
+router.register(r'TheCompany', views.TheCompanyViewSet)
 router.register(r'Map', views.MAPViewSet)
 router.register(r'Meeting', views.MeetingViewSet)
-router.register(r'UserProfile', views.UserProfileViewSet)
+# router.register(r'UserProfile', views.UserProfileViewSet)
 
 schema_view = get_schema_view(title='Pastebin API')
 
 urlpatterns = [
+    path('user_added/', views.user_added, name='user_added'),
     path('schema/', schema_view),
     url(r'^api-token-auth/', obtain_jwt_token),
     url(r'^api-token-verify/', verify_jwt_token),
@@ -26,6 +27,8 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
     path('', views.index, name='index'),
     path('register/', views.register, name='register'),
+    url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        views.activate, name='activate'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('addnewlocations/', views.addnewlocations, name='addnewlocations'),

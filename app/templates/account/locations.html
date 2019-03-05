@@ -1,19 +1,11 @@
 {% extends "account/dashboardlayout.html" %}
 {% load bootstrap4 %}
 
-{% block extrahead %}
-{{ form.media }}
-{% endblock %}
-
 {% block content1 %}
 
 <h1 class="h2">Locations Overview</h1>
 {# Display a form #}
 
-<form action="" method="GET" id="yourFormId" class="form">
-  {% csrf_token %}
-  {{ form }}
-</form>
 <div class="btn-toolbar mb-2 mb-md-0">
   <div class="btn-group mr-2">
     <a href="{% url 'addnewlocations' %}" class="btn btn-dark">Add New</a>

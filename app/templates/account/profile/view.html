@@ -18,19 +18,13 @@
 <div class="container">
     <h1>hey</h1>
     {% for values in user %}
-    {{values.first_name}}
-    {{values.last_name}}
+    {{values.full_name}}
+    {{values.our_company}}
     {{values.email}}
-    {{values.username}}
-    {% endfor %}
-
-    {% for values in userprofile %}
-    {{values.company_name}}
     {{values.mobile}}
     {{values.licenseplate}}
     {{values.about}}
     {{values.comment}}
-    {{values.location}}
     {% endfor %}
 
 </div>
