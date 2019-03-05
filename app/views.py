@@ -49,7 +49,7 @@ class UserViewSet(viewsets.ModelViewSet):
         for the currently authenticated user.
         """
         queryset = self.queryset
-        query_set = queryset.filter(our_company=self.request.user.our_company)
+        query_set = queryset.filter(id=self.request.user.id)
         return query_set
 
 
@@ -79,6 +79,15 @@ class TheCompanyViewSet(viewsets.ModelViewSet):
 
     queryset = TheCompany.objects.all()
     serializer_class = TheCompanySerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(name=self.request.user.our_company)
+        return query_set
 
 class MAPViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
@@ -325,47 +334,54 @@ def use_old_visit(request, slug, id):
     print(id)
     thecompany = TheCompany.objects.filter(name=request.user.our_company)
     query_list = Visitor.objects.filter(id=id)
-    form2 = MeetingForm(thecompany[0], request.POST)
+    
+    if request.method == 'POST':
+        form2 = MeetingForm(thecompany[0], request.POST)
+        visitor = Visitor.objects.get(id=id)
+        
+        if form2.is_valid():
+            name = visitor.full_name
+            email = visitor.email
+            
+            hostname = form2.cleaned_data.get("host")
+            fromtime = form2.cleaned_data.get("start_time").strftime('%H:%M:%S')
+            totime = form2.cleaned_data.get("end_time").strftime('%H:%M:%S')
+            ondate = form2.cleaned_data.get("date").strftime('%m-%d-%Y')
+            hostval = hostname.values()
+            list_result = [entry for entry in hostval]
+            colleagues_names = []
+            colleagues_emails = []
+            for value in list_result:
+                colleagues_names.append(value["full_name"])
+                colleagues_emails.append(value["email"])
+            
+            hname = list_result[0]['full_name']
 
-    if form2.is_valid():
-        # instance1 = form1.save(commit=False)
-        # instance1.user = request.user
-        # instance1.save()
+            hostsubject = 'New apointment is created with 111'+name
+            hostmessage = 'New visit is added with '+hname + \
+                ' on '+ondate + ' from '+fromtime + ' to '+totime
+            hostsender_email = email
+            hostreceipient_email = EMAIL_HOST_USER
 
-        # name = form1.cleaned_data.get("full_name")
-        # email = form1.cleaned_data.get("email")
-        # hostname = form2.cleaned_data.get("host")
-        # fromtime = form2.cleaned_data.get("start_time").strftime('%H:%M:%S')
-        # totime = form2.cleaned_data.get("end_time").strftime('%H:%M:%S')
-        # ondate = form2.cleaned_data.get("date").strftime('%m-%d-%Y')
-        # hostval = hostname.values()
-        # list_result = [entry for entry in hostval]
-        # hname = list_result[0]['full_name']
+            reciversubject = 'New apointment is created with '+hname
+            recivermessage = 'New visit is added with '+name + \
+                ' on '+ondate + ' from '+fromtime + ' to '+totime
+            sender_email = EMAIL_HOST_USER
+            receipient_email = email
+            messages.success(request, "Successfully Create New Entry for "+name)
 
-        # hostsubject = 'New apointment is created with '+name
-        # hostmessage = 'New visit is added with '+hname + \
-        #     ' on '+ondate + ' from '+fromtime + ' to '+totime
-        # hostsender_email = email
-        # hostreceipient_email = EMAIL_HOST_USER
+            sendmail.delay(hostsubject, hostmessage,
+                           hostsender_email, hostreceipient_email)
+            sendmail.delay(reciversubject, recivermessage,
+                           sender_email, receipient_email)
 
-        # reciversubject = 'New apointment is created with '+hname
-        # recivermessage = 'New visit is added with '+name + \
-        #     ' on '+ondate + ' from '+fromtime + ' to '+totime
-        # sender_email = EMAIL_HOST_USER
-        # receipient_email = email
-        # messages.success(request, "Successfully Create New Entry for "+name)
+            # add karvanu che mailing
 
-        # send_mail(hostsubject,hostmessage,hostsender_email,[hostreceipient_email],fail_silently=False)
-        # send_mail(reciversubject,recivermessage,sender_email,[receipient_email],fail_silently=False)
-
-        # add karvanu che mailing
-
-        # instance1.save()
-        instance2 = form2.save(commit=False)
-        instance2.user = request.user
-        instance2.visitor_id = id
-        instance2.save()
-        form2.save_m2m()
+            instance2 = form2.save(commit=False)
+            instance2.user = request.user
+            instance2.visitor_id = id
+            instance2.save()
+            form2.save_m2m()
     else:
         form2 = MeetingForm(thecompany[0])
     
@@ -376,7 +392,6 @@ def use_old_visit(request, slug, id):
         'image': image,
         "objects_all": query_list,
         "map": mapdata,
-        'form1': form1,
         'form2': form2,
         'slug': slug,
     }

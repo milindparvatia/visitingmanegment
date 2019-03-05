@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 
 {% block extrahead %}
-{{ form.media }}
+{{ form2.media }}
 {% endblock %}
 
 {% block content %}
@@ -30,32 +30,47 @@
         <form action="{% url 'useoldvisit' slug=slug id=ip.id %}" method="POST">
             {% csrf_token %}
             <div class="form-group row">
-                <label for="fname" class="col-sm-2 col-form-label">Full Name</label>
-                <input class="form-control" id="fname" type="text" placeholder="{{ip.full_name}}" readonly>
+                <div class="col">
+                    <label for="fname" class="col-form-label">Full Name</label>
+                    <input class="form-control" id="fname" type="text" placeholder="{{ip.full_name}}" readonly>
+                </div>
             </div>
             <div class="form-group row">
-                <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
-                <input class="form-control" id="staticEmail" type="text" placeholder="{{ip.email}}" readonly>
+                <div class="col">
+                    <label for="staticEmail" class="col-form-label">Email</label>
+                    <input class="form-control" id="staticEmail" type="text" placeholder="{{ip.email}}" readonly>
+                </div>
             </div>
             <div class="form-group row">
-                <label for="cname" class="col-sm-2 col-form-label">Company Name</label>
-                <input class="form-control" id="cname" type="text" placeholder="{{ip.company_name}}" readonly>
+                <div class="col">
+                    <label for="cname" class="col-form-label">Company Name</label>
+                    <input class="form-control" id="cname" type="text" placeholder="{{ip.company_name}}" readonly>
+                </div>
             </div>
             <div class="form-group row">
-                <label for="mobile" class="col-sm-2 col-form-label">Mobile</label>
-                <input class="form-control" id="mobile" type="text" placeholder="{{ip.mobile}}" readonly>
+                <div class="col">
+                    <label for="mobile" class="col-form-label">Mobile</label>
+                    <input class="form-control" id="mobile" type="text" placeholder="{{ip.mobile}}" readonly>
+                </div>
             </div>
             <div class="form-group row">
-                <label for="licenseplate" class="col-sm-2 col-form-label">Licenseplate</label>
-                <input class="form-control" id="licenseplate" type="text" placeholder="{{ip.licenseplate}}" readonly>
+                <div class="col">
+                    <label for="licenseplate" class="col-form-label">Licenseplate</label>
+                    <input class="form-control" id="licenseplate" type="text" placeholder="{{ip.licenseplate}}"
+                        readonly>
+                </div>
             </div>
             <div class="form-group row">
-                <label for="about" class="col-sm-2 col-form-label">About</label>
-                <input class="form-control" id="about" type="text" placeholder="{{ip.about}}" readonly>
+                <div class="col">
+                    <label for="about" class="col-form-label">About</label>
+                    <input class="form-control" id="about" type="text" placeholder="{{ip.about}}" readonly>
+                </div>
             </div>
             <div class="form-group row">
-                <label for="comment" class="col-sm-2 col-form-label">Comment</label>
-                <input class="form-control" id="comment" type="text" placeholder="{{ip.comment}}" readonly>
+                <div class="col">
+                    <label for="comment" class="col-form-label">Comment</label>
+                    <input class="form-control" id="comment" type="text" placeholder="{{ip.comment}}" readonly>
+                </div>
             </div>
             {% endfor %}
             <div class="form-group">
