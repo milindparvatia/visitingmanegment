@@ -112,7 +112,7 @@ class MeetingViewSet(viewsets.ModelViewSet):
         for the currently authenticated user.
         """
         queryset = self.queryset
-        query_set = queryset.filter(our_company=self.request.user.our_company)
+        query_set = queryset.filter(host=self.request.user.id)
         return query_set
 
 
