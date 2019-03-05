@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^delselectedaddress/(?:id=(?P<id>\d+)/)?$',
         views.delselectedaddress, name='delselectedaddress'),
     path('locations/', views.locations, name='locations'),
+    url(r'^locations/(?P<id>\d+)/$', views.editlocations, name='editlocations'),
     path('analytics/', views.analytics, name='analytics'),
     path('colleagues/', views.colleagues, name='colleagues'),
     path('addnewvisit/', views.addnewvisit, name='addnewvisit'),
@@ -30,6 +31,5 @@ urlpatterns = [
     url(r'^colleagues/(?P<id>\d+)/$', views.view, name='view'),
     url(r'^colleagues/(?P<id>\d+)/edituser/$', views.edituser, name='edituser'),
     url(r'^colleagues/(?P<id>\d+)/password/$', views.password, name='password'),
-
     url(r'^search/', include('haystack.urls')),
 ]

@@ -10,7 +10,7 @@
 <div class="col">
   <div class="row">
     <div class="col-4">
-      {% for ip in objects_all %}
+      {% for ip in objects_all|slice:":1" %}
       <div class="card" style="height:80vh;">
         <h5 class="card-header">
           <div class="row">
@@ -83,8 +83,8 @@
                   <th scope="col"></th>
                   <th scope="col">VISITOR</th>
                   <th scope="col">COMPANY</th>
-                  <th scope="col">HOST</th>
                   <th scope="col">EMAIL</th>
+                  <th scope="col">HOST</th>
                   <th scope="col">MOBILE</th>
                   <th scope="col">LICENSEPLATE</th>
                   <th scope="col">ABOUT</th>
@@ -122,8 +122,12 @@
                     {% for data in ip.visitor.full_name%}{{ data }}{% endfor%}
                   </td>
                   <td>{% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
-                  <td>{% for data in ip.host.all %}{{ data }}{%endfor %}</td>
                   <td>{% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
+                  <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
+                    <div style="width: 120px;">
+                      {% for data in ip.host.all %}{{ data.full_name }}<br>{%endfor %}
+                    </div>
+                  </td>
                   <td>{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</td>
                   <td>{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</td>
                   <td>{% for data in ip.visitor.about %}{{ data }}{% endfor %}</td>

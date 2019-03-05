@@ -99,6 +99,9 @@ class StatusForm(forms.ModelForm):
 
 
 class VisitorForm(forms.ModelForm):
+    profile_pic = forms.ImageField(label='Visitor Logo', required=False,
+                                   widget=forms.FileInput)
+
     class Meta:
         model = Visitor
         fields = [
@@ -193,7 +196,6 @@ class UserForm(forms.ModelForm):
         model = User
         fields = [
             'full_name',
-            'password',
             'email',
             'is_active',
             'mobile',

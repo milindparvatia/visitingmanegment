@@ -1,9 +1,23 @@
 FROM python:3.6-alpine
 ENV PYTHONUNBUFFERED 1
-RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev jpeg-dev zlib-dev
+
 RUN mkdir /code
 WORKDIR /code
-COPY requirements.txt /code/
-RUN pip install -r requirements.txt
 COPY . /code/
-RUN apk --no-cache add libpq
+RUN apk add --no-cache --virtual .build-deps \
+    ca-certificates gcc postgresql-dev linux-headers musl-dev \
+    libffi-dev jpeg-dev zlib-dev \
+    && pip install -r requirements.txt \
+    && find /usr/local \
+    \( -type d -a -name test -o -name tests \) \
+    -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
+    -exec rm -rf '{}' + \
+    && runDeps="$( \
+    scanelf --needed --nobanner --recursive /usr/local \
+    | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+    | sort -u \
+    | xargs -r apk info --installed \
+    | sort -u \
+    )" \
+    && apk add --virtual .rundeps $runDeps \
+    && apk del .build-deps
