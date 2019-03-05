@@ -43,14 +43,14 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    # def get_queryset(self):
-    #     """
-    #     This view should return a list of all the purchases
-    #     for the currently authenticated user.
-    #     """
-    #     queryset = self.queryset
-    #     query_set = queryset.filter(our_company=self.request.user.our_company)
-    #     return query_set
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(our_company=self.request.user.our_company)
+        return query_set
 
 
 class VisitorViewSet(viewsets.ModelViewSet):
