@@ -1,3 +1,4 @@
+from django.contrib.auth import update_session_auth_hash
 from .tokens import account_activation_token
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -8,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import localdate
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.shortcuts import render, redirect, get_object_or_404
@@ -42,14 +43,14 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def get_queryset(self):
-        """
-        This view should return a list of all the purchases
-        for the currently authenticated user.
-        """
-        queryset = self.queryset
-        query_set = queryset.filter(our_company=self.request.user.our_company)
-        return query_set
+    # def get_queryset(self):
+    #     """
+    #     This view should return a list of all the purchases
+    #     for the currently authenticated user.
+    #     """
+    #     queryset = self.queryset
+    #     query_set = queryset.filter(our_company=self.request.user.our_company)
+    #     return query_set
 
 
 class VisitorViewSet(viewsets.ModelViewSet):
@@ -109,7 +110,7 @@ class MeetingViewSet(viewsets.ModelViewSet):
 def index(request):
     if request.user.is_authenticated:
         try:
-            map_data = Map.objects.filter(id=request.user.our_company.id)
+            map_data = Map.objects.filter(name=request.user.our_company.location.all()[0])
             url = map_data[0].slug + '/logbook'
             return HttpResponseRedirect(url)
         except ObjectDoesNotExist:
@@ -626,7 +627,6 @@ def locations(request, slug):
 
 
 def addnewlocations(request,slug=None):
-
     form = MapForm(request.POST or None)
     if form.is_valid():
         instance = form.save(commit=False)
@@ -639,11 +639,7 @@ def addnewlocations(request,slug=None):
     
         ismap = Map.objects.filter(name=instance.name)
     
-        print(1)
         company = TheCompany.objects.get(name=request.user.our_company)
-        print(ismap)
-        print(instance)
-        print(old_slug)
         company.location.add(ismap[0].id)
 
         context = {
@@ -812,12 +808,12 @@ def settings_visitslist_notifications(request, slug):
     return render(request, 'account/settings/visitslist/notifications.html', instance)
 
 
-def view(request, slug):
-    print(request.user)
+def view(request, slug, id):
+    print(id)
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
 
-    user = User.objects.filter(email=request.user)
+    user = User.objects.filter(id=id)
     instance = {
         'user': user,
         'image': image,
@@ -827,7 +823,7 @@ def view(request, slug):
     return render(request, 'account/profile/view.html', instance)
 
 
-def edituser(request, slug):
+def edituser(request,id, slug):
     mapdata = request.user.our_company.location.all()    
     image = request.user.profile_pic
     
@@ -854,11 +850,19 @@ def edituser(request, slug):
     return render(request, 'account/profile/edit_user.html', instance)
 
 
-def password(request, slug):
+def password(request, slug,id):
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
 
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+    else:
+        form = PasswordChangeForm(user=request.user)
     instance = {
+        'form':form,
         'image': image,
         'slug': slug,
         "map": mapdata,

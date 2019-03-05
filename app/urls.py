@@ -1,7 +1,7 @@
 from .models import Visitor
 from django.conf.urls import url
 from django.urls import path
-from . import views, url_settings, url_profile
+from . import views, url_settings
 from rest_framework import routers
 from django.conf.urls import url, include
 
@@ -27,6 +27,9 @@ urlpatterns = [
     url(r'^delselected/(?:id=(?P<id>\d+)/)?$',
         views.delselected, name='delselected'),
     path('settings/', include('app.url_settings')),
-    path('profile/', include('app.url_profile')),
+    url(r'^colleagues/(?P<id>\d+)/$', views.view, name='view'),
+    url(r'^colleagues/(?P<id>\d+)/edituser/$', views.edituser, name='edituser'),
+    url(r'^colleagues/(?P<id>\d+)/password/$', views.password, name='password'),
+
     url(r'^search/', include('haystack.urls')),
 ]

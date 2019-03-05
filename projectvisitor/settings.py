@@ -91,8 +91,8 @@ JWT_AUTH = {
     'JWT_AUDIENCE': None,
     'JWT_ISSUER': None,
 
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
     'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
 
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
     'JWT_AUTH_COOKIE': None,

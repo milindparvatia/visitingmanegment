@@ -119,20 +119,6 @@ class VisitorForm(forms.ModelForm):
             self.fields['email'].widget.attrs['readonly'] = True
 
 
-# class HostForm(forms.ModelForm):
-#     attrs = {
-#         'class': 'form-control'
-#     }
-
-#     class Meta:
-#         model = Host
-#         fields = [
-#             "full_name",
-#             "email",
-#             "mobile",
-#             "comment"
-#         ]
-
 class MeetingForm(forms.ModelForm):
     host = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(), widget=Select2MultipleWidget)
@@ -199,22 +185,10 @@ class MeetingForm(forms.ModelForm):
         return instance
 
 
-# class UserProfileForm(forms.ModelForm):
-#     class Meta:
-#         model = UserProfile
-#         fields = [
-#             'user',
-#             'company_name',
-#             'mobile',
-#             'licenseplate',
-#             'about',
-#             'comment',
-#             'location',
-#             'profile_pic'
-#         ]
-
-
 class UserForm(forms.ModelForm):
+    profile_pic = forms.ImageField(label='User Logo', required=False,
+                                   widget=forms.FileInput)
+
     class Meta:
         model = User
         fields = [
@@ -229,6 +203,12 @@ class UserForm(forms.ModelForm):
             'profile_pic',
             'our_company'
         ]
+
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            self.fields['our_company'].widget.attrs['readonly'] = True
 
 
 class SearchVisitorForm(forms.ModelForm):

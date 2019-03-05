@@ -16,7 +16,7 @@
 </ul>
 {% endif %}
 <div class="container">
-    <form action="{% url 'edituser' slug=slug %}" enctype="multipart/form-data" method="POST">
+    <form action="{% url 'edituser' id=request.user.id slug=slug %}" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
         <div class=" row">
             <div class="col-2"></div>
@@ -25,7 +25,8 @@
                     {{ form.full_name|as_crispy_field }}
                 </div>
                 <div class="form-group">
-                    {{ form.password|as_crispy_field }}
+                    to change password click on this below <a href="{% url 'password' id=request.user.id slug=slug %}"
+                        class="btn btn-success">Change Password</a>
                 </div>
                 <div class="form-group">
                     {{ form.our_company|as_crispy_field }}
