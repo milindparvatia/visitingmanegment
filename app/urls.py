@@ -32,4 +32,7 @@ urlpatterns = [
     url(r'^colleagues/(?P<id>\d+)/edituser/$', views.edituser, name='edituser'),
     url(r'^colleagues/(?P<id>\d+)/password/$', views.password, name='password'),
     url(r'^search/', include('haystack.urls')),
+    url(r'^addselected/(?P<email>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})/$',
+        views.addselected, name='addselected'),
+
 ]

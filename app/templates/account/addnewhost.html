@@ -6,12 +6,29 @@
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}
+    {% if message.extra_tags == "exists" %}
     <div class="alert alert-primary alert-dismissible fade show" role="alert">
-        <ul {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</ul>
+        <ul id="replace" class="{{ message.tags }}">{{ message }}
+            <button onclick="Addselected()" class="btn btn-primary">
+                Yes
+            </button>
+            or
+            <a href="{% url 'logbook' slug=slug %}" class="btn btn-success">
+                No
+            </a>
+        </ul>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
+    {% else %}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <ul class="{{ message.tags }}">{{ message }}</ul>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endif %}
     {% endfor %}
 </ul>
 {% endif %}
@@ -36,4 +53,44 @@
         </form>
     </div>
 </div>
+<script>
+    {% block jquery %}
+
+    function Addselected() {
+        var email = $('#id_email').val();
+        var slug = window.location.pathname;
+        var metaslug = slug.split('/');
+        console.log(email);
+        $.ajax({
+            method: 'GET',
+            url: '../../' + metaslug[1] + '/addselected/' + email,
+            data: {
+                'email': email
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    "X-CSRFToken",
+                    "{{ csrf_token }}"
+                );
+            },
+            success: function (response) {
+                // var parsed_data = JSON.stringify(data);
+                // location.reload(); // then reload the page.(3)
+                console.log(response);
+
+                $("#replace").replaceWith(response.msg)
+
+
+                // var $div = $("<div>", { id: "foo", "class": "a" });
+                // $div.click(function () { /* ... */ });
+                // $("#box").append($div);
+            },
+            error: function (error_data) {
+                console.log("error");
+                console.log(error_data);
+            }
+        });
+    };
+    {% endblock %}
+</script>
 {% endblock %}

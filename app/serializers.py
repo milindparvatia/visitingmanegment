@@ -24,7 +24,7 @@ class MeetingSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('url', 'id', 'status', 'visitor', 'host',
+        fields = ('url', 'id', 'status', 'visitor', 'counter', 'pre_registered', 'host',
                   'location', 'date', 'start_time', 'end_time', 'our_company')
         depth = 1
 
@@ -40,5 +40,4 @@ class MAPSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'id',  'full_name', 'is_active', 'last_login', 'is_admin',
-                  'password', 'email', 'mobile', 'licenseplate', 'about', 'comment', 'profile_pic', 'our_company')
+        fields = ('url', 'id',  'full_name', 'is_active', 'last_login', 'is_admin', 'email', 'mobile', 'licenseplate', 'about', 'comment', 'user_location', 'profile_pic', 'our_company')

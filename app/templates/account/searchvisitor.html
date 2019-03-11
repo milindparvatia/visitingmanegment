@@ -3,18 +3,7 @@
 
 {% block content %}
 <br>
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <div class="alert alert-primary alert-dismissible fade show" role="alert">
-        <ul {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</ul>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    {% endfor %}
-</ul>
-{% endif %}
+
 <div class="container">
     <div class="card mx-auto card-container w-50 p-5">
         <h1 class="card-title">Enter the name of Visitor</h1>

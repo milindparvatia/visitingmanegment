@@ -20,50 +20,64 @@
 
 <div class="col-11 mx-auto">
   <div class="row">
+    <h5>How busy is your reception?</h5>
     <div class="jumbotron">
       <div class="row">
-        <h5 class="card-title mx-auto">How busy is your reception?</h5>
       </div>
-      <div id="tester" style="width:1100px;height:500px;"></div>
+      <div id="myDiv1" style="width:1050px;height:400px;">
+      </div>
     </div>
   </div>
   <div class="row">
+    <h5>How many visitors per month?</h5>
     <div class="jumbotron">
       <div class="row">
-        <h5 class="card-title mx-auto">How busy is your reception?</h5>
+        <div id="myDiv2" style="width:1050px;height:400px;"></div>
       </div>
-      <div id="myDiv" style="width:1100px;height:500px;"></div>
     </div>
   </div>
   <div class="row">
+    <h5>Do your colleagues pre-register visitors?</h5>
     <div class="jumbotron">
       <div class="row">
-        <h5 class="card-title mx-auto">How busy is your reception?</h5>
+        <div id="myDiv3" style="width:1050px;height:400px;"></div>
       </div>
-      <div id="tester" style="width:1100px;height:500px;"></div>
     </div>
   </div>
   <div class="row">
+    <h5>Who hosts the most visits?</h5>
     <div class="jumbotron">
       <div class="row">
-        <h5 class="card-title mx-auto">How busy is your reception?</h5>
+        <div style="width:1050px;">
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0"
+              aria-valuemax="100"></div>
+          </div>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0"
+              aria-valuemax="100"></div>
+          </div>
+        </div>
       </div>
-      <div id="tester" style="width:1100px;height:500px;"></div>
     </div>
   </div>
 </div>
 
+</div>
 <script>
   {% block jquery %}
-  var endpoint1 = '/api/data/VisitorView/'
-  var defaultData = [];
+  var endpoint1 = '/ListUsers/'
+  var defaultData1 = [];
 
   $.ajax({
     method: "GET",
     url: endpoint1,
     success: function (datalist) {
-      defaultData = datalist
-      setCharts()
+      console.log(datalist)
+      defaultData1 = datalist
+      graph1(defaultData1)
+      graph2(defaultData1)
+      graph3(defaultData1)
       // $("#progress").hide()
     },
     error: function (error_data) {
@@ -72,54 +86,136 @@
     }
   });
 
-  function setCharts() {
-    var xValue = [defaultData.start_time];
-
-    var yValue = [20, 14, 23];
-    var yValue2 = [24, 16, 20];
-
+  function graph1() {
+    var xValue = defaultData1.date_s;
+    var yValue = defaultData1.count_s;
     var trace1 = {
       x: xValue,
       y: yValue,
       type: 'bar',
-      text: yValue.map(String),
+      text: yValue,
       textposition: 'auto',
       hoverinfo: 'none',
       opacity: 0.5,
       marker: {
         color: 'rgb(158,202,225)',
         line: {
-          color: 'rgb(8,48,107)',
+          color: 'rbg(8,48,107)',
+          width: 1.5
+        }
+      }
+    };
+
+    var data = [trace1];
+
+    var layout = {
+      title: 'January 2013 Sales Report',
+      barmode: 'stack'
+    };
+
+    Plotly.newPlot('myDiv1', data, layout, { showSendToCloud: true });
+  }
+
+  function graph2() {
+    var xValue = defaultData1.count_1_date;
+    var xValue2 = defaultData1.count_2_date;
+    var xValue3 = defaultData1.count_3_date;
+
+    var yValue = defaultData1.count_1;
+    var yValue2 = defaultData1.count_2;
+    var yValue3 = defaultData1.count_3;
+
+    var trace1 = {
+      x: xValue,
+      y: yValue,
+      type: 'bar',
+      text: yValue,
+      textposition: 'auto',
+      hoverinfo: 'none',
+      opacity: 0.5,
+      marker: {
+        color: 'rgb(158,202,225)',
+        line: {
+          color: 'rbg(8,48,107)',
           width: 1.5
         }
       }
     };
 
     var trace2 = {
-      x: xValue,
+      x: xValue2,
       y: yValue2,
       type: 'bar',
-      text: yValue2.map(String),
+      text: yValue2,
       textposition: 'auto',
       hoverinfo: 'none',
       marker: {
-        color: 'rgba(58,200,225,.5)',
+        color: 'rgba(58,1,225,.5)',
         line: {
-          color: 'rgb(8,48,107)',
+          color: 'rbg(8,48,107)',
           width: 1.5
         }
       }
     };
 
-    var data = [trace1, trace2];
-
-    var layout = {
-      title: 'January 2013 Sales Report'
+    var trace3 = {
+      x: xValue3,
+      y: yValue3,
+      type: 'bar',
+      text: yValue3,
+      textposition: 'auto',
+      hoverinfo: 'none',
+      marker: {
+        color: 'rgba(1,200,225)',
+        line: {
+          color: 'rbg(8,48,107)',
+          width: 1.5
+        }
+      }
     };
 
-    Plotly.newPlot('myDiv', data, layout);
+    var data = [trace1, trace2, trace3];
+
+    var layout = {
+      title: 'January 2013 Sales Report',
+      barmode: 'stack'
+    };
+
+    Plotly.newPlot('myDiv2', data, layout, { showSendToCloud: true });
   }
-  {% endblock %}          
+
+
+
+  function graph3() {
+    var xValue = defaultData1.date_r;
+    var yValue = defaultData1.count_r;
+    var trace1 = {
+      x: xValue,
+      y: yValue,
+      type: 'bar',
+      text: yValue,
+      textposition: 'auto',
+      hoverinfo: 'none',
+      opacity: 0.5,
+      marker: {
+        color: 'rgb(1,202,225)',
+        line: {
+          color: 'rbg(8,48,107)',
+          width: 1.5
+        }
+      }
+    };
+
+    var data = [trace1];
+
+    var layout = {
+      title: 'January 2013 Sales Report',
+      barmode: 'stack'
+    };
+
+    Plotly.newPlot('myDiv3', data, layout, { showSendToCloud: true });
+  }
+  {% endblock %}
 </script>
 
 {% endblock %}

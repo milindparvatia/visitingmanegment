@@ -58,11 +58,12 @@ class RegistraionForm(UserCreationForm):
 
 
 class ColleaguesForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
     class Meta:
         model = User
         fields = [
             "full_name",
-            "email",
             "password1",
             "password2"
         ]
@@ -125,6 +126,7 @@ class VisitorForm(forms.ModelForm):
 class MeetingForm(forms.ModelForm):
     host = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(), widget=Select2MultipleWidget)
+    location = forms.ModelChoiceField(queryset=TheCompany.objects.all())
     date = forms.DateField(
         widget=DatePickerInput(
             format='%m/%d/%Y',
@@ -137,10 +139,10 @@ class MeetingForm(forms.ModelForm):
         model = Meeting
         fields = [
             "status",
-            "location",
             'start_time',
+            'pre_registered',
             'end_time',
-            'status'
+            'status',
         ]
         widgets = {
             'start_time': TimePickerInput().start_of('party time'),
@@ -149,8 +151,14 @@ class MeetingForm(forms.ModelForm):
 
     def __init__(self, thecompany, *args, **kwargs):
         super(MeetingForm, self).__init__(*args, **kwargs)
+        self.fields['pre_registered'].label = 'Directly Check-In'
+        self.fields['date'].required = False
+        self.fields['start_time'].required = False
+        self.fields['end_time'].required = False
         self.fields['host'].queryset = User.objects.filter(
             our_company=thecompany)
+        self.fields['location'].queryset = Map.objects.filter(
+            related_maps=thecompany)
 
     # def __init__(self, *args, **kwargs):
     #     # Only in case we build the form from an instance

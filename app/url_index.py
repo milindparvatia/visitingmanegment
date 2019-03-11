@@ -12,12 +12,12 @@ router.register(r'Visitor', views.VisitorViewSet)
 router.register(r'TheCompany', views.TheCompanyViewSet)
 router.register(r'Map', views.MAPViewSet)
 router.register(r'Meeting', views.MeetingViewSet)
-# router.register(r'UserProfile', views.UserProfileViewSet)
 
 schema_view = get_schema_view(title='Pastebin API')
 
 urlpatterns = [
     path('user_added/', views.user_added, name='user_added'),
+    path('ListUsers/', views.ListUsers.as_view()),
     path('schema/', schema_view),
     url(r'^api-token-auth/', obtain_jwt_token),
     url(r'^api-token-verify/', verify_jwt_token),
