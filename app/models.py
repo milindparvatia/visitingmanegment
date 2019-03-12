@@ -22,6 +22,9 @@ class Map(models.Model):
         return self.slug
 
 
+pre_save.connect(post_save_slug_receiver, sender=Map)
+
+
 def post_save_slug_receiver(sender, instance, *args, **kwargs):
     slug = slugify(instance.name)
     exists = Map.objects.filter(slug=slug).exists()
@@ -29,9 +32,6 @@ def post_save_slug_receiver(sender, instance, *args, **kwargs):
     if exists:
         slug = "%s-%s" % (slug, randomstring)
     instance.slug = slug
-
-
-pre_save.connect(post_save_slug_receiver, sender=Map)
 
 
 class TheCompany(models.Model):
