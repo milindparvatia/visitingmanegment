@@ -70,11 +70,13 @@ class ListUsers(APIView):
         """
         Return a list of all users.
         """
-        register = Meeting.objects.values('date','pre_registered').annotate(
-            count=Count("pre_registered"))
-        
-        status = Meeting.objects.filter(status='check-out').values('date', 'status').annotate(
-            count=Count("status"))
+        register_T = Meeting.objects.filter(pre_registered=True).values(
+            'date', 'pre_registered').annotate(count=Count("pre_registered"))
+
+        register_F = Meeting.objects.filter(pre_registered=False).values(
+            'date', 'pre_registered').annotate(count=Count("pre_registered"))
+
+        status = Meeting.objects.filter(status='check-out').values('date', 'status').annotate(count=Count("status"))
 
         counter1 = Meeting.objects.filter(counter='by-kiosk').values('date', 'counter').annotate(count=Count("counter"))
 
@@ -86,7 +88,10 @@ class ListUsers(APIView):
         cabc2 = pd.DataFrame.from_records(counter2)
         cabc3 = pd.DataFrame.from_records(counter3)
         sabc = pd.DataFrame.from_records(status)
-        rabc = pd.DataFrame.from_records(register)        
+        rt = pd.DataFrame.from_records(register_T)
+        rf = pd.DataFrame.from_records(register_F)
+
+        
         
         if counter1:
             count_1 = cabc1['count']
@@ -126,9 +131,10 @@ class ListUsers(APIView):
             'date_s': date_s,
             'status': status,
             'count_s': count_s,
-            'count_r': rabc['count'],
-            'date_r': rabc['date'],
-            'pre_registered': rabc['pre_registered'],
+            'count_rt': rt['count'],
+            'count_rf': rf['count'],
+            'date_rt': rt['date'],
+            'date_rf': rf['date'],
             'count_1': count_1,
             'count_1_date': count_1_date,
             'count_2': count_2,
@@ -786,8 +792,8 @@ def addnewlocations(request, slug=None):
         # messages.success(request, "Successfully Create New Entry for " + fname)
         slug = old_slug.slug
 
-        ismap = Map.objects.filter(slug=instance.name)
-
+        ismap = Map.objects.filter(slug=instance.slug)
+        print(ismap)
         company = TheCompany.objects.get(name=request.user.our_company)
         company.location.add(ismap[0].id)
 
@@ -853,13 +859,41 @@ def editlocations(request, slug, id):
 
 
 def analytics(request, slug):
-    print(slug)
     datalist = Visitor.objects.all().order_by('-date')
 
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
 
+    colleagues = Meeting.objects.values(
+        'host').annotate(count=Count("host")).order_by('host')
+            
+    colleague_frame = pd.DataFrame.from_records(
+        colleagues) 
+    total = 0
+    
+    for index, row in colleague_frame.iterrows():
+        total = total + row['count']
+    print(total)
+    prt = []
+    
+    for index, row in colleague_frame.iterrows():
+        val = row['count'] * 100 / total
+        prt.append(round(val,2))
+    print(prt)
+
+    # for index, row in colleague_frame.iterrows():
+    #     colleague_frame['prt'] = prt[index]
+    
+    colleague_frame.insert(2, "prt", prt, True)
+    userlist = colleague_frame['host'].tolist()
+
+    userdata = User.objects.filter(pk__in=userlist)
+
+    print(colleague_frame)
+
     instance = {
+        'userdata': userdata,
+        'colleague_frame': colleague_frame['prt'],
         'image': image,
         "map": mapdata,
         "datalist": datalist,

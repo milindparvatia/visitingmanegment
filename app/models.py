@@ -155,6 +155,12 @@ COUNTER_CHOICES = (
     ('not-check-in', 'not-check-in')
 )
 
+TIMER_CHOICES = (
+    ('5', '5 min'),
+    ('10', '10 min'),
+    ('0', 'let them in')
+)
+
 
 class Meeting(models.Model):
     our_company = models.ForeignKey(
@@ -166,9 +172,10 @@ class Meeting(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, max_length=10)
     counter = models.CharField(
         choices=COUNTER_CHOICES, max_length=15, default='')
+    timer = models.CharField(
+        choices=TIMER_CHOICES, max_length=15, default='')
     pre_registered = models.BooleanField(default=True)
     location = models.ForeignKey(Map, on_delete=models.CASCADE)
-    date = models.DateField(
-        default=django.utils.timezone.now)
+    date = models.DateField(default=django.utils.timezone.now)
     start_time = models.TimeField()
     end_time = models.TimeField()

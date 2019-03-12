@@ -6,16 +6,7 @@
 {{ form.media }}
 {% endblock %}
 <h1 class="h2">Analytics</h1>
-<div class="btn-toolbar mb-2 mb-md-0">
-  <div class="btn-group mr-2">
-    <button class="btn btn-sm btn-outline-secondary">Share</button>
-    <button class="btn btn-sm btn-outline-secondary">Export</button>
-  </div>
-  <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
-    <span data-feather="calendar"></span>
-    This week
-  </button>
-</div>
+
 </div>
 
 <div class="col-11 mx-auto">
@@ -49,18 +40,37 @@
     <div class="jumbotron">
       <div class="row">
         <div style="width:1050px;">
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0"
-              aria-valuemax="100"></div>
-          </div>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0"
-              aria-valuemax="100"></div>
+          <div class="col">
+            <div class="row">
+              <div class="col-3">
+                {% for values in userdata %}
+                <div class="row">
+                  <div class="col">
+                    <img src="/media/{{ values.profile_pic }}" class="img-thumbnail" alt="Profile Picture" width="50"
+                      height="50">
+                    {{values.full_name}}
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              <div class=" col">
+                {% for values in colleague_frame %}
+                <br>
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                    style="width: {{values}}%" aria-valuenow="{{values}}" aria-valuemin="0" aria-valuemax="100">
+                    {{values}}%
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </div>
 
 </div>
@@ -187,8 +197,12 @@
 
 
   function graph3() {
-    var xValue = defaultData1.date_r;
-    var yValue = defaultData1.count_r;
+    var xValue = defaultData1.date_rt;
+    var yValue = defaultData1.count_rt;
+
+    var xValue2 = defaultData1.date_rf;
+    var yValue2 = defaultData1.count_rf;
+
     var trace1 = {
       x: xValue,
       y: yValue,
@@ -196,9 +210,8 @@
       text: yValue,
       textposition: 'auto',
       hoverinfo: 'none',
-      opacity: 0.5,
       marker: {
-        color: 'rgb(1,202,225)',
+        color: 'rgb(1,200,225)',
         line: {
           color: 'rbg(8,48,107)',
           width: 1.5
@@ -206,7 +219,24 @@
       }
     };
 
-    var data = [trace1];
+    var trace2 = {
+      x: xValue2,
+      y: yValue2,
+      type: 'bar',
+      text: yValue2,
+      textposition: 'auto',
+      hoverinfo: 'none',
+      opacity: 0.5,
+      marker: {
+        color: 'rgb(100,202,225)',
+        line: {
+          color: 'rbg(8,225,107)',
+          width: 1.5
+        }
+      }
+    };
+
+    var data = [trace1, trace2];
 
     var layout = {
       title: 'January 2013 Sales Report',
