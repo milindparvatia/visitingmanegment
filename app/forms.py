@@ -33,12 +33,12 @@ class RegistraionForm(UserCreationForm):
     class Meta:
         model = User
         fields = [
-            "email",
             'full_name',
             'company_name',
-            'mobile',
+            "email",
             "password1",
-            "password2"
+            "password2",
+            'mobile',
         ]
 
     # def __init__(self, *args, **kwargs):
@@ -65,7 +65,8 @@ class ColleaguesForm(UserCreationForm):
         fields = [
             "full_name",
             "password1",
-            "password2"
+            "password2",
+            'user_type'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -97,6 +98,28 @@ class StatusForm(forms.ModelForm):
         self.fields['status'].label = False
         # self.fields['status'].widget.attrs.update({'class': "ssss"})
         # self.fields['status'].widget.attrs={ 'id': '{{ip.id}}', 'class': 'myCustomClass'}
+
+
+class NumberOFVisitorForm(forms.Form):
+    id = forms.IntegerField(max_value=10, min_value=1)
+
+
+class M2MVisitorForm(forms.Form):
+    class Meta:
+        model = Meeting
+        fields = [
+            "visitor",
+        ]
+
+
+class GroupVisitorForm(forms.ModelForm):
+    class Meta:
+        model = Visitor
+        fields = [
+            "full_name",
+            "company_name",
+            "email",
+        ]
 
 
 class VisitorForm(forms.ModelForm):

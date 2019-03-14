@@ -70,9 +70,17 @@
       </div>
     </div>
   </div>
+  <div class="row">
+    <h5>Who Has the most Delivery?</h5>
+    <div class="jumbotron">
+      <div class="row">
+      </div>
+      <div id="myDiv4" style="width:1050px;height:400px;">
+      </div>
+    </div>
+  </div>
 </div>
 </div>
-
 </div>
 <script>
   {% block jquery %}
@@ -88,6 +96,7 @@
       graph1(defaultData1)
       graph2(defaultData1)
       graph3(defaultData1)
+      graph4(defaultData1)
       // $("#progress").hide()
     },
     error: function (error_data) {
@@ -124,6 +133,38 @@
     };
 
     Plotly.newPlot('myDiv1', data, layout, { showSendToCloud: true });
+  }
+
+  function graph4() {
+    var xValue = defaultData1.delivery_date;
+    var yValue = defaultData1.delivery_count;
+    var username = defaultData1.delivery_username;
+
+    var trace1 = {
+      x: xValue,
+      y: yValue,
+      type: 'bar',
+      text: username,
+      textposition: 'auto',
+      hoverinfo: 'none',
+      opacity: 0.5,
+      marker: {
+        color: 'rgb(158,202,225)',
+        line: {
+          color: 'rbg(8,48,107)',
+          width: 1.5
+        }
+      }
+    };
+
+    var data = [trace1];
+
+    var layout = {
+      title: 'January 2013 Sales Report',
+      barmode: 'stack'
+    };
+
+    Plotly.newPlot('myDiv4', data, layout, { showSendToCloud: true });
   }
 
   function graph2() {

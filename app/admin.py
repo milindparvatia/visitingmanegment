@@ -105,7 +105,7 @@ class MeetingAdmin(ModelAdmin):
 
 
 admin.site.register(Visitor)
-# admin.site.register(Host)
+admin.site.register(Delivery)
 admin.site.register(Meeting, MeetingAdmin)
 admin.site.register(Map)
 admin.site.register(TheCompany)

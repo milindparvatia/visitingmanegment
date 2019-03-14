@@ -40,4 +40,12 @@ class MAPSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'id',  'full_name', 'is_active', 'last_login', 'is_admin', 'email', 'mobile', 'licenseplate', 'about', 'comment', 'user_location', 'profile_pic', 'our_company')
+        fields = ('url', 'id',  'full_name', 'is_active', 'user_type', 'last_login', 'is_admin', 'email',
+                  'mobile', 'licenseplate', 'about', 'comment', 'user_location', 'profile_pic', 'our_company')
+
+
+class DeliverySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Delivery
+        fields = ('url', 'id', 'our_company', 'Deliverytype',
+                  'which_user', 'which_date', 'which_time')

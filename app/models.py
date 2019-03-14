@@ -9,6 +9,7 @@ from django.conf import settings
 from django import forms
 from django.db import models
 from django.utils.text import slugify
+from django.core.validators import RegexValidator
 
 
 class Map(models.Model):
@@ -78,6 +79,13 @@ class MyUserManager(BaseUserManager):
         return user
 
 
+USER_TYPE_CHOICES = (
+    ('1', 'secretary'),
+    ('2', 'receptionist'),
+    ('3', 'admin'),
+)
+
+
 class User(AbstractBaseUser):
     email = models.EmailField(
         verbose_name='email address',
@@ -85,12 +93,17 @@ class User(AbstractBaseUser):
         unique=True,
     )
 
+    user_type = models.CharField(
+        choices=USER_TYPE_CHOICES, max_length=20, default='')
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     full_name = models.CharField(max_length=50, blank=True, default='')
     colleague = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='related_user', null=True, default='')
-    mobile = models.CharField(max_length=20, blank=True, default='')
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    mobile = models.CharField(
+        validators=[phone_regex], max_length=17, blank=True)
     licenseplate = models.CharField(max_length=20, blank=True, default='')
     about = models.CharField(max_length=50, blank=True, default='')
     comment = models.CharField(max_length=100, blank=True, default='')
@@ -106,8 +119,8 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'mobile']
 
-    def __unicode__(self):
-        return u'%s %s' % (self.full_name, self.email)
+    def __str__(self):
+        return self.full_name
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -126,13 +139,29 @@ class User(AbstractBaseUser):
         return self.is_admin
 
 
+class Delivery(models.Model):
+    our_company = models.ForeignKey(
+        TheCompany, on_delete=models.CASCADE, null=True, default='')
+    Deliverytype = models.CharField(max_length=30)
+    which_user = models.ManyToManyField(
+        User, related_name='related_userdelivery', default='')
+    which_date = models.DateField(default=django.utils.timezone.now)
+    which_time = models.TimeField()
+
+    def __str__(self):
+        return self.which_date
+
+
 class Visitor(models.Model):
     our_company = models.ForeignKey(
         TheCompany, on_delete=models.CASCADE, null=True, default='')
     full_name = models.CharField(max_length=50)
     company_name = models.CharField(max_length=20)
     email = models.EmailField(max_length=255)
-    mobile = models.CharField(max_length=20)
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    mobile = models.CharField(
+        validators=[phone_regex], max_length=17, blank=True)
     licenseplate = models.CharField(max_length=20, blank=True, default='')
     about = models.CharField(max_length=50, blank=True, default='')
     comment = models.CharField(max_length=100, blank=True, default='')

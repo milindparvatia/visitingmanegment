@@ -1,3 +1,6 @@
+from django.forms import formset_factory
+import numpy as np
+import pandas as pd
 from rest_framework.views import APIView
 import django
 from .tasks import add, sendmail
@@ -33,8 +36,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth import get_user_model
 User = get_user_model()
-import pandas as pd
-import numpy as np
+
 
 class UserViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
@@ -44,14 +46,14 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    # def get_queryset(self):
-    #     """
-    #     This view should return a list of all the purchases
-    #     for the currently authenticated user.
-    #     """
-    #     queryset = self.queryset
-    #     query_set = queryset.filter(id=self.request.user.id)
-    #     return query_set
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(id=self.request.user.id)
+        return query_set
 
 
 class ListUsers(APIView):
@@ -76,13 +78,28 @@ class ListUsers(APIView):
         register_F = Meeting.objects.filter(pre_registered=False).values(
             'date', 'pre_registered').annotate(count=Count("pre_registered"))
 
-        status = Meeting.objects.filter(status='check-out').values('date', 'status').annotate(count=Count("status"))
+        status = Meeting.objects.filter(
+            status='check-out').values('date', 'status').annotate(count=Count("status"))
 
-        counter1 = Meeting.objects.filter(counter='by-kiosk').values('date', 'counter').annotate(count=Count("counter"))
+        counter1 = Meeting.objects.filter(
+            counter='by-kiosk').values('date', 'counter').annotate(count=Count("counter"))
 
-        counter2 = Meeting.objects.filter(counter='by-dashboard').values('date', 'counter').annotate(count=Count("counter"))
+        counter2 = Meeting.objects.filter(
+            counter='by-dashboard').values('date', 'counter').annotate(count=Count("counter"))
 
-        counter3 = Meeting.objects.filter(counter='not-check-in').values('date', 'counter').annotate(count=Count("counter"))
+        counter3 = Meeting.objects.filter(
+            counter='not-check-in').values('date', 'counter').annotate(count=Count("counter"))
+
+        delivery = Delivery.objects.filter(our_company=request.user.our_company).values(
+            'which_date', 'which_user').annotate(count=Count("which_user")).order_by('which_user')
+
+        user_to_join = User.objects.filter(
+            our_company=request.user.our_company).values('id', 'full_name').order_by('id')
+       
+        user_frame = pd.DataFrame.from_records(user_to_join)
+        test = pd.DataFrame.from_records(delivery)
+        delivery_frame = test.rename(index=str, columns={"which_user": "id"})
+        result = pd.merge_asof(delivery_frame, user_frame, on='id', by='id')
 
         cabc1 = pd.DataFrame.from_records(counter1)
         cabc2 = pd.DataFrame.from_records(counter2)
@@ -91,8 +108,6 @@ class ListUsers(APIView):
         rt = pd.DataFrame.from_records(register_T)
         rf = pd.DataFrame.from_records(register_F)
 
-        
-        
         if counter1:
             count_1 = cabc1['count']
             count_1_date = cabc1['date']
@@ -100,7 +115,6 @@ class ListUsers(APIView):
             count_1 = counter1
             count_1_date = rabc['date']
 
-        
         if counter2:
             count_2 = cabc2['count']
             count_2_date = cabc2['date']
@@ -108,7 +122,6 @@ class ListUsers(APIView):
             count_2 = counter2
             count_2_date = rabc['date']
 
-        
         if counter3:
             count_3 = cabc3['count']
             count_3_date = cabc3['date']
@@ -117,17 +130,19 @@ class ListUsers(APIView):
             count_3 = counter3
             count_3_date = rabc['date']
 
-        
         if status:
             date_s = sabc['date']
-            status= sabc['status']
+            status = sabc['status']
             count_s = sabc['count']
         else:
             date_s = status
             status = status
             count_s = status
-        
+
         instance = {
+            'delivery_count': result['count'],
+            'delivery_date': result['which_date'],
+            'delivery_username': result['full_name'],
             'date_s': date_s,
             'status': status,
             'count_s': count_s,
@@ -209,14 +224,34 @@ class MeetingViewSet(viewsets.ModelViewSet):
         return query_set
 
 
+class DeliveryViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JSONWebTokenAuthentication,
+                              SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    queryset = Delivery.objects.all()
+    serializer_class = DeliverySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ['which_user']
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        queryset = self.queryset
+        query_set = queryset.filter(our_company=self.request.user.our_company)
+        return query_set
+
+
 def index(request):
     if request.user.is_authenticated:
         try:
-            map_data = Map.objects.filter(slug=request.user.our_company.location.all()[0])
-            print(request.user.our_company.location.all()[0])
+            map_data = Map.objects.filter(
+                slug=request.user.our_company.location.all()[0])
             url = map_data[0].slug + '/logbook'
             return HttpResponseRedirect(url)
-        except (TypeError, ValueError, OverflowError,IndexError, ObjectDoesNotExist):
+        except (AttributeError, TypeError, ValueError, OverflowError, IndexError):
             return HttpResponseRedirect('../addnewlocations/')
     else:
         return render(request, 'app/index.html')
@@ -240,6 +275,7 @@ def register(request):
             company_name = form.cleaned_data['company_name']
             password = form.cleaned_data['password1']
             company_instance = TheCompany.objects.create(name=company_name)
+            instance.user_type = '3'
             instance.our_company = company_instance
             instance.save()
 
@@ -357,11 +393,64 @@ def delselected(request, id, slug):
     }
     return render(request, 'account/logbook.html', data)
 
+def addmultiplevisit(request, id, slug):
+    mapdata = request.user.our_company.location.all()
+    image = request.user.profile_pic
+    GroupVisitorFormSet = formset_factory(
+        GroupVisitorForm, extra=int(id)-1, max_num=10, min_num=1, validate_min=True)
+    if request.method == 'POST':
+        formset = GroupVisitorFormSet(request.POST, prefix='grpVisitor')
+        if formset.is_valid():
+            for form in formset:
+                if form.is_valid():
+                    instance = form.save(commit=False)
+                    print(instance.full_name)
+                    instance.our_company = request.user.our_company
+                    instance.save()
+                    messages.success(request, "Visitor " + instance.full_name + " saved successfully")
+                else:
+                    messages.error(request, "Database error. Please try again")
+        else:
+            print('1')
+    else:
+        formset = GroupVisitorFormSet(prefix='grpVisitor')
+    instance = {
+        'id': id,
+        'image': image,
+        "map": mapdata,
+        'formset': formset,
+        'slug': slug,
+    }
+    return render(request, 'account/addmultiplevisit.html', instance)
+
+
+def addmultipleMeeting(request, slug):
+    mapdata = request.user.our_company.location.all()
+    thecompany = TheCompany.objects.filter(name=request.user.our_company)
+    image = request.user.profile_pic
+    if request.method == 'POST':
+        form = MeetingForm(thecompany[0],request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            print(instance.full_name)
+            instance.our_company = request.user.our_company
+            instance.save()
+            messages.success(request, "Visitor " + instance.full_name + " saved successfully")
+        else:
+            messages.error(request, "Database error. Please try again")
+    else:
+        form = MeetingForm(thecompany[0])
+    instance = {
+        'image': image,
+        "map": mapdata,
+        'form': form,
+        'slug': slug,
+    }
+    return render(request, 'account/addmultipleMeeting.html', instance)
+
 
 def addnewvisit(request, slug):
-
     thecompany = TheCompany.objects.filter(name=request.user.our_company)
-
     if request.method == 'POST':
         form2 = MeetingForm(thecompany[0], request.POST)
         form1 = VisitorForm(request.POST)
@@ -510,13 +599,22 @@ def use_old_visit(request, slug, id):
 
 
 def search_visitor(request, slug):
-    print(slug)
-    puserdata = User.objects.filter(email=request.user).values()
+    puserdata = User.objects.filter(email=request.user.email).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
         image = puserdata
+
+    if request.method == 'POST':
+        form = NumberOFVisitorForm(request.POST)
+        if form.is_valid():
+            id = form.cleaned_data['id']
+            return redirect('addmultiplevisit', slug=slug,id=id)
+    else:
+        form = NumberOFVisitorForm()
+    
     instance = {
+        'form': form,
         'image': image,
         'slug': slug,
     }
@@ -529,7 +627,7 @@ def searchlist(request, slug):
     if visitor:
         visitor[:5]
     print(slug)
-    puserdata = User.objects.filter(email=request.user).values()
+    puserdata = User.objects.filter(email=request.user.email).values()
     if puserdata:
         image = puserdata[0]['profile_pic']
     else:
@@ -556,7 +654,7 @@ def search_list(request, slug):
 
 
 def addressbook(request, slug):
-    print(request.user)
+    print(request.user.user_type)
     query_list = Visitor.objects.filter(our_company=request.user.our_company)
 
     query = request.GET.get("q")
@@ -691,7 +789,7 @@ def addnewhost(request, slug):
                 print("2")
                 instance = form.save(commit=False)
                 instance.is_active = False
-                instance.email=is_email
+                instance.email = is_email
                 instance.set_password(randomstring)
                 instance.our_company = request.user.our_company
                 instance.save()
@@ -713,9 +811,10 @@ def addnewhost(request, slug):
                 sender_email = EMAIL_HOST_USER
 
                 sendmail.delay(mail_subject, message,
-                            sender_email, to_email)
+                               sender_email, to_email)
 
-                messages.success(request, "Successfully Create New Entry for " + fname)
+                messages.success(
+                    request, "Successfully Create New Entry for " + fname)
     else:
         form = ColleaguesForm()
 
@@ -737,7 +836,7 @@ def addselected(request, email, slug):
     is_user = User.objects.filter(
         email=email, user_location=locations_assign.id)
     if is_user.exists():
-        return JsonResponse({"msg": "User is already assign to that location, try someother email"},safe=False)
+        return JsonResponse({"msg": "User is already assign to that location, try someother email"}, safe=False)
     else:
         user_instance = User.objects.get(email=email)
         user_instance.user_location.add(locations_assign.id)
@@ -797,7 +896,7 @@ def addnewlocations(request, slug=None):
         company = TheCompany.objects.get(name=request.user.our_company)
         company.location.add(ismap[0].id)
 
-        is_user = User.objects.get(email=request.user)
+        is_user = User.objects.get(email=request.user.email)
         is_user.user_location.add(ismap[0].id)
 
         context = {
@@ -806,18 +905,18 @@ def addnewlocations(request, slug=None):
         }
         return render(request, 'account/logbook.html', context)
     else:
-        mapdata = request.user.our_company.location.all()
-
-        if mapdata.exists():
+        try:
+            mapdata = request.user.our_company.location.all()
             mapdata = mapdata[0].slug
             context = {
                 'Map': mapdata,
                 'form': form,
             }
-        else:
+        except (AttributeError, TypeError, ValueError, OverflowError, IndexError):
             context = {
                 'form': form,
             }
+
         return render(request, 'account/addnewlocations.html', context)
 
 
@@ -866,33 +965,27 @@ def analytics(request, slug):
 
     colleagues = Meeting.objects.values(
         'host').annotate(count=Count("host")).order_by('host')
-            
+
     colleague_frame = pd.DataFrame.from_records(
-        colleagues) 
+        colleagues)
     total = 0
-    
+
     for index, row in colleague_frame.iterrows():
         total = total + row['count']
-    print(total)
+
     prt = []
-    
+
     for index, row in colleague_frame.iterrows():
         val = row['count'] * 100 / total
-        prt.append(round(val,2))
-    print(prt)
+        prt.append(round(val, 2))
 
-    # for index, row in colleague_frame.iterrows():
-    #     colleague_frame['prt'] = prt[index]
-    
     colleague_frame.insert(2, "prt", prt, True)
     userlist = colleague_frame['host'].tolist()
 
-    userdata = User.objects.filter(pk__in=userlist)
-
-    print(colleague_frame)
+    userdata_for_percentage = User.objects.filter(pk__in=userlist)
 
     instance = {
-        'userdata': userdata,
+        'userdata': userdata_for_percentage,
         'colleague_frame': colleague_frame['prt'],
         'image': image,
         "map": mapdata,
@@ -1031,28 +1124,32 @@ def settings_visitslist_notifications(request, slug):
     return render(request, 'account/settings/visitslist/notifications.html', instance)
 
 
-def view(request, slug, id):
-    print(id)
+def viewuser(request, id, slug):
+
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
 
-    user = User.objects.filter(id=id)
+    userData = User.objects.filter(id=id)
+
     instance = {
-        'user': user,
+        'id': id,
+        'userData': userData,
         'image': image,
         'slug': slug,
         "map": mapdata,
     }
-    return render(request, 'account/profile/view.html', instance)
+    return render(request, 'account/profile/viewuser.html', instance)
 
 
 def edituser(request, id, slug):
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
 
+    user_instance = User.objects.get(id=id)
+
     if request.method == 'POST':
         form = UserForm(request.POST or None,
-                        request.FILES or None, instance=request.user)
+                        request.FILES or None, instance=user_instance)
         if form.is_valid():
             form.save()
             instance = {
@@ -1065,8 +1162,9 @@ def edituser(request, id, slug):
         else:
             print('eroor')
     else:
-        form = UserForm(instance=request.user)
+        form = UserForm(instance=user_instance)
     instance = {
+        'id': id,
         'image': image,
         'form': form,
         'slug': slug,
@@ -1088,6 +1186,7 @@ def password(request, slug, id):
         form = PasswordChangeForm(user=request.user)
     instance = {
         'form': form,
+        'id': id,
         'image': image,
         'slug': slug,
         "map": mapdata,

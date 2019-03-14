@@ -13,17 +13,20 @@
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs">
             <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'view' %}active{% endif %}"
-                    href="{% url 'view' id=request.user.id slug=slug %}">View</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'viewuser' %}active{% endif %}"
+                    href="{% url 'viewuser' id=id slug=slug %}">View</a>
             </li>
+            <!-- user.user_type >= '2' and user.id == request.user.id-->
+            {% if user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'edituser' %}active{% endif %}"
-                    href="{% url 'edituser' id=request.user.id slug=slug %}">Edit</a>
+                    href="{% url 'edituser' id=id slug=slug %}">Edit</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'password' %}active{% endif %}"
-                    href="{% url 'password' id=request.user.id slug=slug %}">Password</a>
+                    href="{% url 'password' id=id slug=slug %}">Password</a>
             </li>
+            {% endif %}
         </ul>
     </div>
     {% block profilemanage %}{% endblock %}

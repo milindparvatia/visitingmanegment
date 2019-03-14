@@ -2,11 +2,13 @@
 
 {% block content1 %}
 <h1 class="h2">Colleagues</h1>
+{% if user.is_authenticated and user.user_type  >= '2' %}
 <div class="btn-toolbar mb-2 mb-md-0">
   <div class="btn-group mr-2">
     <a href="{% url 'addnewhost' slug=slug %}" class="btn btn-dark">Add New</a>
   </div>
 </div>
+{% endif %}
 </div>
 
 <form class="form-inline">

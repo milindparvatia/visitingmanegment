@@ -58,7 +58,7 @@
             Hello {{user.full_name}}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{% url 'view' id=request.user.id slug=slug %}">View Profile</a>
+            <a class="dropdown-item" href="{% url 'viewuser' id=request.user.id slug=slug %}">View Profile</a>
             <a class="dropdown-item" href="{% url 'edituser' id=request.user.id slug=slug %}">Manage Profile</a>
             <a class="dropdown-item" href="{% url 'logout' %}">Log out</a>
           </div>

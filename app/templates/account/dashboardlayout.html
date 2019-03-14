@@ -25,6 +25,7 @@
                 title="Visitors Address Book">contacts</i>
             </a>
           </li>
+          {% if user.is_authenticated and user.user_type  == '3' %}
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}"
               href="{% url 'analytics' slug=slug %}">
@@ -38,6 +39,10 @@
                 title="Locations overview">location_on</i>
             </a>
           </li>
+          {% else %}
+
+          {% endif %}
+
         </ul>
       </div>
     </nav>

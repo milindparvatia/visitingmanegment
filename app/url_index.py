@@ -12,6 +12,7 @@ router.register(r'Visitor', views.VisitorViewSet)
 router.register(r'TheCompany', views.TheCompanyViewSet)
 router.register(r'Map', views.MAPViewSet)
 router.register(r'Meeting', views.MeetingViewSet)
+router.register(r'Delivery', views.DeliveryViewSet)
 
 schema_view = get_schema_view(title='Pastebin API')
 
