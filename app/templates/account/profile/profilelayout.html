@@ -1,7 +1,7 @@
 {% extends "account/dashboardlayout.html" %}
 {% block content1 %}
 
-{% if request.resolver_match.url_name == 'view' %}
+{% if request.resolver_match.url_name == 'viewuser' %}
 <h1 class="h2">View Profile</h1>
 {% elif request.resolver_match.url_name == 'edituser' %}
 <h1 class="h2">Manage Profile</h1>

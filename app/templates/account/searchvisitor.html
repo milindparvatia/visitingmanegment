@@ -5,25 +5,27 @@
 <br>
 
 <div class="container">
-    <div class="card mx-auto card-container w-50 p-5">
-        <h1 class="card-title">Enter the name of Visitor</h1>
-        <form method="post" action="" class="autocomplete-me">
-            <div class="form-group row">
-                <input type="text" class="textinput textInput form-control" name="search" id="search">
-                <div id="search-results"></div>
+    <div class="card mx-auto card-container p-5">
+        <div class="row">
+            <div class="col-6">
+                <h1 class="card-title">Enter the name of Visitor</h1>
+                <form method="post" action="" class="autocomplete-me">
+                    <div class="form-group mx-auto">
+                        <input type="text" class="textinput textInput form-control" name="search" id="search">
+                        <div id="search-results"></div>
+                    </div>
+                </form>
             </div>
-        </form>
-        <h1 class="card-title">Or add multiple visitor</h1>
-        <form action="{% url 'search_visitor' slug=slug %}" method="post">
-            {% csrf_token %}
-            {{form|crispy}}
-            <div class="form-group mx-auto">
-                <button type="submit" class="btn btn-primary">Save Visit</button>
-                <button type="submit" class="btn btn-secondary">Save And Create New One</button>
-                <a href="{% url 'logbook' slug=slug %}" class="btn btn-success">Cancel</a>
-                <input type="hidden" name="next" value="{{next}}">
+            <div class="col-6">
+                <h1 class="card-title">Or add multiple visitor</h1>
+                <form action="{% url 'search_visitor' slug=slug %}" method="post">
+                    {% csrf_token %}
+                    {{form|crispy}}
+                </form>
             </div>
-        </form>
+        </div>
+        <br>
+        <hr>
     </div>
 </div>
 <script>

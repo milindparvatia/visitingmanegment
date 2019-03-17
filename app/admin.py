@@ -101,7 +101,7 @@ admin.site.unregister(Group)
 
 
 class MeetingAdmin(ModelAdmin):
-    form = MeetingForm
+    form = AdminMeetingForm
 
 
 admin.site.register(Visitor)

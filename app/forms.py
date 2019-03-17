@@ -101,15 +101,24 @@ class StatusForm(forms.ModelForm):
 
 
 class NumberOFVisitorForm(forms.Form):
-    id = forms.IntegerField(max_value=10, min_value=1)
+    id = forms.IntegerField(max_value=10, min_value=1, label='')
 
 
 class M2MVisitorForm(forms.Form):
+    visitor = forms.ModelMultipleChoiceField(
+        queryset=Visitor.objects.all(), widget=Select2MultipleWidget)
+
+    def __init__(self, thecompany, *args, **kwargs):
+        super(M2MVisitorForm, self).__init__(*args, **kwargs)
+        print(thecompany)
+        self.fields['visitor'].queryset = Visitor.objects.filter(
+            our_company=thecompany)
+
+
+class AdminMeetingForm(forms.ModelForm):
     class Meta:
         model = Meeting
-        fields = [
-            "visitor",
-        ]
+        fields = '__all__'
 
 
 class GroupVisitorForm(forms.ModelForm):
@@ -195,7 +204,7 @@ class MeetingForm(forms.ModelForm):
     #         initial['host'] = [
     #             t.pk for t in kwargs['instance'].our_company.all()]
 
-    #     forms.ModelForm.__init__(self, *args, **kwargs)
+        # forms.ModelForm.__init__(self, *args, **kwargs)
 
     def save(self, commit=True):
         # Get the unsave Pizza instance

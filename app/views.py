@@ -99,7 +99,19 @@ class ListUsers(APIView):
         user_frame = pd.DataFrame.from_records(user_to_join)
         test = pd.DataFrame.from_records(delivery)
         delivery_frame = test.rename(index=str, columns={"which_user": "id"})
-        result = pd.merge_asof(delivery_frame, user_frame, on='id', by='id')
+        if delivery_frame.empty:
+            result = pd.DataFrame()
+        else:
+            result = pd.merge_asof(delivery_frame, user_frame, on='id', by='id')
+
+        if result.empty:
+            result_full_name = result
+            result_which_date = result
+            result_count = result
+        else:
+            result_full_name = result['full_name']
+            result_which_date = result['which_date']
+            result_count = result['count']
 
         cabc1 = pd.DataFrame.from_records(counter1)
         cabc2 = pd.DataFrame.from_records(counter2)
@@ -108,19 +120,33 @@ class ListUsers(APIView):
         rt = pd.DataFrame.from_records(register_T)
         rf = pd.DataFrame.from_records(register_F)
 
+        if rt.empty:
+            rt_1 = rt
+            rt_date = rt
+        else:
+            rt_1 = rt['count']
+            rt_date = rt['date']
+
+        if rf.empty:
+            rf_1 = rf
+            rf_date = rf
+        else:
+            rf_1 = rf['count']
+            rf_date = rf['date']
+
         if counter1:
             count_1 = cabc1['count']
             count_1_date = cabc1['date']
         else:
             count_1 = counter1
-            count_1_date = rabc['date']
+            count_1_date = counter1
 
         if counter2:
             count_2 = cabc2['count']
             count_2_date = cabc2['date']
         else:
             count_2 = counter2
-            count_2_date = rabc['date']
+            count_2_date = counter2
 
         if counter3:
             count_3 = cabc3['count']
@@ -128,7 +154,7 @@ class ListUsers(APIView):
 
         else:
             count_3 = counter3
-            count_3_date = rabc['date']
+            count_3_date = counter3
 
         if status:
             date_s = sabc['date']
@@ -139,17 +165,19 @@ class ListUsers(APIView):
             status = status
             count_s = status
 
+        
+
         instance = {
-            'delivery_count': result['count'],
-            'delivery_date': result['which_date'],
-            'delivery_username': result['full_name'],
+            'delivery_count': result_count,
+            'delivery_date': result_which_date,
+            'delivery_username': result_full_name,
             'date_s': date_s,
             'status': status,
             'count_s': count_s,
-            'count_rt': rt['count'],
-            'count_rf': rf['count'],
-            'date_rt': rt['date'],
-            'date_rf': rf['date'],
+            'count_rt': rt_1,
+            'count_rf': rf_1,
+            'date_rt': rt_date,
+            'date_rf': rf_date,
             'count_1': count_1,
             'count_1_date': count_1_date,
             'count_2': count_2,
@@ -293,7 +321,7 @@ def logbook(request, slug):
     map_key = Map.objects.filter(slug=slug).values('id')
     query_list = Meeting.objects.all().filter(
         location_id=map_key[0]['id']).order_by('-date')
-    query_list_visitor = Visitor.objects.prefetch_related('relateds')
+    query_list_visitor = Visitor.objects.prefetch_related('related_visitor')
 
     user_form = ToDoForm(request.POST or None)
     status_form = StatusForm()
@@ -315,15 +343,13 @@ def logbook(request, slug):
             Q(company_name__icontains=query)
         )
 
-        query_list_v = query_list_visitor.filter(Q(full_name__icontains=query) &
-                                                 Q(email__icontains=query))
         y = 0
         report = None
         for x in query_list_visitor_list:
             if y == 0:
-                query_list_vi = query_list.filter(
+                query_list_firstItem = query_list.filter(
                     visitor=query_list_visitor_list[y])
-                report = chain(query_list_v, query_list_vi)
+                report = chain(report, query_list_firstItem)
                 y = y+1
             else:
                 query_list_vi = query_list.filter(
@@ -393,6 +419,7 @@ def delselected(request, id, slug):
     }
     return render(request, 'account/logbook.html', data)
 
+
 def addmultiplevisit(request, id, slug):
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
@@ -410,6 +437,7 @@ def addmultiplevisit(request, id, slug):
                     messages.success(request, "Visitor " + instance.full_name + " saved successfully")
                 else:
                     messages.error(request, "Database error. Please try again")
+            return redirect('addmultipleMeeting', slug=slug)
         else:
             print('1')
     else:
@@ -429,27 +457,84 @@ def addmultipleMeeting(request, slug):
     thecompany = TheCompany.objects.filter(name=request.user.our_company)
     image = request.user.profile_pic
     if request.method == 'POST':
-        form = MeetingForm(thecompany[0],request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            print(instance.full_name)
-            instance.our_company = request.user.our_company
-            instance.save()
-            messages.success(request, "Visitor " + instance.full_name + " saved successfully")
+        print('1')
+        form1 = M2MVisitorForm(thecompany[0],request.POST)
+        form2 = MeetingForm(thecompany[0], request.POST)
+        
+        if form1.is_valid() and form2.is_valid():   
+            visitors = form1.cleaned_data['visitor']
+            instance = form2.save(commit=False)
+            for visitor in visitors:
+                instance.pk = None
+                instance.counter = 'not-check-in'
+                if instance.pre_registered is True:
+                    instance.pre_registered = False
+                    instance.counter = 'by-dashboard'
+                if instance.start_time is None:
+                    instance.start_time = django.utils.timezone.now().time()
+                if instance.end_time is None:
+                    instance.end_time = django.utils.timezone.now(
+                    ) + django.utils.timezone.timedelta(hours=1)
+                if instance.date is None:
+                    instance.date = django.utils.timezone.now().strftime("%d-%m-%Y")
+                instance.our_company = request.user.our_company
+                instance.location_id = form2.cleaned_data.get("location").id
+                instance.visitor = visitor
+                instance.save()
+                form2.save_m2m()
+
+            nameval = form1.cleaned_data.get('visitor').values()
+            list_result = [entry for entry in nameval]
+            visitor_name = []
+            visitor_email = []
+            for value in list_result:
+                visitor_name.append(value["full_name"])
+                visitor_email.append(value["email"])
+            print(visitor_name)
+            print(visitor_email)
+
+            hostname = form2.cleaned_data.get("host")
+            fromtime = instance.start_time.strftime('%H:%M:%S')
+            totime = instance.end_time.strftime('%H:%M:%S')
+            ondate = instance.date.strftime('%d-%m-%Y')
+            
+            hostval = hostname.values()
+            list_result = [entry for entry in hostval]
+            hname = list_result[0]['full_name']
+
+            hostsubject = 'New apointment is created with '+ visitor_name[0]
+            hostmessage = 'New visit is added with '+hname+' on '+ondate+' from '+fromtime+' to '+totime
+            hostsender_email = EMAIL_HOST_USER
+            hostreceipient_email = visitor_email
+
+            reciversubject = 'New apointment is created with '+hname
+            recivermessage = 'New visit is added with '+visitor_name[0] + \
+                ' on '+ondate + ' from '+fromtime + ' to '+totime
+            sender_email = EMAIL_HOST_USER
+            receipient_email = visitor_email
+
+            # sendmail.delay(hostsubject, hostmessage, hostsender_email,hostreceipient_email)
+            # sendmail.delay(reciversubject, recivermessage,sender_email, receipient_email)
+            messages.success(request, "Meeting saved successfully")
         else:
             messages.error(request, "Database error. Please try again")
     else:
-        form = MeetingForm(thecompany[0])
+        form1 = M2MVisitorForm(thecompany[0])
+        print(form1)
+        print('2')
+        form2 = MeetingForm(thecompany[0])
     instance = {
         'image': image,
         "map": mapdata,
-        'form': form,
+        'form1': form1,
+        'form2': form2,
         'slug': slug,
     }
     return render(request, 'account/addmultipleMeeting.html', instance)
 
 
 def addnewvisit(request, slug):
+    print(request.user.id)
     thecompany = TheCompany.objects.filter(name=request.user.our_company)
     if request.method == 'POST':
         form2 = MeetingForm(thecompany[0], request.POST)
@@ -474,14 +559,14 @@ def addnewvisit(request, slug):
                 instance2.end_time = django.utils.timezone.now(
                 ) + django.utils.timezone.timedelta(hours=1)
             if instance2.date is None:
-                instance2.date = django.utils.timezone.now()
+                instance2.date = django.utils.timezone.now().strftime("%d-%m-%Y")
 
             name = form1.cleaned_data.get("full_name")
             email = form1.cleaned_data.get("email")
             hostname = form2.cleaned_data.get("host")
             fromtime = instance2.start_time.strftime('%H:%M:%S')
             totime = instance2.end_time.strftime('%H:%M:%S')
-            ondate = instance2.date.strftime('%m-%d-%Y')
+            ondate = instance2.date.strftime('%d-%m-%Y')
             hostval = hostname.values()
             list_result = [entry for entry in hostval]
             hname = list_result[0]['full_name']
@@ -570,15 +655,15 @@ def use_old_visit(request, slug, id):
             messages.success(
                 request, "Successfully Create New Entry for "+name)
 
-            sendmail.delay(hostsubject, hostmessage,
-                           hostsender_email, hostreceipient_email)
-            sendmail.delay(reciversubject, recivermessage,
-                           sender_email, receipient_email)
+            # sendmail.delay(hostsubject, hostmessage,
+            #                hostsender_email, hostreceipient_email)
+            # sendmail.delay(reciversubject, recivermessage,
+            #                sender_email, receipient_email)
 
             # add karvanu che mailing
 
             instance2 = form2.save(commit=False)
-            instance2.user = request.user
+            instance2.user = request.user.id
             instance2.visitor_id = id
             instance2.save()
             form2.save_m2m()
@@ -680,15 +765,14 @@ def addressbook(request, slug):
 
 def addressbookdetail(request, id, slug):
     query_list = Meeting.objects.all().filter(visitor_id=id).order_by('-date')
-    query_list_visitor = Visitor.objects.prefetch_related('relateds')
+    visitor_list = Visitor.objects.filter(id=id)
 
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
 
     instance = {
         'id': id,
-        "query_list_visitor": query_list_visitor,
-        # "objects_all1": query_list_host,
+        "visitor_list": visitor_list,
         'image': image,
         "map": mapdata,
         "objects_all": query_list,
@@ -713,7 +797,7 @@ def addressbookedit(request, id, slug):
                            request.FILES or None, instance=instance)
         if form.is_valid():
             instance = form.save(commit=False)
-            instance.user = request.user
+            instance.user = request.user.id
             print(form.cleaned_data.get("full_name"))
             fname = form.cleaned_data.get("full_name")
             instance.save()
@@ -810,8 +894,8 @@ def addnewhost(request, slug):
                 to_email = form.cleaned_data.get('email')
                 sender_email = EMAIL_HOST_USER
 
-                sendmail.delay(mail_subject, message,
-                               sender_email, to_email)
+                # sendmail.delay(mail_subject, message,
+                #                sender_email, to_email)
 
                 messages.success(
                     request, "Successfully Create New Entry for " + fname)
@@ -885,7 +969,7 @@ def addnewlocations(request, slug=None):
     if form.is_valid():
         instance = form.save(commit=False)
         # fname = form.cleaned_data.get("name")
-        instance.user = request.user
+        instance.user = request.user.id
         instance.save()
         old_slug = Map.objects.get(id=instance.pk)
         # messages.success(request, "Successfully Create New Entry for " + fname)
@@ -893,6 +977,7 @@ def addnewlocations(request, slug=None):
 
         ismap = Map.objects.filter(slug=instance.slug)
         print(ismap)
+        print(request.user.our_company)
         company = TheCompany.objects.get(name=request.user.our_company)
         company.location.add(ismap[0].id)
 
@@ -1178,12 +1263,12 @@ def password(request, slug, id):
     image = request.user.profile_pic
 
     if request.method == 'POST':
-        form = PasswordChangeForm(user=request.user, data=request.POST)
+        form = PasswordChangeForm(user=request.user.id, data=request.POST)
         if form.is_valid():
             form.save()
             update_session_auth_hash(request, form.user)
     else:
-        form = PasswordChangeForm(user=request.user)
+        form = PasswordChangeForm(user=request.user.id)
     instance = {
         'form': form,
         'id': id,

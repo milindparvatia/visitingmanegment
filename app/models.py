@@ -98,8 +98,6 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     full_name = models.CharField(max_length=50, blank=True, default='')
-    colleague = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='related_user', null=True, default='')
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     mobile = models.CharField(
@@ -120,7 +118,7 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['full_name', 'mobile']
 
     def __str__(self):
-        return self.full_name
+        return "Name: %s and Email: %s" % (self.full_name, self.email)
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -169,7 +167,7 @@ class Visitor(models.Model):
         upload_to='visitor_data', default='media_data/profile-pic.png')
 
     def __str__(self):
-        return self.full_name
+        return "Name: %s and Email: %s" % (self.full_name, self.email)
 
 
 STATUS_CHOICES = (
@@ -195,16 +193,17 @@ class Meeting(models.Model):
     our_company = models.ForeignKey(
         TheCompany, on_delete=models.CASCADE, null=True, default='')
     visitor = models.ForeignKey(
-        Visitor, on_delete=models.CASCADE, related_name='related_visitor')
+        Visitor, related_name='related_visitor', on_delete=models.CASCADE, null=True, default='')
     host = models.ManyToManyField(
         User, related_name='related_host', blank=True, default='')
     status = models.CharField(choices=STATUS_CHOICES, max_length=10)
     counter = models.CharField(
-        choices=COUNTER_CHOICES, max_length=15, default='')
+        choices=COUNTER_CHOICES, max_length=15, default='by-dashboard')
     timer = models.CharField(
         choices=TIMER_CHOICES, max_length=15, default='')
     pre_registered = models.BooleanField(default=True)
     location = models.ForeignKey(Map, on_delete=models.CASCADE)
-    date = models.DateField(default=django.utils.timezone.now)
+    date = models.DateField(
+        default=django.utils.timezone.now)
     start_time = models.TimeField()
     end_time = models.TimeField()

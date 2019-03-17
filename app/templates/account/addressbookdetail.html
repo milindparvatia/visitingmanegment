@@ -10,26 +10,25 @@
 <div class="col">
   <div class="row">
     <div class="col-4">
-      {% for ip in objects_all|slice:":1" %}
+      {% for ip in visitor_list %}
       <div class="card" style="height:80vh;">
         <h5 class="card-header">
           <div class="row">
             <div class="col-3">
-              <img src="{% for data in ip.visitor.profile_pic.url %}{{ data }}{% endfor %}" alt="Profile Picture"
-                width="75" height="75">
+              <img src="{{ ip.profile_pic.url }}" alt="Profile Picture" width="75" height="75">
             </div>
             <div class="col-9">
-              {% for data in ip.visitor.full_name%}{{ data }}{% endfor%}
+              {{ ip.full_name }}
             </div>
           </div>
         </h5>
         <div class="card-body">
           <h5 class="card-title">Email</h5>
-          <p class="card-text">{% for data in ip.visitor.email %}{{ data }}{% endfor %}</p>
+          <p class="card-text">{{ ip.email }}</p>
           <h5 class="card-title">Mobile</h5>
-          <p class="card-text">{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</p>
+          <p class="card-text">{{ ip.mobile }}</p>
           <h5 class="card-title">License Plate</h5>
-          <p class="card-text">{% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</p>
+          <p class="card-text">{{ ip.licenseplate }}</p>
         </div>
         <h5 class="card-header">
           <div class="row">

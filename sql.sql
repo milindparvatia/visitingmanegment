@@ -1,1 +1,3 @@
-SELECT * FROM `results`;
+SELECT *
+FROM `results
+`;

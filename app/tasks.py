@@ -20,4 +20,4 @@ def xsum(numbers):
 
 @shared_task
 def sendmail(subject, message, sender_email, receipient_email):
-    return send_mail(subject, message, sender_email, [receipient_email], fail_silently=False)
+    return send_mail(subject, message, sender_email, receipient_email, fail_silently=False)
