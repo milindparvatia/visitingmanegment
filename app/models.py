@@ -118,7 +118,7 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['full_name', 'mobile']
 
     def __str__(self):
-        return "Name: %s and Email: %s" % (self.full_name, self.email)
+        return "Name: %s, Phone: %s" % (self.full_name, self.mobile)
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -155,7 +155,7 @@ class Visitor(models.Model):
         TheCompany, on_delete=models.CASCADE, null=True, default='')
     full_name = models.CharField(max_length=50)
     company_name = models.CharField(max_length=20)
-    email = models.EmailField(max_length=255)
+    email = models.EmailField(max_length=255, unique=True)
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     mobile = models.CharField(
@@ -167,8 +167,7 @@ class Visitor(models.Model):
         upload_to='visitor_data', default='media_data/profile-pic.png')
 
     def __str__(self):
-        return "Name: %s and Email: %s" % (self.full_name, self.email)
-
+        return "Name: %s, Phone: %s" % (self.full_name, self.mobile)
 
 STATUS_CHOICES = (
     ('expected', 'expected'),

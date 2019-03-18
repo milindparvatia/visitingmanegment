@@ -343,13 +343,15 @@ def logbook(request, slug):
             Q(company_name__icontains=query)
         )
 
+        query_list_v = query_list_visitor.filter(Q(full_name__icontains=query) &
+                                                 Q(email__icontains=query))
         y = 0
         report = None
         for x in query_list_visitor_list:
             if y == 0:
-                query_list_firstItem = query_list.filter(
+                query_list_vi = query_list.filter(
                     visitor=query_list_visitor_list[y])
-                report = chain(report, query_list_firstItem)
+                report = chain(query_list_v, query_list_vi)
                 y = y+1
             else:
                 query_list_vi = query_list.filter(
@@ -457,13 +459,14 @@ def addmultipleMeeting(request, slug):
     thecompany = TheCompany.objects.filter(name=request.user.our_company)
     image = request.user.profile_pic
     if request.method == 'POST':
-        print('1')
+        
         form1 = M2MVisitorForm(thecompany[0],request.POST)
         form2 = MeetingForm(thecompany[0], request.POST)
         
         if form1.is_valid() and form2.is_valid():   
             visitors = form1.cleaned_data['visitor']
             instance = form2.save(commit=False)
+            print(form2)
             for visitor in visitors:
                 instance.pk = None
                 instance.counter = 'not-check-in'
@@ -477,6 +480,8 @@ def addmultipleMeeting(request, slug):
                     ) + django.utils.timezone.timedelta(hours=1)
                 if instance.date is None:
                     instance.date = django.utils.timezone.now().strftime("%d-%m-%Y")
+                    print(instance.date)
+                print(instance.date)
                 instance.our_company = request.user.our_company
                 instance.location_id = form2.cleaned_data.get("location").id
                 instance.visitor = visitor
@@ -522,7 +527,8 @@ def addmultipleMeeting(request, slug):
         form1 = M2MVisitorForm(thecompany[0])
         print(form1)
         print('2')
-        form2 = MeetingForm(thecompany[0])
+        form2 = MeetingForm(thecompany[0], initial={'pre_registered': False, 'date': django.utils.timezone.now(
+        ), 'start_time': django.utils.timezone.now(), 'end_time': django.utils.timezone.now()+django.utils.timezone.timedelta(hours=1)})
     instance = {
         'image': image,
         "map": mapdata,
@@ -1051,10 +1057,11 @@ def analytics(request, slug):
     colleagues = Meeting.objects.values(
         'host').annotate(count=Count("host")).order_by('host')
 
+    
     colleague_frame = pd.DataFrame.from_records(
         colleagues)
     total = 0
-
+    print(colleagues)
     for index, row in colleague_frame.iterrows():
         total = total + row['count']
 
@@ -1063,20 +1070,29 @@ def analytics(request, slug):
     for index, row in colleague_frame.iterrows():
         val = row['count'] * 100 / total
         prt.append(round(val, 2))
+    if colleagues.exists():
+        colleague_frame.insert(2, "prt", prt, True)
+        userlist = colleague_frame['host'].tolist()
 
-    colleague_frame.insert(2, "prt", prt, True)
-    userlist = colleague_frame['host'].tolist()
+        userdata_for_percentage = User.objects.filter(pk__in=userlist)
 
-    userdata_for_percentage = User.objects.filter(pk__in=userlist)
-
-    instance = {
-        'userdata': userdata_for_percentage,
-        'colleague_frame': colleague_frame['prt'],
-        'image': image,
-        "map": mapdata,
-        "datalist": datalist,
-        'slug': slug,
-    }
+        instance = {
+            'userdata': userdata_for_percentage,
+            'colleague_frame': colleague_frame['prt'],
+            'image': image,
+            "map": mapdata,
+            "datalist": datalist,
+            'slug': slug,
+        }
+    else:
+        instance = {
+            'userdata': colleague_frame,
+            'colleague_frame': colleague_frame,
+            'image': image,
+            "map": mapdata,
+            "datalist": datalist,
+            'slug': slug,
+        }
     return render(request, 'account/analytics.html', instance)
 
 

@@ -25,11 +25,9 @@
                     {{ form.full_name|as_crispy_field }}
                 </div>
                 <div class="form-group">
-                    to change password click on this below <a href="{% url 'password' id=request.user.id slug=slug %}"
-                        class="btn btn-success">Change Password</a>
-                </div>
-                <div class="form-group">
-                    {{ form.our_company|as_crispy_field }}
+                    <p>to change password click on this below</p>
+                    <a href="{% url 'password' id=request.user.id slug=slug %}" class="btn btn-success">Change
+                        Password</a>
                 </div>
                 <div class="form-group">
                     {{ form.licenseplate|as_crispy_field }}
@@ -63,7 +61,6 @@
         <div class="row">
             <div class="form-group mx-auto">
                 <button type="submit" class="btn btn-primary">Save Visit</button>
-                <button type="submit" class="btn btn-secondary">Save And Create New One</button>
                 <a href="/logbook" class="btn btn-success">Cancel</a>
                 <input type="hidden" name="next" value="{{next}}">
             </div>

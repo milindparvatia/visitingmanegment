@@ -15,41 +15,160 @@
     {% endfor %}
 </ul>
 {% endif %}
-<div class="container">
+<div class="container" style="height: 300px;">
     {% for values in userData %}
-    <div class="col mx-auto">
-        <div class="row mx-auto">
-            <div class="col-3">
-                <h5>hey {{values.full_name}}</h5>
-                <img src="{{values.profile_pic.url}}" alt="Profile Picture" width="200" height="200">
-            </div>
-            <div class="col-4">
-                <h5>
-                    {{values.our_company}}
-                    {{values.email}}
-                </h5>
-            </div>
-
+    <div class="row">
+        <div class="col-3">
+            <p>Your Profile Picture:</p>
+            <img src="{{values.profile_pic.url}}" alt="Profile Picture" width="200" height="200">
         </div>
-        <div class="row">
-            <div class="col-3">
-                <h5>
-
-                </h5>
-            </div>
-            <div class="col-3">
-
-            </div>
-            <div class="col-3">
-                <h5>
-                    {{values.about}}
-                    {{values.licenseplate}}
-                    {{values.comment}}
-                </h5>
-            </div>
+        <div class="col">
+            <table class="table table-borderless">
+                <thead>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Your Full Name:</td>
+                        <td>{{values.full_name}}</td>
+                    </tr>
+                    <tr>
+                        <td>Your Company Name:</td>
+                        <td>{{values.our_company}}</td>
+                    </tr>
+                    <tr>
+                        <td>Your Email:</td>
+                        <td colspan="2">{{values.email}}</td>
+                    </tr>
+                    <tr>
+                        <td>Is Active:</td>
+                        <td colspan="2">{{values.is_active}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col">
+            <table class="table table-borderless">
+                <thead>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mobile:</td>
+                        <td>{{values.mobile}}</td>
+                    </tr>
+                    <tr>
+                        <td>Licenseplate:</td>
+                        <td>{{values.licenseplate}}</td>
+                    </tr>
+                    <tr>
+                        <td>About:</td>
+                        <td>{{values.about}}</td>
+                    </tr>
+                    <tr>
+                        <td>Comment:</td>
+                        <td colspan="2">{{values.comment}}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     {% endfor %}
 </div>
 </div>
 {% endblock %}
+
+<div class="col">
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                Your Full Name:
+            </div>
+            <div class="row">
+                <h5>
+                    <p>
+
+                    </p>
+                </h5>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                Your Company Name:
+            </div>
+            <div class="row">
+                <h5>
+                    <p>
+                        {{values.our_company}}
+                    </p>
+                </h5>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                Your Email:
+            </div>
+            <div class="row">
+                <h5>
+                    <p>
+                        Your Email: {{values.email}}
+                    </p>
+                </h5>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col">
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                Licenseplate:
+            </div>
+            <div class="row">
+                {{values.licenseplate}}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                About:
+            </div>
+            <div class="row">
+                {{values.about}}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                Comment:
+            </div>
+            <div class="row">
+                {{values.comment}}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                Mobile:
+            </div>
+            <div class="row">
+                {{values.mobile}}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                Is active:
+            </div>
+            <div class="row">
+                {{values.is_active}}
+            </div>
+        </div>
+    </div>
+</div>

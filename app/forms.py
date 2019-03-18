@@ -170,6 +170,7 @@ class MeetingForm(forms.ModelForm):
     class Meta:
         model = Meeting
         fields = [
+            'date',
             "status",
             'start_time',
             'pre_registered',
@@ -243,14 +244,7 @@ class UserForm(forms.ModelForm):
             'about',
             'comment',
             'profile_pic',
-            'our_company'
         ]
-
-    def __init__(self, *args, **kwargs):
-        super(UserForm, self).__init__(*args, **kwargs)
-        instance = getattr(self, 'instance', None)
-        if instance and instance.pk:
-            self.fields['our_company'].widget.attrs['readonly'] = True
 
 
 class SearchVisitorForm(forms.ModelForm):
