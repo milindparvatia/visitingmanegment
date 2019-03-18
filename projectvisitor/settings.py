@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'bootstrap_datepicker_plus',
     'crispy_forms',
     'app',
+    'push_notifications',
     'rest_framework',
     'django_filters',
     'bootstrap4',
@@ -61,6 +62,13 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+
+PUSH_NOTIFICATIONS_SETTINGS = {
+    "APNS_CERTIFICATE": os.path.join(BASE_DIR, "Visitor_dev.pem"),
+    "APNS_TOPIC": "com.vethics.visitorAdmin",
+    "WP_PRIVATE_KEY": os.path.join(BASE_DIR, "private_key.pem"),
+    "WP_CLAIMS": os.path.join(BASE_DIR, "claim.json"),
+}
 
 # JWT settings
 JWT_AUTH = {

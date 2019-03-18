@@ -5,6 +5,7 @@ from django.conf.urls import url, include
 from rest_framework.schemas import get_schema_view
 from rest_framework.documentation import include_docs_urls
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
+from push_notifications.api.rest_framework import APNSDeviceAuthorizedViewSet, GCMDeviceAuthorizedViewSet
 
 router = routers.DefaultRouter()
 router.register(r'User', views.UserViewSet)
@@ -13,6 +14,8 @@ router.register(r'TheCompany', views.TheCompanyViewSet)
 router.register(r'Map', views.MAPViewSet)
 router.register(r'Meeting', views.MeetingViewSet)
 router.register(r'Delivery', views.DeliveryViewSet)
+router.register(r'device/apns', APNSDeviceAuthorizedViewSet)
+router.register(r'device/gcm', GCMDeviceAuthorizedViewSet)
 
 schema_view = get_schema_view(title='Pastebin API')
 
