@@ -169,6 +169,7 @@ class Visitor(models.Model):
     def __str__(self):
         return "Name: %s, Phone: %s" % (self.full_name, self.mobile)
 
+
 STATUS_CHOICES = (
     ('expected', 'expected'),
     ('check-in', 'check-in'),

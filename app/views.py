@@ -1,9 +1,10 @@
+from push_notifications.models import APNSDevice
 from django.forms import formset_factory
 import numpy as np
 import pandas as pd
 from rest_framework.views import APIView
 import django
-from .tasks import add, sendmail
+from .tasks import add, sendmail,sendnotification
 import json
 from haystack.query import SearchQuerySet
 from itertools import chain
@@ -317,6 +318,8 @@ def register(request):
 
 
 def logbook(request, slug):
+    # APNSDevice.objects.filter(
+    #     name="milind1997@gmail.com").delete()
     mapdata = request.user.our_company.location.all()
     map_key = Map.objects.filter(slug=slug).values('id')
     query_list = Meeting.objects.all().filter(
@@ -393,12 +396,15 @@ def logbook(request, slug):
 
 def statusupdate(request, slug, id=None):
     instance = get_object_or_404(Meeting, id=id)
-
+    visitor_name = instance.visitor.full_name
+    visitor_profile_pic = instance.visitor.profile_pic.url
+    print(visitor_profile_pic)
     form = StatusForm(request.POST or None, instance=instance)
     if form.is_valid():
         instance = form.save(commit=False)
-        print(form.cleaned_data.get("status"))
+        status = form.cleaned_data.get("status")
         instance.save(update_fields=["status"])
+        sendnotification(request.user.email, id,status,visitor_name, visitor_profile_pic)
     else:
         form = StatusForm()
 

@@ -11,17 +11,15 @@
 {% block content1 %}
 <form class="form-inline">
   <input class="form-control mr-sm-2" placeholder="Search" type="search" name="q" id="query" aria-label="Search">
-  <a href="{% url 'logbook' slug=slug %}" class="btn btn-success mx-auto">Reset Filter</a>
+  <a href="{% url 'logbook' slug=slug %}" class="btn btn-success mx-auto">Reset</a>
 </form>
 <form action="" method="POST" id="yourFormId" class="form">
   {% csrf_token %}
   {{ form }}
 </form>
-<!-- <h1 class="h2">Log Book</h1> -->
 <div class="btn-toolbar mb-2 mb-md-0">
   <div class="btn-group mr-2">
-    <a href="{% url 'search_visitor' slug=slug %}" class="btn btn-dark">Add Single Meeting</a>
-    <a href="{% url 'addmultipleMeeting' slug=slug %}" class="btn btn-success mx-auto">Add Group Meeting</a>
+    <a href="{% url 'search_visitor' slug=slug %}" class="btn btn-dark">Create Visit</a>
   </div>
 </div>
 </div>

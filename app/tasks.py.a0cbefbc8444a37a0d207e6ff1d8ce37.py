@@ -31,7 +31,7 @@ def sendnotification(user_email, meeting_id, status, visitor_name, visitor_profi
     device.send_message("visitor "+visitor_name+" is arrived", thread_id="1",
                         extra={
                             "notification_type": "1",
-                            "meeting_id": "1",
+                            "meeting_id": meeting_id,
                             "status": status,
                             "visitor_name": visitor_name,
                             "visitor_profile_pic": visitor_profile_pic
