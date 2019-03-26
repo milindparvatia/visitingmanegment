@@ -155,7 +155,7 @@ class Visitor(models.Model):
         TheCompany, on_delete=models.CASCADE, null=True, default='')
     full_name = models.CharField(max_length=50)
     company_name = models.CharField(max_length=20)
-    email = models.EmailField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255)
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     mobile = models.CharField(

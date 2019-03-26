@@ -73,22 +73,22 @@ class ListUsers(APIView):
         """
         Return a list of all users.
         """
-        register_T = Meeting.objects.filter(pre_registered=True).values(
+        register_T = Meeting.objects.filter(pre_registered=True, our_company=request.user.our_company).values(
             'date', 'pre_registered').annotate(count=Count("pre_registered"))
 
-        register_F = Meeting.objects.filter(pre_registered=False).values(
+        register_F = Meeting.objects.filter(pre_registered=False, our_company=request.user.our_company).values(
             'date', 'pre_registered').annotate(count=Count("pre_registered"))
 
-        status = Meeting.objects.filter(
+        status = Meeting.objects.filter(our_company=request.user.our_company,
             status='check-out').values('date', 'status').annotate(count=Count("status"))
 
-        counter1 = Meeting.objects.filter(
+        counter1 = Meeting.objects.filter(our_company=request.user.our_company,
             counter='by-kiosk').values('date', 'counter').annotate(count=Count("counter"))
 
-        counter2 = Meeting.objects.filter(
+        counter2 = Meeting.objects.filter(our_company=request.user.our_company,
             counter='by-dashboard').values('date', 'counter').annotate(count=Count("counter"))
 
-        counter3 = Meeting.objects.filter(
+        counter3 = Meeting.objects.filter(our_company=request.user.our_company,
             counter='not-check-in').values('date', 'counter').annotate(count=Count("counter"))
 
         delivery = Delivery.objects.filter(our_company=request.user.our_company).values(
@@ -404,7 +404,7 @@ def statusupdate(request, slug, id=None):
         instance = form.save(commit=False)
         status = form.cleaned_data.get("status")
         instance.save(update_fields=["status"])
-        sendnotification(request.user.email, id,status,visitor_name, visitor_profile_pic)
+        sendnotification.delay(request.user.email, id,status,visitor_name, visitor_profile_pic)
     else:
         form = StatusForm()
 
@@ -1060,7 +1060,7 @@ def analytics(request, slug):
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
 
-    colleagues = Meeting.objects.values(
+    colleagues = Meeting.objects.filter(our_company=request.user.our_company).values(
         'host').annotate(count=Count("host")).order_by('host')
 
     

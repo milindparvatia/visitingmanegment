@@ -28,7 +28,7 @@ def sendmail(subject, message, sender_email, receipient_email):
 def sendnotification(user_email, meeting_id, status, visitor_name, visitor_profile_pic):
     print("1")
     device = APNSDevice.objects.filter(name=user_email)
-    device.send_message("visitor "+visitor_name+" is arrived", thread_id="1",
+    return device.send_message("visitor "+visitor_name+" is arrived", thread_id="1",
                         extra={
                             "notification_type": "1",
                             "meeting_id": "1",
@@ -36,4 +36,3 @@ def sendnotification(user_email, meeting_id, status, visitor_name, visitor_profi
                             "visitor_name": visitor_name,
                             "visitor_profile_pic": visitor_profile_pic
                         })
-    return True

@@ -17,7 +17,7 @@ import os
 
 # Celery settings
 
-CELERY_BROKER_URL = 'amqp://admin:mypass@192.168.99.100:5673'
+CELERY_BROKER_URL = 'amqp://admin:mypass@rabbit:5672'
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
