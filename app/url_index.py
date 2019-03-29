@@ -20,8 +20,11 @@ router.register(r'device/gcm', GCMDeviceAuthorizedViewSet)
 schema_view = get_schema_view(title='Pastebin API')
 
 urlpatterns = [
+    url(r'^api/(?P<visitor_id>(\d+))/(?P<user_id>(\d+))/$',
+        views.MeetingFilter.as_view()),
     path('user_added/', views.user_added, name='user_added'),
     path('ListUsers/', views.ListUsers.as_view()),
+    path('Assistant/', views.AssistantApi.as_view()),
     path('schema/', schema_view),
     url(r'^api-token-auth/', obtain_jwt_token),
     url(r'^api-token-verify/', verify_jwt_token),

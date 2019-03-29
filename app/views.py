@@ -1,10 +1,11 @@
+from rest_framework import generics
 from push_notifications.models import APNSDevice
 from django.forms import formset_factory
 import numpy as np
 import pandas as pd
 from rest_framework.views import APIView
 import django
-from .tasks import add, sendmail,sendnotification
+from .tasks import add, sendmail, sendnotification, sendassistant
 import json
 from haystack.query import SearchQuerySet
 from itertools import chain
@@ -253,6 +254,43 @@ class MeetingViewSet(viewsets.ModelViewSet):
         return query_set
 
 
+class MeetingFilter(generics.ListAPIView):
+    serializer_class = MeetingSerializer
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        queryset = Meeting.objects.all()
+        visitor_id = self.kwargs['visitor_id']
+        user_id = self.kwargs['user_id']
+
+        if visitor_id is not None and user_id is not None:
+            queryset = queryset.filter(visitor_id=visitor_id, host=user_id)
+        return queryset
+
+
+class AssistantApi(APIView):
+    """
+    View to list all users in the system.
+
+    * Requires token authentication.
+    * Only admin users are able to access this view.
+    """
+    authentication_classes = [JSONWebTokenAuthentication,
+                              SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        """
+        Return a list of all users.
+        """
+        if request.method == 'POST':
+            print(request.data['email'])
+            sendassistant.delay(request.data['email'])
+        return Response({'Response':'notification have been sent to admin'})
+
 class DeliveryViewSet(viewsets.ModelViewSet):
     authentication_classes = [JSONWebTokenAuthentication,
                               SessionAuthentication, BasicAuthentication]
@@ -306,6 +344,7 @@ def register(request):
             company_instance = TheCompany.objects.create(name=company_name)
             instance.user_type = '3'
             instance.our_company = company_instance
+            instance.is_admin = True
             instance.save()
 
             user = authenticate(username=email, password=password)
@@ -432,21 +471,20 @@ def addmultiplevisit(request, id, slug):
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
     GroupVisitorFormSet = formset_factory(
-        GroupVisitorForm, extra=int(id)-1, max_num=10, min_num=1, validate_min=True)
+        GroupVisitorForm, extra=int(id)-1, max_num=10, min_num=int(id), validate_min=True)
     if request.method == 'POST':
         formset = GroupVisitorFormSet(request.POST, prefix='grpVisitor')
         if formset.is_valid():
             for form in formset:
+                print(form.empty_form())
                 if form.is_valid():
                     instance = form.save(commit=False)
-                    print(instance.full_name)
                     instance.our_company = request.user.our_company
-                    instance.save()
-                    messages.success(request, "Visitor " + instance.full_name + " saved successfully")
-                else:
-                    messages.error(request, "Database error. Please try again")
+                    instance.save()                
+            messages.success(request, "Visitors are saved successfully")
             return redirect('addmultipleMeeting', slug=slug)
         else:
+            messages.error(request, "Database error. Please try again")
             print('1')
     else:
         formset = GroupVisitorFormSet(prefix='grpVisitor')
@@ -472,7 +510,6 @@ def addmultipleMeeting(request, slug):
         if form1.is_valid() and form2.is_valid():   
             visitors = form1.cleaned_data['visitor']
             instance = form2.save(commit=False)
-            print(form2)
             for visitor in visitors:
                 instance.pk = None
                 instance.counter = 'not-check-in'
@@ -524,8 +561,8 @@ def addmultipleMeeting(request, slug):
             sender_email = EMAIL_HOST_USER
             receipient_email = visitor_email
 
-            # sendmail.delay(hostsubject, hostmessage, hostsender_email,hostreceipient_email)
-            # sendmail.delay(reciversubject, recivermessage,sender_email, receipient_email)
+            sendmail.delay(hostsubject, hostmessage, hostsender_email,hostreceipient_email)
+            sendmail.delay(reciversubject, recivermessage,sender_email, receipient_email)
             messages.success(request, "Meeting saved successfully")
         else:
             messages.error(request, "Database error. Please try again")
@@ -597,10 +634,10 @@ def addnewvisit(request, slug):
             messages.success(
                 request, "Successfully Create New Entry for "+name)
 
-            # sendmail.delay(hostsubject, hostmessage,
-            #             hostsender_email, hostreceipient_email)
-            # sendmail.delay(reciversubject, recivermessage,
-            #             sender_email, receipient_email)
+            sendmail.delay(hostsubject, hostmessage,
+                        hostsender_email, hostreceipient_email)
+            sendmail.delay(reciversubject, recivermessage,
+                        sender_email, receipient_email)
             print(form2.cleaned_data.get("location").id)
             instance2.our_company = request.user.our_company
             instance2.visitor_id = instance1.pk
@@ -667,10 +704,10 @@ def use_old_visit(request, slug, id):
             messages.success(
                 request, "Successfully Create New Entry for "+name)
 
-            # sendmail.delay(hostsubject, hostmessage,
-            #                hostsender_email, hostreceipient_email)
-            # sendmail.delay(reciversubject, recivermessage,
-            #                sender_email, receipient_email)
+            sendmail.delay(hostsubject, hostmessage,
+                           hostsender_email, hostreceipient_email)
+            sendmail.delay(reciversubject, recivermessage,
+                           sender_email, receipient_email)
 
             # add karvanu che mailing
 
@@ -906,8 +943,8 @@ def addnewhost(request, slug):
                 to_email = form.cleaned_data.get('email')
                 sender_email = EMAIL_HOST_USER
 
-                # sendmail.delay(mail_subject, message,
-                #                sender_email, to_email)
+                sendmail.delay(mail_subject, message,
+                               sender_email, to_email)
 
                 messages.success(
                     request, "Successfully Create New Entry for " + fname)
@@ -1237,7 +1274,6 @@ def viewuser(request, id, slug):
     image = request.user.profile_pic
 
     userData = User.objects.filter(id=id)
-
     instance = {
         'id': id,
         'userData': userData,
@@ -1252,7 +1288,7 @@ def edituser(request, id, slug):
     mapdata = request.user.our_company.location.all()
     image = request.user.profile_pic
 
-    user_instance = User.objects.get(id=id)
+    user_instance = User.objects.get(id=request.user.id)
 
     if request.method == 'POST':
         form = UserForm(request.POST or None,
@@ -1260,12 +1296,13 @@ def edituser(request, id, slug):
         if form.is_valid():
             form.save()
             instance = {
+                'id': id,
                 'image': image,
                 'form': form,
                 'slug': slug,
                 "map": mapdata,
             }
-            return render(request, 'account/profile/edit_user.html', instance)
+            return redirect('../', instance)
         else:
             print('eroor')
     else:
@@ -1289,6 +1326,7 @@ def password(request, slug, id):
         if form.is_valid():
             form.save()
             update_session_auth_hash(request, form.user)
+            return redirect('../', instance)
     else:
         form = PasswordChangeForm(user=request.user.id)
     instance = {

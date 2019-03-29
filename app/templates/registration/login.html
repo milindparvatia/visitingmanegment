@@ -24,13 +24,13 @@
             <div class="form-group">
                 {{form.password|as_crispy_field}}
             </div>
-            <button class="btn btn-primary" type="submit">Sign in</button>
+            <button class="btn btn-primary" type="submit">Login</button>
             <input type="hidden" name="next" value="{{next}}">
-            <a href="{% url 'register' %}" class="btn btn-dark">register</a>
+            <a href="{% url 'register' %}" class="btn btn-dark">Register</a>
         </form>
         {# Assumes you setup the password_reset view in your URLconf #}
         <br>
-        <p><a href="{% url 'password_reset' %}" class="btn btn-warning" role="button">Lost password?</a></p>
+        <p><a href="{% url 'password_reset' %}" class="btn btn-warning" role="button">Forgot Your Password?</a></p>
 
     </div>
     </form>

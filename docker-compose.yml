@@ -1,4 +1,5 @@
 version: "3.3"
+
 services:
   rabbit:
     hostname: rabbit
@@ -9,24 +10,49 @@ services:
     ports:
       - "5673:5672"
       - "15672:15672"
+    networks:
+      - nginx_network
+
   db:
     image: postgres:10-alpine
     ports:
       - "5432"
+    networks:  # <-- here
+      - nginx_network
+
   web:
     image: visitor
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
+    deploy:
+      restart_policy:
+        condition: on-failure
     ports:
       - "8000:8000"
     links:
       - rabbit
       - db
     depends_on:
+      - db
       - rabbit
       - migration
       - celery
+    networks:  # <-- here
+      - nginx_network
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "10080:80"
+      - "10443:443"
+    volumes:
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:  # <-- wait for djangoapp to be "ready" before starting this service
+      - web
+    networks:  # <-- here
+      - nginx_network
+
   migration:
     build: .
     image: visitor
@@ -37,11 +63,21 @@ services:
       - db
     depends_on:
       - db
+    networks:  # <-- here
+      - nginx_network
+
   celery:
     build: .
+    image: visitor
     command: celery -A projectvisitor worker -l info -E
     volumes:
       - .:/code
     depends_on:
       - db
       - rabbit
+    networks:  # <-- here
+      - nginx_network
+
+networks:  # <-- and here
+  nginx_network:
+    driver: bridge

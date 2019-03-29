@@ -24,7 +24,7 @@
 <div class="container">
     <div class="card mx-auto card-container w-50 p-5">
         <p id="profile-name" class="profile-name-card">
-            <h1 class="card-title">Create meeting with Old Visitor</h1>
+            <h1 class="card-title">Create Visit with Old Visitor</h1>
         </p>
         {% for ip in objects_all %}
         <form action="{% url 'useoldvisit' slug=slug id=ip.id %}" method="POST">

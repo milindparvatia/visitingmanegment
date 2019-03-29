@@ -80,9 +80,9 @@ class MyUserManager(BaseUserManager):
 
 
 USER_TYPE_CHOICES = (
-    ('1', 'secretary'),
-    ('2', 'receptionist'),
-    ('3', 'admin'),
+    ('1', 'Employees'),
+    ('2', 'Receptionist'),
+    ('3', 'Admin'),
 )
 
 
