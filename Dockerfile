@@ -5,6 +5,7 @@ RUN mkdir /code
 WORKDIR /code
 COPY . /code/
 
+# RUN chown -R ubuntu:ubuntu projectvisitor
 # Update the default application repository sources list
 RUN pip install -r requirements.txt
 # RUN sed $'s/\r$//' ./start.sh > ./start.Unix.sh

@@ -9,13 +9,14 @@
 {% block content %}
 <div class="container-fluid">
   <div class="row">
-    <nav class="col-md-1 d-xl-block bg-light sidebar">
-      <div class="sidebar-sticky" style="height:80vh;">
+    <nav class="bg-light sidebar" style="width: 70px;">
+      <div class="sidebar-sticky" style="height:90vh;">
         <ul class="nav flex-column">
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'logbook' %}active{% endif %}"
               href="{% url 'logbook' slug=slug %}">
-              <i class="material-icons" data-toggle="tooltip" data-placement="right" title="Log Book">people</i>
+
+              <i class="material-icons" data-toggle="tooltip" title="Log Book">people</i>
             </a>
           </li>
           <li class="nav-item">

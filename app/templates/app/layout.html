@@ -98,6 +98,10 @@
   </nav>
   {% block content %}{% endblock %}
   <script>
+
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip({ placement: 'right' });
+    })
     // Utils functions:
 
     function urlBase64ToUint8Array(base64String) {

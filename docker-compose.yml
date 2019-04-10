@@ -44,10 +44,11 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - "10080:80"
-      - "10443:443"
+      - "8080:80"
+      - "8443:443"
     volumes:
       - ./config/nginx/conf.d:/etc/nginx/conf.d
+      - .:/code
     depends_on:  # <-- wait for djangoapp to be "ready" before starting this service
       - web
     networks:  # <-- here

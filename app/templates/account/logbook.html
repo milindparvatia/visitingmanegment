@@ -39,15 +39,15 @@
             <th scope="col">DATE</th>
             <th scope="col"></th>
             <th scope="col">VISITOR</th>
-            <th scope="col">COMPANY</th>
+            <th scope="col">VISITOR EMAIL</th>
             <th scope="col">HOST NAME</th>
             <th scope="col">HOST EMAIL</th>
             <th scope="col">HOST MOBILE</th>
-            <th scope="col">EMAIL</th>
-            <th scope="col">MOBILE</th>
-            <th scope="col">LICENSEPLATE</th>
-            <th scope="col">ABOUT</th>
-            <th scope="col">COMMENT</th>
+            <th scope="col">VISITOR COMPANY</th>
+            <th scope="col">VISITOR MOBILE</th>
+            <th scope="col">VISITOR LICENSEPLATE</th>
+            <th scope="col">VISITOR ABOUT</th>
+            <th scope="col">VISITOR COMMENT</th>
           </tr>
         </thead>
         <tbody>
@@ -85,7 +85,7 @@
               {% for data in ip.visitor.full_name%}{{ data }}{% endfor%}
             </td>
             <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
-              {% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
+              {% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
 
             <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
               <div style="width: 120px;">
@@ -98,7 +98,8 @@
               {% for data in ip.host.all %}{{ data.mobile }}<br>{%endfor %}</td>
 
             <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
-              {% for data in ip.visitor.email %}{{ data }}{% endfor %}</td>
+              {% for data in ip.visitor.company_name %}{{ data }}{% endfor %}</td>
+
             <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
               {% for data in ip.visitor.mobile %}{{ data }}{% endfor %}</td>
             <td class="clickable" data-toggle="modal" data-target="#{{ip.id}}">
@@ -155,16 +156,18 @@
                       <div class="container">
                         <div class="row list-group list-group-flush">
                           <div class="col">
-                            <div class="row list-group-item">{% for data in ip.host.all %}{{ data }}{%endfor %}</div>
-                            <div class="row list-group-item">{% for data in ip.visitor.email %}{{ data }}{% endfor %}
+                            <div class="row list-group-item">Host: {% for data in ip.host.all %}{{ data }}{%endfor %}
                             </div>
-                            <div class="row list-group-item">{% for data in ip.visitor.mobile %}{{ data }}{% endfor %}
+                            <div class="row list-group-item">Visitor Email:
+                              {% for data in ip.visitor.email %}{{ data }}{% endfor %}
                             </div>
-                            <div class="row list-group-item">
+                            <div class="row list-group-item">Visitor Licenseplate:
                               {% for data in ip.visitor.licenseplate %}{{ data }}{% endfor %}</div>
-                            <div class="row list-group-item">{% for data in ip.visitor.about %}{{ data }}{% endfor %}
+                            <div class="row list-group-item">About:
+                              {% for data in ip.visitor.about %}{{ data }}{% endfor %}
                             </div>
-                            <div class="row list-group-item">{% for data in ip.visitor.comment %}{{ data }}{% endfor %}
+                            <div class="row list-group-item">Comment:
+                              {% for data in ip.visitor.comment %}{{ data }}{% endfor %}
                             </div>
                           </div>
                         </div>

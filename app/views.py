@@ -267,7 +267,8 @@ class MeetingFilter(generics.ListAPIView):
         user_id = self.kwargs['user_id']
 
         if visitor_id is not None and user_id is not None:
-            queryset = queryset.filter(visitor_id=visitor_id, host=user_id)
+            queryset = queryset.filter(
+                visitor_id=visitor_id, host=user_id, date=django.utils.timezone.now())
         return queryset
 
 
@@ -476,7 +477,6 @@ def addmultiplevisit(request, id, slug):
         formset = GroupVisitorFormSet(request.POST, prefix='grpVisitor')
         if formset.is_valid():
             for form in formset:
-                print(form.empty_form())
                 if form.is_valid():
                     instance = form.save(commit=False)
                     instance.our_company = request.user.our_company

@@ -38,7 +38,7 @@ SECRET_KEY = '#k#8#t7zz-iqji_2dfoa^rca1_#8+xi7z2^tdvbgzz(_3xw&4s'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0','52.66.203.115']
 
 # Application definition
 
@@ -254,5 +254,3 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 AUTH_USER_MODEL = 'app.User'
-
-django_heroku.settings(locals())

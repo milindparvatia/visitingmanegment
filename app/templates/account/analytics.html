@@ -11,7 +11,11 @@
 
 <div class="col-11 mx-auto">
   <div class="row">
-    <h5>How busy is your reception?</h5>
+    <h5>How busy is your reception
+      <i class="material-icons" data-toggle="tooltip" title="Shows total number of people visited for meeting">
+        help_outline
+      </i>
+    </h5>
     <div class="jumbotron">
       <div class="row">
       </div>
@@ -20,7 +24,12 @@
     </div>
   </div>
   <div class="row">
-    <h5>How many visitors per month?</h5>
+    <h5>How many visitors per month
+      <i class="material-icons" data-toggle="tooltip" title="Shows total number of people registered for meeting">
+        help_outline
+      </i>
+    </h5>
+    </h5>
     <div class="jumbotron">
       <div class="row">
         <div id="myDiv2" style="width:1050px;height:400px;"></div>
@@ -28,7 +37,12 @@
     </div>
   </div>
   <div class="row">
-    <h5>Do your colleagues pre-register visitors?</h5>
+    <h5>Do your colleagues pre-register visitors
+      <i class="material-icons" data-toggle="tooltip" title="Shows if meeting are pre-registered or not">
+        help_outline
+      </i>
+    </h5>
+    </h5>
     <div class="jumbotron">
       <div class="row">
         <div id="myDiv3" style="width:1050px;height:400px;"></div>
@@ -36,7 +50,13 @@
     </div>
   </div>
   <div class="row">
-    <h5>Who hosts the most visits?</h5>
+    <h5>Who hosts the most visits
+      <i class="material-icons" data-toggle="tooltip"
+        title="Shows which colleagues, host how much percentage of meeting">
+        help_outline
+      </i>
+    </h5>
+    </h5>
     <div class="jumbotron">
       <div class="row">
         <div style="width:1050px;">
@@ -71,7 +91,12 @@
     </div>
   </div>
   <div class="row">
-    <h5>Who Has the most Delivery?</h5>
+    <h5>Who Has the most Delivery
+      <i class="material-icons" data-toggle="tooltip" title="Shows total number of Delivery users have">
+        help_outline
+      </i>
+    </h5>
+    </h5>
     <div class="jumbotron">
       <div class="row">
       </div>
@@ -84,6 +109,9 @@
 </div>
 <script>
   {% block jquery %}
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip({ placement: 'right' });
+  })
   var endpoint1 = '/ListUsers/'
   var defaultData1 = [];
 

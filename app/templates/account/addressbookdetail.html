@@ -94,17 +94,7 @@
                 {% for ip in objects_all %}
                 <tr>
                   <td>
-                    <form style="width: 180px;" action="../statusupdate/{{ip.id}}/" class="form-inline" id="updateForm"
-                      method="POST">
-                      {% csrf_token %}
-                      <select name="{{ form1.status.name }}" class="form-control" id="{{ip.id}}">
-                        <option value="{{ choice.0 }}">{{ ip.status }}</option>
-                        {% for choice in form1.status.field.choices %}
-                        <option value="{{ choice.0 }}">{{ choice.0 }}</option>
-                        {% endfor %}
-                      </select>
-                      <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
+                    {{ ip.status }}
                   </td>
                   <td>
                     <div style="width: 100px;">{{ip.start_time}}</div>
