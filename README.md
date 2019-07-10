@@ -9,4 +9,4 @@
 3.2 python manage.py migrate
 4.  python manage.py runserver
 
-### any new feuture request will be apriciated.
+### any new feature request will be apriciated.
