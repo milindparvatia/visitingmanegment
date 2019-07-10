@@ -34,11 +34,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '#k#8#t7zz-iqji_2dfoa^rca1_#8+xi7z2^tdvbgzz(_3xw&4s'
+SECRET_KEY = ''
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0','52.66.203.115']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -65,9 +65,9 @@ SITE_ID = 1
 
 PUSH_NOTIFICATIONS_SETTINGS = {
     "APNS_CERTIFICATE": os.path.join(BASE_DIR, "Visitor_dev.pem"),
-    "APNS_TOPIC": "com.vethics.visitorAdmin",
+    "APNS_TOPIC": "###",
     "WP_PRIVATE_KEY": os.path.join(BASE_DIR, "private_key.pem"),
-    "WP_CLAIMS":  {'sub': "mailto: milind1997@gmail.com"},
+    "WP_CLAIMS":  {'sub': "mailto: ###"},
 }
 
 # JWT settings
@@ -149,9 +149,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'demo.vethics@gmail.com'
-EMAIL_HOST_PASSWORD = '9116597096'
-DEFAULT_FROM_EMAIL = 'Vethic Team <noreply@example.com>'
+EMAIL_HOST_USER = '###'
+EMAIL_HOST_PASSWORD = '###'
+DEFAULT_FROM_EMAIL = '###'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
