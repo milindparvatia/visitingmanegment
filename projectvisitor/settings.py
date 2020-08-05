@@ -254,3 +254,5 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 AUTH_USER_MODEL = 'app.User'
+
+django_heroku.settings(locals())
